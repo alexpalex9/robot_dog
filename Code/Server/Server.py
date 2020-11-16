@@ -98,6 +98,7 @@ class Server:
     def __init__(self):
         
         self.tcp_flag=False
+        """
         self.led=Led()
         self.servo=Servo()
         self.adc=ADS7830()
@@ -106,6 +107,7 @@ class Server:
         self.sonic=Ultrasonic()
         self.control.Thread_conditiona.start()
         self.battery_voltage=[8.4,8.4,8.4,8.4,8.4]
+        """
     def get_interface_ip(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         return socket.inet_ntoa(fcntl.ioctl(s.fileno(),
