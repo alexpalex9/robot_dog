@@ -109,12 +109,13 @@ class Server:
     class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
         allow_reuse_address = True
         daemon_threads = True
-        def get_interface_ip(self):
-            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            return socket.inet_ntoa(fcntl.ioctl(s.fileno(),
-                                                0x8915,
-                                                struct.pack('256s',b'wlan0'[:15])
-                                                )[20:24])
+        
+    def get_interface_ip(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        return socket.inet_ntoa(fcntl.ioctl(s.fileno(),
+                                            0x8915,
+                                            struct.pack('256s',b'wlan0'[:15])
+                                            )[20:24])
                 
     def turn_on_server(self):
         #ip adress
