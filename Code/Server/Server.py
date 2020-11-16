@@ -129,8 +129,8 @@ class Server:
             camera.start_recording(self.output, format='mjpeg')
             try:
                 address = ('', 8000)
-                server = StreamingServer(address, StreamingHandler)
-                server.serve_forever()
+                self.server_stream = StreamingServer(address, StreamingHandler)
+                self.server_stream.serve_forever()
             finally:
                 camera.stop_recording()
         
@@ -151,7 +151,7 @@ class Server:
     def reset_server(self):
         self.turn_off_server()
         self.turn_on_server()
-        self.video=threading.Thread(target=self.transmission_video)
+        self.video = threading.Thread(target=self.transmission_video)
         self.instruction=threading.Thread(target=self.receive_instruction)
         self.video.start()
         self.instruction.start()
@@ -161,40 +161,6 @@ class Server:
             #print("send",data)
         except Exception as e:
             print(e)
-    def transmission_video(self):
-        try:
-            self.connection,self.client_address = self.server_socket.accept()
-            self.connection=self.connection.makefile('wb')
-        except:
-            pass
-        self.server_socket.close()
-        try:
-            with picamera.PiCamera() as camera:
-                camera.resolution = (400,300)       # pi camera resolution
-                camera.framerate = 15               # 15 frames/sec
-                camera.saturation = 80              # Set image video saturation
-                camera.brightness = 50              # Set the brightness of the image (50 indicates the state of white balance)
-                start = time.time()
-                stream = io.BytesIO()
-                # send jpeg format video stream
-                print ("Start transmit ... ")
-                for foo in camera.capture_continuous(stream, 'jpeg', use_video_port = True):
-                    try:
-                        self.connection.flush()
-                        stream.seek(0)
-                        b = stream.read()
-                        lengthBin = struct.pack('L', len(b))
-                        self.connection.write(lengthBin)
-                        self.connection.write(b)
-                        stream.seek(0)
-                        stream.truncate()
-                    except BaseException as e:
-                        #print (e)
-                        print ("End transmit ... " )
-                        break
-        except BaseException as e:
-            #print(e)
-            print ("Camera unintall")
             
     def measuring_voltage(self,connect):
         try:
@@ -304,5 +270,9 @@ class Server:
         
 
 if __name__ == '__main__':
-    pass
+    s = Server()
+    s.turn_on_server()
+    instruction = threading.Thread(target = s.receive_instruction)
+    instruction.start()
+    #pass
     
