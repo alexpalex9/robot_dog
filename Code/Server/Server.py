@@ -105,7 +105,7 @@ class Server:
             else:
                 self.send_error(404)
                 self.end_headers()
-    
+        
     class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
         allow_reuse_address = True
         daemon_threads = True
@@ -115,6 +115,7 @@ class Server:
                                                 0x8915,
                                                 struct.pack('256s',b'wlan0'[:15])
                                                 )[20:24])
+                
     def turn_on_server(self):
         #ip adress
         HOST = self.get_interface_ip()
