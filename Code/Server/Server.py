@@ -129,7 +129,11 @@ class Server:
         #self.server_socket.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEPORT,1)
         #self.server_socket.bind((HOST, 8001))              
         #self.server_socket.listen(1)
-        
+        self.server_socket1 = socket.socket()
+        self.server_socket1.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEPORT,1)
+        self.server_socket1.bind((HOST, 5001))
+        self.server_socket1.listen(1)
+        print('Server address: '+HOST)
         
         with picamera.PiCamera(resolution='640x480', framerate=24) as camera:
             #output = StreamingOutput()
@@ -146,11 +150,7 @@ class Server:
                 camera.stop_recording()
         
         #Port 5000 is used for instruction sending and receiving
-        self.server_socket1 = socket.socket()
-        self.server_socket1.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEPORT,1)
-        self.server_socket1.bind((HOST, 5001))
-        self.server_socket1.listen(1)
-        print('Server address: '+HOST)
+        
         
     def turn_off_server(self):
         try:
@@ -206,7 +206,7 @@ class Server:
         while True:
             try:
                 allData=self.connection1.recv(1024).decode('utf-8')
-                #print(allData)
+                print("receive data = ",allData)
             except:
                 if self.tcp_flag:
                     if max(self.battery_voltage) > 6.4:
@@ -283,6 +283,7 @@ class Server:
 if __name__ == '__main__':
     s = Server()
     s.turn_on_server()
+    s.tcp_flag=True
     instruction = threading.Thread(target = s.receive_instruction)
     instruction.start()
     #pass
