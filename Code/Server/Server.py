@@ -147,6 +147,7 @@ class Server:
                 self.video = threading.Thread(target=self.server_stream.serve_forever)
                 self.video.daemon = True
                 self.video.start()
+                print("camera served")
             finally:
                 print("end server")
                 # when turn off
