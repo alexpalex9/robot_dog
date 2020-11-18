@@ -140,7 +140,7 @@ class Server:
             camera.start_recording(output, format='mjpeg')
             try:
                 address = ('', 8000)
-                self.server_stream = StreamingServer(address, self.StreamingHandler)
+                self.server_stream = StreamingServer(address, StreamingHandler)
                 self.server_stream.serve_forever()
             finally:
                 camera.stop_recording()
