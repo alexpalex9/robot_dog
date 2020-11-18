@@ -144,7 +144,9 @@ class Server:
                 address = ('', 8000)
                 self.server_stream = StreamingServer(address, StreamingHandler)
                 #self.server_stream.serve_forever()
-                self.video = threading.Thread(target=self.server_stream.serve_forever).start()
+                self.video = threading.Thread(target=self.server_stream.serve_forever)
+                self.video.daemon = True
+                self.video.start()
             finally:
                 print("end server")
                 # when turn off
