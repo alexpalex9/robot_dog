@@ -144,10 +144,10 @@ class Server:
         try:
             address = ('', 8000)
             self.server_stream = StreamingServer(address, StreamingHandler)
-            self.server_stream.serve_forever()
-            #self.video = threading.Thread(target=self.server_stream.serve_forever)
-            #self.video.daemon = True
-            #self.video.start()
+            #self.server_stream.serve_forever()
+            self.video = threading.Thread(target=self.server_stream.serve_forever)
+            self.video.daemon = True
+            self.video.start()
             print("camera served")
         finally:
             print("end server")
