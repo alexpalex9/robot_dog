@@ -135,23 +135,24 @@ class Server:
         self.server_socket1.listen(1)
         print('Server address: '+HOST)
         
-        with picamera.PiCamera(resolution='640x480', framerate=24) as camera:
+        self.camera = picamera.PiCamera(resolution='640x480', framerate=24)
+        #with picamera.PiCamera(resolution='640x480', framerate=24) as camera:
             #output = StreamingOutput()
             #Uncomment the next line to change your Pi's Camera rotation (in degrees)
             #camera.rotation = 90
-            camera.start_recording(output, format='mjpeg')
-            try:
-                address = ('', 8000)
-                self.server_stream = StreamingServer(address, StreamingHandler)
-                #self.server_stream.serve_forever()
-                self.video = threading.Thread(target=self.server_stream.serve_forever)
-                self.video.daemon = True
-                self.video.start()
-                print("camera served")
-            finally:
-                print("end server")
-                # when turn off
-                #camera.stop_recording()
+        self.camera.start_recording(output, format='mjpeg')
+        try:
+            address = ('', 8000)
+            self.server_stream = StreamingServer(address, StreamingHandler)
+            self.server_stream.serve_forever()
+            #self.video = threading.Thread(target=self.server_stream.serve_forever)
+            #self.video.daemon = True
+            #self.video.start()
+            print("camera served")
+        finally:
+            print("end server")
+            # when turn off
+            #camera.stop_recording()
         
         #Port 5000 is used for instruction sending and receiving
         
