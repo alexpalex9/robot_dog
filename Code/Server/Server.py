@@ -265,8 +265,9 @@ class Server:
                         command=cmd.CMD_WORKING_TIME+'#'+str(round(self.control.move_count))+'#'+str(0)+"\n"
                     self.send_data(self.connection1,command)
                 else:
-                    self.control.order=data
-                    self.control.timeout=time.time()
+                    print("will pass that for test")
+                    #self.control.order=data
+                    #self.control.timeout=time.time()
 
         try:    
             stop_thread(thread_power)
