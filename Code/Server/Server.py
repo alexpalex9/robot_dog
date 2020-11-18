@@ -144,9 +144,11 @@ class Server:
                 address = ('', 8000)
                 self.server_stream = StreamingServer(address, StreamingHandler)
                 #self.server_stream.serve_forever()
-                threading.Thread(target=self.server_stream.serve_forever).start()
+                self.video = threading.Thread(target=self.server_stream.serve_forever).start()
             finally:
-                camera.stop_recording()
+                print("end server")
+                # when turn off
+                #camera.stop_recording()
         
         #Port 5000 is used for instruction sending and receiving
         
