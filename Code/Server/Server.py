@@ -143,7 +143,8 @@ class Server:
             try:
                 address = ('', 8000)
                 self.server_stream = StreamingServer(address, StreamingHandler)
-                self.server_stream.serve_forever()
+                #self.server_stream.serve_forever()
+                threading.Thread(target=self.server_stream.serve_forever).start()
             finally:
                 camera.stop_recording()
         
