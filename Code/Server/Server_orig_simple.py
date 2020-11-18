@@ -215,5 +215,12 @@ class Server:
         
 
 if __name__ == '__main__':
-    pass
+    server=Server()
+    server.turn_on_server()
+    server.tcp_flag=True
+    video=threading.Thread(target=self.server.transmission_video)
+    video.start()
+    instruction=threading.Thread(target=self.server.receive_instruction)
+    instruction.start()
+    #pass
     
