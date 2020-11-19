@@ -22,7 +22,7 @@ from threading import Condition
 from http import server
 
 
-
+        
 class StreamingOutput(object):
     def __init__(self):
         self.frame = None
@@ -49,11 +49,21 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.send_response(301)
             self.send_header('Location', '/index.html')
             self.end_headers()
-        elif self.path == '/icon.png':
-            self.send_header('Content-Type', 'img/html')
-            self.send_header('Content-Length', len(content))
+        if self.path.endswith('.css'):
+            self.send_response(200)
+            self.send_header("Content-type", "text/css")
+            self.end_headers()
+            dest = self.path.replace("/", "")
+            self.wfile.write(dest)
+        if self.path == "/icon.png":
+            with open('./../../Picture/icon.png',"rb") as file:
+                icon = file.read()
+            self.send_response(200)
+            self.send_header("Content-type", "image/jpeg")
+            self.end_headers()
+            self.wfile.write(icon)
         elif self.path == '/index.html':
-            with open('index.html', 'r') as file:
+            with open('view/index.html', 'r') as file:
                 PAGE = file.read().replace('\n', '')
             content = PAGE.encode('utf-8')
             self.send_response(200)
@@ -189,6 +199,7 @@ class Server:
             self.connection1.close()
             if self.webUI:
                 self.camera.stop_recording()
+                self.server_stream.shutdown()
                 # make server_stream close?
                 #self.server_close()
             else:
