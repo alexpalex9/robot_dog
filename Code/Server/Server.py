@@ -191,6 +191,8 @@ class Server:
                 self.camera.stop_recording()
                 # make server_stream close?
                 #self.server_close()
+            else:
+                self.connection.close()
 
         except :
             print ('\n'+"No client connection")
