@@ -27,13 +27,12 @@ PAGE="""\
 <title>Raspberry Pi - Surveillance Camera</title>
 </head>
 <body>
-<center><h1>Raspberry Pi - robot dog Camera</h1></center>
+<center><h1>Raspberry Pi - Surveillance Camera</h1></center>
 <center><img src="stream.mjpg" width="640" height="480"></center>
 </body>
 </html>
 """
-with open('index.html', 'r') as file:
-    PAGE = file.read().replace('\n', '')
+
 
 class StreamingOutput(object):
     def __init__(self):
@@ -52,13 +51,10 @@ class StreamingOutput(object):
             self.buffer.seek(0)
         return self.buffer.write(buf)
 
-# TODO: try to place output object into the Server Class
 output = StreamingOutput()
 
+
 class StreamingHandler(server.BaseHTTPRequestHandler):
-    # TO : move this in Server
-    # def __init(self,output):
-    #    
     def do_GET(self):
         if self.path == '/':
             self.send_response(301)
@@ -101,15 +97,11 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
 class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
     allow_reuse_address = True
     daemon_threads = True
-
-
-        
-        
+    
 class Server:
-    def __init__(self,webUI=True):
+    def __init__(self):
         
         self.tcp_flag=False
-        self.webUI = webUI
         """
         self.led=Led()
         self.servo=Servo()
@@ -128,80 +120,47 @@ class Server:
                                             0x8915,
                                             struct.pack('256s',b'wlan0'[:15])
                                             )[20:24])
-    def transmission_video(self):
-        if self.webUI:
-            self.camera = picamera.PiCamera(resolution='640x480', framerate=24)
-            self.camera.start_recording(output, format='mjpeg')
-            self.server_stream.serve_forever()
-            #self.camera = picamera.PiCamera(resolution='400x300', framerate=15)
-        else:
-            try:
-                self.connection,self.client_address = self.server_socket.accept()
-                self.connection=self.connection.makefile('wb')
-            except:
-                pass
-            self.server_socket.close()
-            try:
-                with picamera.PiCamera() as camera:
-                    camera.resolution = (400,300)       # pi camera resolution
-                    camera.framerate = 15               # 15 frames/sec
-                    camera.saturation = 80              # Set image video saturation
-                    camera.brightness = 50              # Set the brightness of the image (50 indicates the state of white balance)
-                    start = time.time()
-                    stream = io.BytesIO()
-                    # send jpeg format video stream
-                    print ("Start transmit ... ")
-                    for foo in camera.capture_continuous(stream, 'jpeg', use_video_port = True):
-                        try:
-                            self.connection.flush()
-                            stream.seek(0)
-                            b = stream.read()
-                            lengthBin = struct.pack('L', len(b))
-                            self.connection.write(lengthBin)
-                            self.connection.write(b)
-                            stream.seek(0)
-                            stream.truncate()
-                        except BaseException as e:
-                            #print (e)
-                            print ("End transmit ... " )
-                            break
-            except BaseException as e:
-                #print(e)
-                print ("Camera unintall")
 
-    def serve_forever(self):
-        """Handle one request at a time until doomsday."""
-        while 1:
-            self.handle_request()
-            
     def turn_on_server(self):
         #ip adress
         HOST = self.get_interface_ip()
-        if self.webUI:
-            address = ('', 8000)
-            self.server_stream = StreamingServer(address, StreamingHandler)        
-        else:
-            #Port 8000 for video transmission
-            self.server_socket = socket.socket()
-            self.server_socket.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEPORT,1)
-            self.server_socket.bind((HOST, 8001))              
-            self.server_socket.listen(1)
+        #Port 8000 for video transmission
+        #self.server_socket = socket.socket()
+        #self.server_socket.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEPORT,1)
+        #self.server_socket.bind((HOST, 8001))              
+        #self.server_socket.listen(1)
         self.server_socket1 = socket.socket()
         self.server_socket1.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEPORT,1)
         self.server_socket1.bind((HOST, 5001))
         self.server_socket1.listen(1)
         print('Server address: '+HOST)
         
+        self.camera = picamera.PiCamera(resolution='640x480', framerate=24)
+        #with picamera.PiCamera(resolution='640x480', framerate=24) as camera:
+            #output = StreamingOutput()
+            #Uncomment the next line to change your Pi's Camera rotation (in degrees)
+            #camera.rotation = 90
+        self.camera.start_recording(output, format='mjpeg')
+        try:
+            address = ('', 8000)
+            self.server_stream = StreamingServer(address, StreamingHandler)
+            #self.server_stream.serve_forever()
+            self.video = threading.Thread(target=self.server_stream.serve_forever)
+            self.video.daemon = True
+            self.video.start()
+            print("camera served")
+        finally:
+            print("end server")
+            # when turn off
+            #camera.stop_recording()
+        
+        #Port 5000 is used for instruction sending and receiving
+        
         
     def turn_off_server(self):
         try:
-            #self.connection.close()
+            self.connection.close()
             self.connection1.close()
-            if self.webUI:
-                self.camera.stop_recording()
-                # make server_stream close?
-                #self.server_close()
-
         except :
             print ('\n'+"No client connection")
     
@@ -209,7 +168,7 @@ class Server:
         self.turn_off_server()
         self.turn_on_server()
         self.video = threading.Thread(target=self.transmission_video)
-        self.instruction = threading.Thread(target=self.receive_instruction)
+        self.instruction=threading.Thread(target=self.receive_instruction)
         self.video.start()
         self.instruction.start()
     def send_data(self,connect,data):
@@ -333,7 +292,5 @@ if __name__ == '__main__':
     s.tcp_flag=True
     instruction = threading.Thread(target = s.receive_instruction)
     instruction.start()
-    video=threading.Thread(target=s.transmission_video)
-    video.start()
     #pass
     
