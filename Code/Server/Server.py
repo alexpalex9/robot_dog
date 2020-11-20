@@ -54,7 +54,13 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.send_header("Content-type", "text/css")
             self.end_headers()
             dest = self.path.replace("/", "")
-            self.wfile.write(dest)
+            self.wfile.write('views/' + dest)
+        if self.path.endswith('.js'):
+            self.send_response(200)
+            self.send_header("Content-type", "text/script")
+            self.end_headers()
+            dest = self.path.replace("/", "")
+            self.wfile.write('views/' + dest)
         if self.path == "/icon.png":
             with open('./../../Picture/icon.png',"rb") as file:
                 icon = file.read()
