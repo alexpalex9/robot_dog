@@ -41,5 +41,5 @@
            }
         setTimeout(draw,1000,video,context,width,height);
     }
-	draw(video, context,640,480);
+	draw(video, canvas,640,480);
 })();
