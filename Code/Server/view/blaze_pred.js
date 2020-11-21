@@ -19,7 +19,7 @@
 		// console.log(predictions)
           if (predictions.length > 0)
           {
-           console.log("predictin found",predictions);
+           console.log("prediction found",predictions);
            for (let i = 0; i < predictions.length; i++) {
            const start = predictions[i].topLeft;
            const end = predictions[i].bottomRight;
@@ -39,7 +39,7 @@
            context.fillText(text,start[0]+5,start[1]+20);
             }
            }
-        setTimeout(draw,1000,video,context,width,height);
+        setTimeout(draw,2000,video,canvas,width,height);
     }
 	draw(video, canvas,640,480);
 })();

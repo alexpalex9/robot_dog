@@ -57,14 +57,14 @@ var init = function(){
 	setInterval(function(){ joy2X.value=Joy2.GetX(); }, 50);
 	setInterval(function(){ joy2Y.value=Joy2.GetY(); }, 50);
 
-	var joy3Param = { "title": "joystick3" };
-	var Joy3 = new JoyStick('joy3Div', joy3Param);
+	// var joy3Param = { "title": "joystick3" };
+	// var Joy3 = new JoyStick('joy3Div', joy3Param);
 
-	var joy3IinputPosX = document.getElementById("joy3PosizioneX");
-	var joy3InputPosY = document.getElementById("joy3PosizioneY");
-	var joy3Direzione = document.getElementById("joy3Direzione");
-	var joy3X = document.getElementById("joy3X");
-	var joy3Y = document.getElementById("joy3Y");
+	// var joy3IinputPosX = document.getElementById("joy3PosizioneX");
+	// var joy3InputPosY = document.getElementById("joy3PosizioneY");
+	// var joy3Direzione = document.getElementById("joy3Direzione");
+	// var joy3X = document.getElementById("joy3X");
+	// var joy3Y = document.getElementById("joy3Y");
 
 	setInterval(function(){ joy3IinputPosX.value=Joy3.GetPosX(); }, 50);
 	setInterval(function(){ joy3InputPosY.value=Joy3.GetPosY(); }, 50);
