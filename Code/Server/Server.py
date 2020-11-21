@@ -54,18 +54,18 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.send_response(301)
             self.send_header('Location', 'text/javascript')
             self.end_headers()
-        elif self.path.endswith('.css'):
-            self.send_response(200)
-            self.send_header("Content-type", "text/css")
-        elif self.path.endswith('.js'):
+        elif self.path.endswith('.js') or self.path.endswith('.css'):
             self.send_response(200)
             self.send_header("Content-type", "text/javascript")
             self.end_headers()
             dest = './view/' + self.path.replace("/", "")
             print("dest = ",dest)
-            file = open(dest,"rb").read()
-            self.wfile.write(file)
-            
+            try:
+                file = open(dest,"rb").read()
+                self.wfile.write(file)
+            except:
+                self.send_error(404)
+                self.end_headers()
         elif self.path == "/icon.png":
             with open('./../../Picture/icon.png',"rb") as file:
                 icon = file.read()
