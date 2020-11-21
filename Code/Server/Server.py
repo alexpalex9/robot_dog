@@ -45,23 +45,28 @@ output = StreamingOutput()
 
 class StreamingHandler(server.BaseHTTPRequestHandler):
     def do_GET(self):
+        print("GET request",self.path)
         if self.path == '/':
             self.send_response(301)
             self.send_header('Location', '/index.html')
             self.end_headers()
-        if self.path.endswith('.css'):
+        if self.path.find('/cmd')>=0:
+            self.send_response(301)
+            self.send_header('Location', 'text/javascript')
+            self.end_headers()
+        elif self.path.endswith('.css'):
             self.send_response(200)
             self.send_header("Content-type", "text/css")
-            self.end_headers()
-            dest = self.path.replace("/", "")
-            self.wfile.write('views/' + dest)
-        if self.path.endswith('.js'):
+        elif self.path.endswith('.js'):
             self.send_response(200)
-            self.send_header("Content-type", "text/script")
+            self.send_header("Content-type", "text/javascript")
             self.end_headers()
-            dest = self.path.replace("/", "")
-            self.wfile.write('views/' + dest)
-        if self.path == "/icon.png":
+            dest = './view/' + self.path.replace("/", "")
+            print("dest = ",dest)
+            file = open(dest,"rb").read()
+            self.wfile.write(file)
+            
+        elif self.path == "/icon.png":
             with open('./../../Picture/icon.png',"rb") as file:
                 icon = file.read()
             self.send_response(200)
