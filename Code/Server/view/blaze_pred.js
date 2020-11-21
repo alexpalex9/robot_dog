@@ -1,6 +1,5 @@
 (function() {
     var canvas = document.getElementById('canvas'),
-        context = canvas.getContext('2d'),
         video = document.getElementById('webcam');
 
 	// setInterval(function(){
@@ -10,12 +9,13 @@
 
 
 
-    async function draw(video,context, width, height)
+    async function draw(video,canvas, width, height)
     {
         // context.drawImage(video,0,0,width,height);
         const model = await blazeface.load();
         const returnTensors = false;
         const predictions = await model.estimateFaces(document.getElementById("webcam"), returnTensors);
+		var context = canvas.getContext('2d')
 		// console.log(predictions)
           if (predictions.length > 0)
           {
@@ -26,6 +26,7 @@
            var probability = predictions[i].probability;
            const size = [end[0] - start[0], end[1] - start[1]];
            // Render a rectangle over each detected face.
+		   context.clearRect(0, 0, canvas.width, canvas.height);
            context.beginPath();
            context.strokeStyle="green";
            context.lineWidth = "4";
