@@ -71,6 +71,22 @@ a:active{
 color:grey;
 background: #3C3C3C;
 }
+
+#videoContainer {
+    width:640px;
+	position:relative;
+    /*background-image: url(load1.gif);*/
+    text-align: left;
+    border:480px;
+    margin:0 auto;
+}
+#canvas{
+	position:absolute;
+	top:0;
+	left:0;
+}
+
+
 		</style>
 		
 		
@@ -80,6 +96,15 @@ background: #3C3C3C;
 	<img src='/icon.png' style="height:100px"></img> Raspberry Pi robot dog Freenove
 	</h1>
 	<center><img src="stream.mjpg" width="640" height="480"></center>
+	<div id="videoContainer">
+    <!-- <video id="webcam" width="640" height="480" autoplay style="display:none" ></video>     -->
+	<img id="webcam" crossorigin width="640" height="480" src="stream.mjpg" ></img>
+	<!-- <img id="webcam" crossorigin width="640" height="480" src="https://i.imgur.com/PBfpKi5.jpeg" ></img> -->
+	<canvas id="canvas" width="640" height="480" ></canvas>
+		
+    </div>
+	
+	
 	<a class="cmd" value="test" >TEST</a>
 	
 		<!-- Example of FIXED or ABSOLUTE position -->
@@ -123,4 +148,5 @@ The left JoyStick (in red square) is an example that use default parametrs, the 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 		<script src="joy.min.js"></script>
 		<script src="main.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface"></script>
 </html>
