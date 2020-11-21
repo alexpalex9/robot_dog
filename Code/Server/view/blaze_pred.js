@@ -16,6 +16,7 @@
         const returnTensors = false;
         const predictions = await model.estimateFaces(document.getElementById("webcam"), returnTensors);
 		var context = canvas.getContext('2d')
+		context.clearRect(0, 0, canvas.width, canvas.height);
 		// console.log(predictions)
           if (predictions.length > 0)
           {
