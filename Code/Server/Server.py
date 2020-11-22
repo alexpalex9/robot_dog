@@ -347,6 +347,7 @@ class Server:
                 command=cmd.CMD_WORKING_TIME+'#'+str(round(self.control.move_count))+'#'+str(0)+"\n"
             self.send_data(client,command)
             '''
+            
             return True
         else:
             print("will pass that for test")
