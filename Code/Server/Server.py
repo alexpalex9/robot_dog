@@ -43,70 +43,83 @@ class StreamingOutput(object):
 # TODO: try to place output object into the Server Class
 output = StreamingOutput()
 
-class StreamingHandler(server.BaseHTTPRequestHandler):
-    def do_GET(self):
-        print("GET request",self.path)
-        if self.path == '/':
-            self.send_response(301)
-            self.send_header('Location', '/index.html')
-            self.end_headers()
-        if self.path.find('/cmd')>=0:
-            self.send_response(301)
-            self.send_header('Location', 'text/javascript')
-            self.end_headers()
-        elif self.path.endswith('.js') or self.path.endswith('.css'):
-            self.send_response(200)
-            self.send_header("Content-type", "text/javascript")
-            self.end_headers()
-            dest = './view/' + self.path.replace("/", "")
-            print("dest = ",dest)
-            try:
-                file = open(dest,"rb").read()
-                self.wfile.write(file)
-            except:
+
+def buildHandlerClass(server):
+    class StreamingHandler(server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            print("GET request",self.path)
+            if self.path == '/':
+                self.send_response(301)
+                self.send_header('Location', '/index.html')
+                self.end_headers()
+            if self.path.find('/cmd')>=0:
+                self.send_response(301)
+                self.send_header('Location', 'text/javascript')
+                self.end_headers()
+                from urllib.parse import urlparse
+                query = urlparse(self.path).query
+                # query = /cmd?cmd=CMD_MOVE_BACKWARD&value=10
+                # query should look like thise
+                # query = {
+                # "CMD_MOVE_BACKWARD":value
+                # }
+                # => query = ["CMD_MOVE_BACKWARD",value]
+                print("receive command",query)
+                #server.handle_instructions(query)
+            elif self.path.endswith('.js') or self.path.endswith('.css'):
+                self.send_response(200)
+                self.send_header("Content-type", "text/javascript")
+                self.end_headers()
+                dest = './view/' + self.path.replace("/", "")
+                print("dest = ",dest)
+                try:
+                    file = open(dest,"rb").read()
+                    self.wfile.write(file)
+                except:
+                    self.send_error(404)
+                    self.end_headers()
+            elif self.path == "/icon.png":
+                with open('./../../Picture/icon.png',"rb") as file:
+                    icon = file.read()
+                self.send_response(200)
+                self.send_header("Content-type", "image/jpeg")
+                self.end_headers()
+                self.wfile.write(icon)
+            elif self.path == '/index.html':
+                with open('view/index.html', 'r') as file:
+                    PAGE = file.read().replace('\n', '')
+                content = PAGE.encode('utf-8')
+                self.send_response(200)
+                self.send_header('Content-Type', 'text/html')
+                self.send_header('Content-Length', len(content))
+                self.end_headers()
+                self.wfile.write(content)
+            elif self.path == '/stream.mjpg':
+                self.send_response(200)
+                self.send_header('Age', 0)
+                self.send_header('Cache-Control', 'no-cache, private')
+                self.send_header('Pragma', 'no-cache')
+                self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=FRAME')
+                self.end_headers()
+                try:
+                    while True:
+                        with output.condition:
+                            output.condition.wait()
+                            frame = output.frame
+                        self.wfile.write(b'--FRAME\r\n')
+                        self.send_header('Content-Type', 'image/jpeg')
+                        self.send_header('Content-Length', len(frame))
+                        self.end_headers()
+                        self.wfile.write(frame)
+                        self.wfile.write(b'\r\n')
+                except Exception as e:
+                    logging.warning(
+                        'Removed streaming client %s: %s',
+                        self.client_address, str(e))
+            else:
                 self.send_error(404)
                 self.end_headers()
-        elif self.path == "/icon.png":
-            with open('./../../Picture/icon.png',"rb") as file:
-                icon = file.read()
-            self.send_response(200)
-            self.send_header("Content-type", "image/jpeg")
-            self.end_headers()
-            self.wfile.write(icon)
-        elif self.path == '/index.html':
-            with open('view/index.html', 'r') as file:
-                PAGE = file.read().replace('\n', '')
-            content = PAGE.encode('utf-8')
-            self.send_response(200)
-            self.send_header('Content-Type', 'text/html')
-            self.send_header('Content-Length', len(content))
-            self.end_headers()
-            self.wfile.write(content)
-        elif self.path == '/stream.mjpg':
-            self.send_response(200)
-            self.send_header('Age', 0)
-            self.send_header('Cache-Control', 'no-cache, private')
-            self.send_header('Pragma', 'no-cache')
-            self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=FRAME')
-            self.end_headers()
-            try:
-                while True:
-                    with output.condition:
-                        output.condition.wait()
-                        frame = output.frame
-                    self.wfile.write(b'--FRAME\r\n')
-                    self.send_header('Content-Type', 'image/jpeg')
-                    self.send_header('Content-Length', len(frame))
-                    self.end_headers()
-                    self.wfile.write(frame)
-                    self.wfile.write(b'\r\n')
-            except Exception as e:
-                logging.warning(
-                    'Removed streaming client %s: %s',
-                    self.client_address, str(e))
-        else:
-            self.send_error(404)
-            self.end_headers()
+    return StreamingHandler
             
     
 class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
@@ -190,17 +203,18 @@ class Server:
         HOST = self.get_interface_ip()
         if self.webUI:
             address = ('', 8000)
-            self.server_stream = StreamingServer(address, StreamingHandler)        
+            myStreamingHandler = buildHandlerClass(self)
+            self.server_stream = StreamingServer(address, myStreamingHandler)        
         else:
             #Port 8000 for video transmission
             self.server_socket = socket.socket()
             self.server_socket.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEPORT,1)
             self.server_socket.bind((HOST, 8001))              
             self.server_socket.listen(1)
-        self.server_socket1 = socket.socket()
-        self.server_socket1.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEPORT,1)
-        self.server_socket1.bind((HOST, 5001))
-        self.server_socket1.listen(1)
+            self.server_socket1 = socket.socket()
+            self.server_socket1.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEPORT,1)
+            self.server_socket1.bind((HOST, 5001))
+            self.server_socket1.listen(1)
         print('Server address: '+HOST)
         
         
@@ -255,90 +269,132 @@ class Server:
             command=cmd.CMD_RELAX+"#"+str(self.control.move_flag)+"\n"
             self.send_data(self.connection1,command)
             self.control.move_flag= 2  
-                  
-    def receive_instruction(self):
-        try:
-            self.connection1,self.client_address1 = self.server_socket1.accept()
-            print ("Client connection successful !")
-        except:
-            print ("Client connect failed")
-        self.server_socket1.close()
-        while True:
+    def handle_instructions(self,data):        
+        if cmd.CMD_BUZZER in data:
+            self.buzzer.run(data[1])
+        elif cmd.CMD_LED in data:
             try:
-                allData=self.connection1.recv(1024).decode('utf-8')
-                print("receive data = ",allData)
+                stop_thread(self.thread_led)
             except:
-                if self.tcp_flag:
-                    if max(self.battery_voltage) > 6.4:
-                        self.reset_server()
-                    break
+                pass
+            self.thread_led = threading.Thread(target=self.led.light,args=(data,))
+            self.thread_led.start()   
+        elif cmd.CMD_LED_MOD in data:
+            try:
+                stop_thread(self.thread_led)
+            except:
+                pass
+            thread_led=threading.Thread(target=self.led.light,args=(data,))
+            thread_led.start()
+        elif cmd.CMD_HEAD in data:
+            self.servo.setServoAngle(15,int(data[1]))
+        elif cmd.CMD_SONIC in data:
+            command=cmd.CMD_SONIC+'#'+str(self.sonic.getDistance())+"\n"
+            self.send_data(self.connection1,command)
+        elif cmd.CMD_POWER in data:
+            self.measuring_voltage(self.connection1)
+        elif cmd.CMD_WORKING_TIME in data: 
+            if self.control.move_timeout!=0 and self.control.relax_flag==True:
+                if self.control.move_count >180:
+                    command=cmd.CMD_WORKING_TIME+'#'+str(180)+'#'+str(round(self.control.move_count-180))+"\n"
                 else:
-                    break
-            
-            if allData=="" and self.tcp_flag:
-                self.reset_server()
-                break
-            else:
-                cmdArray=allData.split('\n')
-                #print(cmdArray)
-                if cmdArray[-1] !="":
-                    cmdArray==cmdArray[:-1]
-            
-            for oneCmd in cmdArray:
-                data=oneCmd.split("#")
-                if data==None or data[0]=='':
-                    continue
-                elif cmd.CMD_BUZZER in data:
-                    self.buzzer.run(data[1])
-                elif cmd.CMD_LED in data:
-                    try:
-                        stop_thread(thread_led)
-                    except:
-                        pass
-                    thread_led=threading.Thread(target=self.led.light,args=(data,))
-                    thread_led.start()   
-                elif cmd.CMD_LED_MOD in data:
-                    try:
-                        stop_thread(thread_led)
-                    except:
-                        pass
-                    thread_led=threading.Thread(target=self.led.light,args=(data,))
-                    thread_led.start()
-                elif cmd.CMD_HEAD in data:
-                    self.servo.setServoAngle(15,int(data[1]))
-                elif cmd.CMD_SONIC in data:
-                    command=cmd.CMD_SONIC+'#'+str(self.sonic.getDistance())+"\n"
-                    self.send_data(self.connection1,command)
-                elif cmd.CMD_POWER in data:
-                    self.measuring_voltage(self.connection1)
-                elif cmd.CMD_WORKING_TIME in data: 
-                    if self.control.move_timeout!=0 and self.control.relax_flag==True:
-                        if self.control.move_count >180:
-                            command=cmd.CMD_WORKING_TIME+'#'+str(180)+'#'+str(round(self.control.move_count-180))+"\n"
-                        else:
-                            if self.control.move_count==0:
-                                command=cmd.CMD_WORKING_TIME+'#'+str(round(self.control.move_count))+'#'+str(round((time.time()-self.control.move_timeout)+60))+"\n"
-                            else:
-                                command=cmd.CMD_WORKING_TIME+'#'+str(round(self.control.move_count))+'#'+str(round(time.time()-self.control.move_timeout))+"\n"
+                    if self.control.move_count==0:
+                        command=cmd.CMD_WORKING_TIME+'#'+str(round(self.control.move_count))+'#'+str(round((time.time()-self.control.move_timeout)+60))+"\n"
                     else:
-                        command=cmd.CMD_WORKING_TIME+'#'+str(round(self.control.move_count))+'#'+str(0)+"\n"
-                    self.send_data(self.connection1,command)
+                        command=cmd.CMD_WORKING_TIME+'#'+str(round(self.control.move_count))+'#'+str(round(time.time()-self.control.move_timeout))+"\n"
+            else:
+                command=cmd.CMD_WORKING_TIME+'#'+str(round(self.control.move_count))+'#'+str(0)+"\n"
+            self.send_data(self.connection1,command)
+        else:
+            print("will pass that for test")
+            #self.control.order=data
+            #self.control.timeout=time.time()        
+    def receive_instruction(self):
+        if self.webUI==False:
+            try:
+                self.connection1,self.client_address1 = self.server_socket1.accept()
+                print ("Client connection successful !")
+            except:
+                print ("Client connect failed")
+            self.server_socket1.close()
+            while True:
+                try:
+                    allData=self.connection1.recv(1024).decode('utf-8')
+                    print("receive data = ",allData)
+                except:
+                    if self.tcp_flag:
+                        if max(self.battery_voltage) > 6.4:
+                            self.reset_server()
+                        break
+                    else:
+                        break
+                
+                if allData=="" and self.tcp_flag:
+                    self.reset_server()
+                    break
                 else:
-                    print("will pass that for test")
-                    #self.control.order=data
-                    #self.control.timeout=time.time()
-
-        try:    
-            stop_thread(thread_power)
-        except:
-            pass
-        try:    
-            stop_thread(thread_led)
-        except:
-            pass
-        print("close_recv")
-        self.control.relax_flag=False
-        self.control.order[0]=cmd.CMD_RELAX
+                    cmdArray=allData.split('\n')
+                    #print(cmdArray)
+                    if cmdArray[-1] !="":
+                        cmdArray==cmdArray[:-1]
+                
+                for oneCmd in cmdArray:
+                    data = oneCmd.split("#")
+                    self.handle_instructions(data)
+                    """
+                    if data==None or data[0]=='':
+                        continue
+                    elif cmd.CMD_BUZZER in data:
+                        self.buzzer.run(data[1])
+                    elif cmd.CMD_LED in data:
+                        try:
+                            stop_thread(thread_led)
+                        except:
+                            pass
+                        thread_led=threading.Thread(target=self.led.light,args=(data,))
+                        thread_led.start()   
+                    elif cmd.CMD_LED_MOD in data:
+                        try:
+                            stop_thread(thread_led)
+                        except:
+                            pass
+                        thread_led=threading.Thread(target=self.led.light,args=(data,))
+                        thread_led.start()
+                    elif cmd.CMD_HEAD in data:
+                        self.servo.setServoAngle(15,int(data[1]))
+                    elif cmd.CMD_SONIC in data:
+                        command=cmd.CMD_SONIC+'#'+str(self.sonic.getDistance())+"\n"
+                        self.send_data(self.connection1,command)
+                    elif cmd.CMD_POWER in data:
+                        self.measuring_voltage(self.connection1)
+                    elif cmd.CMD_WORKING_TIME in data: 
+                        if self.control.move_timeout!=0 and self.control.relax_flag==True:
+                            if self.control.move_count >180:
+                                command=cmd.CMD_WORKING_TIME+'#'+str(180)+'#'+str(round(self.control.move_count-180))+"\n"
+                            else:
+                                if self.control.move_count==0:
+                                    command=cmd.CMD_WORKING_TIME+'#'+str(round(self.control.move_count))+'#'+str(round((time.time()-self.control.move_timeout)+60))+"\n"
+                                else:
+                                    command=cmd.CMD_WORKING_TIME+'#'+str(round(self.control.move_count))+'#'+str(round(time.time()-self.control.move_timeout))+"\n"
+                        else:
+                            command=cmd.CMD_WORKING_TIME+'#'+str(round(self.control.move_count))+'#'+str(0)+"\n"
+                        self.send_data(self.connection1,command)
+                    else:
+                        print("will pass that for test")
+                        #self.control.order=data
+                        #self.control.timeout=time.time()
+                    """
+            try:    
+                stop_thread(self.thread_power)
+            except:
+                pass
+            try:    
+                stop_thread(self.thread_led)
+            except:
+                pass
+            print("close_recv")
+            self.control.relax_flag=False
+            self.control.order[0]=cmd.CMD_RELAX
         
 
 if __name__ == '__main__':
