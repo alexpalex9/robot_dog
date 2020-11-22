@@ -14,6 +14,7 @@ var init = function(){
 			timeout : 50000,		
 			success : function (data, status) {
 				console.log("success",data)
+				console.log(typeof(data))
 			},
 			error: function(xhr,error) {
 				console.log("error in ajax request",error)

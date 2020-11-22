@@ -73,23 +73,22 @@ def buildHandlerClass(myserver):
                     query_parse =  parse_qs(query)
                     query_parse = {k:v[0] for k,v in query_parse.items()}
                     print("receive command",query_parse)
-                    response = "{success:true}"
-                    query_robot = [query_parse['cmd'],query_parse['value']]
+                    query_robot = query_parse['cmd'].split("#")
                     print("robot command =",query_robot)
-                    myserver.handle_instructions(query_robot)
-                    self.send_response(200)
-                    self.send_header("Content-Type", "application/json")
-                    self.end_headers()
-                    response = "{success:true}"
-                    json_string = json.dumps(response)
-                    self.wfile.write(json_string.encode('utf-8'))
+                    if myserver.handle_instructions(self,query_robot)==True:                        
+                        self.send_response(200)
+                        self.send_header("Content-Type", "application/json")
+                        self.end_headers()
+                        response = {'success':True,'commad':query_robot}
+                        json_string = json.dumps(response)
+                        self.wfile.write(json_string.encode('utf-8'))
                     
                 except Exception as e:
                     print("error",e)
                     self.send_response(200)
                     self.send_header("Content-Type", "application/json")
                     self.end_headers()
-                    response = "{success:false,error" + str(e) +"}"
+                    response = {'success':False,'error':str(e)}
                     json_string = json.dumps(response)
                     self.wfile.write(json_string.encode('utf-8'))
                     
@@ -157,21 +156,19 @@ class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
         
         
 class Server:
-    def __init__(self,webUI=True):
+    def __init__(self,webUI=False):
         
         self.tcp_flag=False
         self.webUI = webUI
-        """
-        self.led=Led()
-        self.servo=Servo()
-        self.adc=ADS7830()
-        self.buzzer=Buzzer()
-        self.control=Control()
-        self.sonic=Ultrasonic()
-        self.control.Thread_conditiona.start()
-        self.battery_voltage=[8.4,8.4,8.4,8.4,8.4]
-        """
-
+        
+        #self.led=Led()
+        #self.servo=Servo()
+        #self.adc=ADS7830()
+        #self.buzzer=Buzzer()
+        #self.control=Control()
+        #self.sonic=Ultrasonic()
+        #self.control.Thread_conditiona.start()
+        #self.battery_voltage=[8.4,8.4,8.4,8.4,8.4]
         
     def get_interface_ip(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -267,23 +264,32 @@ class Server:
         self.instruction = threading.Thread(target=self.receive_instruction)
         self.video.start()
         self.instruction.start()
-    def send_data(self,connect,data):
-        try:
-            connect.send(data.encode('utf-8'))
-            #print("send",data)
-        except Exception as e:
-            print(e)
+    def send_data(self,client,data):
+        if self.webUI:
+            print("sending webUI data",data)
+            client.send_response(200)
+            client.send_header("Content-Type", "application/json")
+            client.end_headers()
+            response = {'data':data}
+            json_string = json.dumps(response)
+            client.wfile.write(json_string.encode('utf-8'))
+        else:
+            try:
+                client.send(data.encode('utf-8'))
+                #print("send",data)
+            except Exception as e:
+                print("error send data",e)
             
-    def measuring_voltage(self,connect):
+    def measuring_voltage(self,client):
         try:
             for i in range(5):
                 self.battery_voltage[i]=round(self.adc.power(0),2)
             command=cmd.CMD_POWER+'#'+str(max(self.battery_voltage))+"\n"
-            self.send_data(connect,command)
+            self.send_data(client,command)
             self.sednRelaxFlag()
             self.battery_reminder()
         except Exception as e:
-            print(e)
+            print("error measuring volotage",e)
     def battery_reminder(self):
         if max(self.battery_voltage) < 6.4:
             self.turn_off_server()
@@ -291,21 +297,26 @@ class Server:
             print("The batteries power are too low. Please recharge the batteries or replace batteries.")
             print("Close the server")
             os._exit(0)
-    def sednRelaxFlag(self):
+    def sednRelaxFlag(self,client):
         if self.control.move_flag!=2:
             command=cmd.CMD_RELAX+"#"+str(self.control.move_flag)+"\n"
-            self.send_data(self.connection1,command)
+            self.send_data(cient,command)
             self.control.move_flag= 2  
-    def handle_instructions(self,data):        
+    def handle_instructions(self,client,data):
+        print(" handle instructions",data)
         if cmd.CMD_BUZZER in data:
             self.buzzer.run(data[1])
+            return true
+        elif "CMD_TEST" in data:
+            self.send_data(client,"I have received it!")
         elif cmd.CMD_LED in data:
             try:
                 stop_thread(self.thread_led)
             except:
                 pass
             self.thread_led = threading.Thread(target=self.led.light,args=(data,))
-            self.thread_led.start()   
+            self.thread_led.start()
+            return true
         elif cmd.CMD_LED_MOD in data:
             try:
                 stop_thread(self.thread_led)
@@ -315,12 +326,15 @@ class Server:
             thread_led.start()
         elif cmd.CMD_HEAD in data:
             self.servo.setServoAngle(15,int(data[1]))
+            return true
         elif cmd.CMD_SONIC in data:
             command=cmd.CMD_SONIC+'#'+str(self.sonic.getDistance())+"\n"
-            self.send_data(self.connection1,command)
+            self.send_data(client,command)
         elif cmd.CMD_POWER in data:
-            self.measuring_voltage(self.connection1)
-        elif cmd.CMD_WORKING_TIME in data: 
+            self.measuring_voltage(client)
+        elif cmd.CMD_WORKING_TIME in data:
+            print("not working without shied")
+            '''
             if self.control.move_timeout!=0 and self.control.relax_flag==True:
                 if self.control.move_count >180:
                     command=cmd.CMD_WORKING_TIME+'#'+str(180)+'#'+str(round(self.control.move_count-180))+"\n"
@@ -331,13 +345,20 @@ class Server:
                         command=cmd.CMD_WORKING_TIME+'#'+str(round(self.control.move_count))+'#'+str(round(time.time()-self.control.move_timeout))+"\n"
             else:
                 command=cmd.CMD_WORKING_TIME+'#'+str(round(self.control.move_count))+'#'+str(0)+"\n"
-            self.send_data(self.connection1,command)
+            self.send_data(client,command)
+            '''
+            return True
         else:
-            self.control.order=data
-            self.control.timeout=time.time()
             print("will pass that for test")
+            #self.control.order=data
+            #self.control.timeout=time.time()
+            return True
+            
     def receive_instruction(self):
-        if self.webUI==False:
+        if self.webUI:
+            print("WEBUI set - nothing to do here")
+            #client = self.server_stream
+        else:
             try:
                 self.connection1,self.client_address1 = self.server_socket1.accept()
                 print ("Client connection successful !")
@@ -367,7 +388,7 @@ class Server:
                 
                 for oneCmd in cmdArray:
                     data = oneCmd.split("#")
-                    self.handle_instructions(data)
+                    self.handle_instructions(self.connection1,data)
                     """
                     if data==None or data[0]=='':
                         continue
