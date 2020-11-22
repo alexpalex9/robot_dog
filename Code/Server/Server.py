@@ -20,7 +20,8 @@ import logging
 import socketserver
 from threading import Condition
 from http import server
-
+from urllib.parse import urlparse, parse_qs
+import json
 
         
 class StreamingOutput(object):
@@ -44,8 +45,21 @@ class StreamingOutput(object):
 output = StreamingOutput()
 
 
-def buildHandlerClass(server):
+def buildHandlerClass(myserver):
     class StreamingHandler(server.BaseHTTPRequestHandler):
+        def do_POST(self):
+            #self._set_headers(
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            print("received post",self.path)
+            response = "{'success':true,'results':'TEST','code':200}"
+            
+            #content_len = int(self.headers.getheader('content-length',0))
+            #post_body = self.rfile.read(content_len)
+            #print(post_body)
+            #self.wfile.write("receivded;</br>{}".format(post_body))
+            self.wfile.write(response.encode('utf-8'))
         def do_GET(self):
             print("GET request",self.path)
             if self.path == '/':
@@ -53,19 +67,32 @@ def buildHandlerClass(server):
                 self.send_header('Location', '/index.html')
                 self.end_headers()
             if self.path.find('/cmd')>=0:
-                self.send_response(301)
-                self.send_header('Location', 'text/javascript')
-                self.end_headers()
-                from urllib.parse import urlparse
-                query = urlparse(self.path).query
-                # query = /cmd?cmd=CMD_MOVE_BACKWARD&value=10
-                # query should look like thise
-                # query = {
-                # "CMD_MOVE_BACKWARD":value
-                # }
-                # => query = ["CMD_MOVE_BACKWARD",value]
-                print("receive command",query)
-                #server.handle_instructions(query)
+                try:
+                    print("headers =",self)
+                    query = urlparse(self.path).query
+                    query_parse =  parse_qs(query)
+                    query_parse = {k:v[0] for k,v in query_parse.items()}
+                    print("receive command",query_parse)
+                    response = "{success:true}"
+                    query_robot = [query_parse['cmd'],query_parse['value']]
+                    print("robot command =",query_robot)
+                    myserver.handle_instructions(query_robot)
+                    self.send_response(200)
+                    self.send_header("Content-Type", "application/json")
+                    self.end_headers()
+                    response = "{success:true}"
+                    json_string = json.dumps(response)
+                    self.wfile.write(json_string.encode('utf-8'))
+                    
+                except Exception as e:
+                    print("error",e)
+                    self.send_response(200)
+                    self.send_header("Content-Type", "application/json")
+                    self.end_headers()
+                    response = "{success:false,error" + str(e) +"}"
+                    json_string = json.dumps(response)
+                    self.wfile.write(json_string.encode('utf-8'))
+                    
             elif self.path.endswith('.js') or self.path.endswith('.css'):
                 self.send_response(200)
                 self.send_header("Content-type", "text/javascript")
@@ -306,9 +333,9 @@ class Server:
                 command=cmd.CMD_WORKING_TIME+'#'+str(round(self.control.move_count))+'#'+str(0)+"\n"
             self.send_data(self.connection1,command)
         else:
+            self.control.order=data
+            self.control.timeout=time.time()
             print("will pass that for test")
-            #self.control.order=data
-            #self.control.timeout=time.time()        
     def receive_instruction(self):
         if self.webUI==False:
             try:

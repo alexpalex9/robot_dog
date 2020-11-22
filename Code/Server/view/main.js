@@ -1,18 +1,21 @@
 var init = function(){
 	$('html').on('click','.cmd',function(){
+		console.log("url =",'cmd?cmd=' + $(this).data('cmd') + '&value=' + $(this).data('v'))
 		$.ajax({
-			url : '/',
+			url : '/cmd&cmd=' + $(this).data('cmd') + '&value=' + $(this).data('v'),
+			//url : '/cmd',
 			type : 'GET',
 			dataType : 'json', //'html',
-			data : $(this).data('value'),
-			cache: false,             // To unable request pages to be cached
-			processData:false,        // To send DOMDocument or non processed data file it is set to false
-			contentType: false,
+			data : {
+				cmd : $(this).data('cmd'),
+				value : $(this).data('v')
+				
+			},
 			timeout : 50000,		
 			success : function (data, status) {
-				concole.log("success",data)
+				console.log("success",data)
 			},
-			error: function(error) {
+			error: function(xhr,error) {
 				console.log("error in ajax request",error)
 			},
 			complete:function(){
@@ -66,11 +69,11 @@ var init = function(){
 	// var joy3X = document.getElementById("joy3X");
 	// var joy3Y = document.getElementById("joy3Y");
 
-	setInterval(function(){ joy3IinputPosX.value=Joy3.GetPosX(); }, 50);
-	setInterval(function(){ joy3InputPosY.value=Joy3.GetPosY(); }, 50);
-	setInterval(function(){ joy3Direzione.value=Joy3.GetDir(); }, 50);
-	setInterval(function(){ joy3X.value=Joy3.GetX(); }, 50);
-	setInterval(function(){ joy3Y.value=Joy3.GetY(); }, 50);
+	// setInterval(function(){ joy3IinputPosX.value=Joy3.GetPosX(); }, 50);
+	// setInterval(function(){ joy3InputPosY.value=Joy3.GetPosY(); }, 50);
+	// setInterval(function(){ joy3Direzione.value=Joy3.GetDir(); }, 50);
+	// setInterval(function(){ joy3X.value=Joy3.GetX(); }, 50);
+	// setInterval(function(){ joy3Y.value=Joy3.GetY(); }, 50);
 
 
 }
