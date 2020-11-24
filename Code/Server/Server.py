@@ -128,7 +128,7 @@ def buildHandlerClass(myserver):
                     self.end_headers()
             elif self.path == '/index.html':
                 with open('view/index.html', 'r') as file:
-                    PAGE = file.read().replace('\n', '')
+                    PAGE = file.read() #.replace('\n', '')
                 content = PAGE.encode('utf-8')
                 self.send_response(200)
                 self.send_header('Content-Type', 'text/html')
