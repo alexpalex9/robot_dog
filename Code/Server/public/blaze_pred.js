@@ -42,5 +42,6 @@
            }
         setTimeout(draw,2000,video,canvas,width,height);
     }
-	draw(video, canvas,640,480);
+	// disable blaze
+	// draw(video, canvas,640,480);
 })();

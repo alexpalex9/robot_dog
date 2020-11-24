@@ -224,12 +224,13 @@ class Server:
             
     def turn_on_server(self):
         #ip adress
-        HOST = self.get_interface_ip()
+        
         if self.webUI:
             address = ('', 8000)
             myStreamingHandler = buildHandlerClass(self)
             self.server_stream = StreamingServer(address, myStreamingHandler)        
         else:
+            HOST = self.get_interface_ip()
             #Port 8000 for video transmission
             self.server_socket = socket.socket()
             self.server_socket.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEPORT,1)
@@ -239,7 +240,7 @@ class Server:
             self.server_socket1.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEPORT,1)
             self.server_socket1.bind((HOST, 5001))
             self.server_socket1.listen(1)
-        print('Server address: '+HOST)
+            print('Server address: '+HOST)
         
         
     def turn_off_server(self):
