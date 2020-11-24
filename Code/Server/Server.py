@@ -92,11 +92,11 @@ def buildHandlerClass(myserver):
                     json_string = json.dumps(response)
                     self.wfile.write(json_string.encode('utf-8'))
                     
-            elif self.path.endswith('.js') or self.path.endswith('.css'):
+            elif self.path.endswith('.js') or self.path.endswith('.css') or self.path.endswith('.json'):
                 self.send_response(200)
                 self.send_header("Content-type", "text/javascript")
                 self.end_headers()
-                dest = './view/' + self.path.replace("/", "")
+                dest = './public' + self.path
                 print("dest = ",dest)
                 try:
                     file = open(dest,"rb").read()
