@@ -156,7 +156,7 @@ class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
         
         
 class Server:
-    def __init__(self,webUI=False):
+    def __init__(self,webUI=True):
         
         self.tcp_flag=False
         self.webUI = webUI
