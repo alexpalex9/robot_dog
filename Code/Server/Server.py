@@ -95,11 +95,14 @@ def buildHandlerClass(myserver):
             elif self.path.endswith('.js') \
                     or self.path.endswith('.css') \
                     or self.path.endswith('.json') \
-                    or self.path.endswith('.map'):
+                    or self.path.endswith('.map') \
+                    or 'model' in self.path:
                 self.send_response(200)
                 #self.send_header("Content-type", "text/javascript")
                 self.end_headers()
                 dest = './public' + self.path
+                if 'model' in self.path:
+                    dest = './public/models' + self.path
                 print("dest = ",dest)
                 try:
                     file = open(dest,"rb").read()
