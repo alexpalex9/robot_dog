@@ -114,6 +114,18 @@ def buildHandlerClass(myserver):
                 self.send_header("Content-type", "image/jpeg")
                 self.end_headers()
                 self.wfile.write(icon)
+            elif self.path.endswith('.jpg') or self.path.endswith('.png'):
+                self.send_response(200)
+                self.send_header("Content-type", "image/jpeg")
+                self.end_headers()
+                dest = './public' + self.path
+                print("dest = ",dest)
+                try:
+                    file = open(dest,"rb").read()
+                    self.wfile.write(file)
+                except:
+                    self.send_error(404)
+                    self.end_headers()
             elif self.path == '/index.html':
                 with open('view/index.html', 'r') as file:
                     PAGE = file.read().replace('\n', '')
