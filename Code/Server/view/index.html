@@ -5,7 +5,7 @@
 -->
 <html>
 	<head>
-		<title>Joy</title>
+		<title>Robot</title>
 		<meta charset="utf-8">
 		<meta name="description" content="Freenove robot doc interface">
 		<meta name="author" content="Alexandre Ambourg">
@@ -171,6 +171,18 @@ background: #3C3C3C;
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
 		
   <script>
+
+
+	//Promise.all([
+	  faceapi.loadFaceLandmarkModel('../models'),
+	  faceapi.loadFaceRecognitionModel('../models'),
+	  faceapi.loadTinyFaceDetectorModel('../models'),
+	  faceapi.loadFaceLandmarkModel('../models'),
+	  faceapi.loadFaceLandmarkTinyModel('../models'),
+	  faceapi.loadFaceRecognitionModel('../models'),
+	  faceapi.loadFaceExpressionModel('../models'),
+	//])
+
 
     let thresh = 0.1;
 
