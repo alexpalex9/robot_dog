@@ -108,6 +108,7 @@ def buildHandlerClass(myserver):
                     file = open(dest,"rb").read()
                     self.wfile.write(file)
                 except:
+                    print("  -> error read JS",self.path)
                     self.send_error(404)
                     self.end_headers()
             elif self.path == "/icon.png":

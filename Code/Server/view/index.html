@@ -85,9 +85,7 @@ background: #3C3C3C;
 	top:0;
 	left:0;
 }
-
-
-		</style>
+</style>
 		
 		
 	</head>
@@ -173,7 +171,7 @@ background: #3C3C3C;
   <script>
 
 
-	//Promise.all([
+	Promise.all([
 	  faceapi.loadFaceLandmarkModel('../models'),
 	  faceapi.loadFaceRecognitionModel('../models'),
 	  faceapi.loadTinyFaceDetectorModel('../models'),
@@ -181,7 +179,7 @@ background: #3C3C3C;
 	  faceapi.loadFaceLandmarkTinyModel('../models'),
 	  faceapi.loadFaceRecognitionModel('../models'),
 	  faceapi.loadFaceExpressionModel('../models'),
-	//])
+	])
 
 
     let thresh = 0.1;
