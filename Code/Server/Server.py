@@ -61,7 +61,7 @@ def buildHandlerClass(myserver):
             #self.wfile.write("receivded;</br>{}".format(post_body))
             self.wfile.write(response.encode('utf-8'))
         def do_GET(self):
-            print("GET request",self.path)
+            #print("GET request",self.path)
             if self.path == '/':
                 self.send_response(301)
                 self.send_header('Location', '/index.html')
@@ -101,16 +101,27 @@ def buildHandlerClass(myserver):
                 #self.send_header("Content-type", "text/javascript")
                 self.end_headers()
                 dest = './public' + self.path
+                print(" ==> RECEIVE request for",dest)
                 if 'model' in self.path:
                     dest = './public/models' + self.path
-                print("dest = ",dest)
+                print(" /!\ DEST = ",dest)
                 try:
                     file = open(dest,"rb").read()
                     self.wfile.write(file)
-                except:
-                    print("  -> error read JS",self.path)
-                    self.send_error(404)
-                    self.end_headers()
+                except Exception as e:
+                    print("   |-> error read file")
+                    print("   |self.path = ",self.path)
+                    print("   |dest = ",dest)
+                    print("   |error : ",e)
+                    #self.send_error(404)
+                    #self.end_headers()
+                    try:
+                        dest = './public/models' + self.path
+                        file = open(dest,"rb").read()
+                        self.wfile.write(file)
+                    except Exception as e:
+                        self.send_error(404)
+                        self.end_headers()
             elif self.path == "/icon.png":
                 with open('./../../Picture/icon.png',"rb") as file:
                     icon = file.read()
