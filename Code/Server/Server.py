@@ -208,6 +208,7 @@ class Server:
                                             )[20:24])
     def transmission_video(self):
         if self.webUI:
+            #self.camera = picamera.PiCamera(resolution='320x240', framerate=5)
             self.camera = picamera.PiCamera(resolution='640x480', framerate=24)
             self.camera.start_recording(output, format='mjpeg')
             self.server_stream.serve_forever()

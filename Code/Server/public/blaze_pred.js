@@ -2,10 +2,7 @@
     var canvas = document.getElementById('canvas'),
         video = document.getElementById('webcam');
 
-	// setInterval(function(){
-		// console.log("check face")
-		
-	// },1000)
+	
 
 
 
@@ -14,7 +11,7 @@
         // context.drawImage(video,0,0,width,height);
         const model = await blazeface.load();
         const returnTensors = false;
-        const predictions = await model.estimateFaces(document.getElementById("webcam"), returnTensors);
+        const predictions = await model.estimateFaces(video, returnTensors);
 		var context = canvas.getContext('2d')
 		context.clearRect(0, 0, canvas.width, canvas.height);
 		// console.log(predictions)
@@ -43,5 +40,5 @@
         setTimeout(draw,2000,video,canvas,width,height);
     }
 	// disable blaze
-	// draw(video, canvas,640,480);
+	//draw(video, canvas,640,480);
 })();
