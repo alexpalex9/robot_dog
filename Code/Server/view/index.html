@@ -5,89 +5,11 @@
 -->
 <html>
 	<head>
-		<title>Robot</title>
-		<meta charset="utf-8">
-		<meta name="description" content="Freenove robot doc interface">
-		<meta name="author" content="Alexandre Ambourg">
-		<style>
-*
-{
-	box-sizing: border-box;
-}
-body
-{
-	margin: 0px;
-	padding: 0px;
-	font-family: monospace;
-}
-.row
-{
-	display: inline-flex;
-	clear: both;
-}
-.columnLateral
-{
-  float: left;
-  width: 15%;
-  min-width: 300px;
-}
-.columnCetral
-{
-  float: left;
-  width: 70%;
-  min-width: 300px;
-}
-#joy2Div
-{
-	width:200px;
-	height:200px;
-	margin:50px
-}
-#joystick
-{
-	border: 1px solid #FF0000;
-}
-#joystick2
-{
-	border: 1px solid #0000FF;
-}
-
-a.cmd{
-display:inline-block;
-height:30px;
-width:100px;
-text-align:center;
-line-height:30px;
-background: #818181;
-background: -moz-linear-gradient(top, #818181 0%, #818181 49%, #3C3C3C 100%);
-background: -webkit-linear-gradient(top, #818181 0%, #818181 49%, #3C3C3C 100%);
-background: linear-gradient(to bottom, #818181 0%, #818181 49%, #3C3C3C 100%);
-}
-a:hover{
-cursor:pointer;
-color:black;
-}
-a:active{
-color:grey;
-background: #3C3C3C;
-}
-
-#videoContainer {
-    width:640px;
-	position:relative;
-    /*background-image: url(load1.gif);*/
-    text-align: left;
-    border:480px;
-    margin:0 auto;
-}
-#webcam_overlay{
-	position:absolute;
-	top:0;
-	left:0;
-}
-</style>
-		
-		
+	      <title>Robot</title>
+	      <meta charset="utf-8">
+	      <meta name="description" content="Freenove robot doc interface">
+	      <meta name="author" content="Alexandre Ambourg">
+	      <link rel="stylesheet" href="main.css">
 	</head>
 	<body style="background-color:#484848;color:#FFFFFF">
 	<div id="navbar" style="height:10px"></div>
@@ -99,21 +21,16 @@ background: #3C3C3C;
 		<!-- <center><img src="stream.mjpg" width="640" height="480"></center> -->
 		<div id="videoContainer">
 		<!-- <video id="webcam" width="640" height="480" autoplay style="display:none" ></video>     -->
-		<img id="webcam" crossorigin width="640" height="480" src="stream.mjpg" ></img>
+		<img class="motionDetection" id="webcam" crossorigin width="640" height="480" src="stream.mjpg" ></img>
 		<!--<img id="webcam" crossorigin width="640" height="480" src="face.jpg" ></img>-->
 		<!-- <img id="webcam" crossorigin width="640" height="480" src="https://i.imgur.com/PBfpKi5.jpeg" ></img> -->
-		<canvas id="webcam_overlay" width="640" height="480" ></canvas>
+		<canvas id="face_overlay" width="640" height="480" ></canvas>
+		<canvas id="motion_overlay" width="640" height="480" ></canvas>
 			
 		</div>
-		<div style="position: relative" class="margin">
-			<img id="imgFace" src="face.jpg" style="max-width:80px;"></img>
-			<canvas id="overlay"></canvas>
-		</div>
-
-		<img id="imgFace2" width="64" height="48" src="happy.jpg" ></img>
-		
-		<a class="cmd" data-v="test" data-cmd="CMD_TEST#45">TEST</a>
-		<a class="cmd" data-v="test" data-cmd="CMD_DUMMY#45">TEST error</a>
+		<a class="button cmd" data-v="test" data-cmd="CMD_TEST#45">TEST</a>
+		<a class="button cmd" data-v="test" data-cmd="CMD_DUMMY#45">TEST error</a>
+		<a id="face_detection_button" class="button disabled">Face</a>
 		
 			<!-- Example of FIXED or ABSOLUTE position -->
 			<!-- <div id="joy3Div" style="width:200px;height:200px;margin:50px;position:fixed;bottom:30px;left:500px;"></div> -->
@@ -154,137 +71,11 @@ background: #3C3C3C;
 			</div>
 		</div>
 	</body>
-	<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
 	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-		<script src="joy.min.js"></script>
-		<script src="main.js"></script>
-		<!--<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>-->
-		<!--<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface"></script>-->
-		<!--<script src="blaze_pred.js"></script>-->
-		<script src="face-api.js"></script>
-	  <script src="commons.js"></script>
-	  <!--<script src="faceDetectionControls.js"></script>-->
-	  <!--<script src="imageSelectionControls.js"></script>-->
-  
-		<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.css"> -->
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
-		
-  <script>
-
-  $(document).ready(function() {
-	Promise.all([
-	  faceapi.loadFaceLandmarkModel('/'),
-	  faceapi.loadFaceRecognitionModel('/'),
-	  faceapi.loadTinyFaceDetectorModel(''),
-	  faceapi.loadFaceLandmarkModel('/'),
-	  faceapi.loadFaceLandmarkTinyModel('/'),
-	  faceapi.loadFaceRecognitionModel('/'),
-	  faceapi.loadFaceExpressionModel('/'),
-	  faceapi.loadSsdMobilenetv1Model('/')
-	  //faceapi.loadFaceRecognitionModel('/')
-	  //faceapi.loadFaceLandmarkModel('/')
-	]).then(function(){
-	  console.log("model loaded")
-	  setInterval(function(){
-	    alex()
-	  },1000)
-	})
-})
-
-    let thresh = 0.1;
-
-    async function updateResults() {
-      if (!isFaceDetectionModelLoaded()) {
-        return
-      }
-
-      const inputImgEl = $('#imgFace').get(0)
-     
-      const options = getFaceDetectorOptions()
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      const results = await faceapi.detectAllFaces(inputImgEl, options)
-        // compute face landmarks to align faces for better accuracy
-        .withFaceLandmarks()
-        .withFaceExpressions()
-      console.log("RESULTS",results)
-      const canvas = $('#overlay').get(0)
-      faceapi.matchDimensions(canvas, inputImgEl)
-
-      const resizedResults = faceapi.resizeResults(results, inputImgEl)
-      const minConfidence = 0.05
-      var context = canvas.getContext('2d')
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      faceapi.draw.drawDetections(canvas, resizedResults)
-      faceapi.draw.drawFaceExpressions(canvas, resizedResults, minConfidence)
-    }
-
-    async function run() {
-      // load face detection and face expression recognition models
-      // and load face landmark model for face alignment
-      await changeFaceDetector(TINY_FACE_DETECTOR)
-      //await faceapi.loadFaceLandmarkModel('/')
-      //await faceapi.loadFaceExpressionModel('/')
-      // start processing image
-      updateResults()
-    }
-    async function load(){
-      console.log('load')
-      //await faceapi.loadSsdMobilenetv1Model('/')
-      //await faceapi.loadFaceRecognitionModel('/')
-      //await faceapi.loadFaceLandmarkModel('/')
-      
-    }
-    
-    var canvas = $('#webcam_overlay').get(0)
-    var context = canvas.getContext('2d')
-    async function alex(){
-      //console.log("load")
-      //var tiny = await new faceapi.TinyFaceDetectorOptions()
-      // console.log('start detection')
-      //await faceapi.loadSsdMobilenetv1Model('/')
-      //await faceapi.loadFaceRecognitionModel('/')
-      //await faceapi.loadFaceLandmarkModel('/')
-      console.log("detection")
-      detection =  await faceapi.detectAllFaces($('#webcam').get(0)).withFaceLandmarks().withFaceExpressions().withFaceDescriptors()
-      //console.log(detection)
-      
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      if (detection.length){
-	console.log(detection)
-	//detection.forEach(function(fd){
-	 // var bestMatch = new faceapi.FaceMatcher(fd.descriptor)  
-	 // console.log(bestMatch.toString())
-	//})
-	const resizedResults = faceapi.resizeResults(detection, $('#webcam').get(0))
-	console.log("draw")
-	
-	
-	faceapi.draw.drawDetections(canvas, resizedResults,0.6)
-	faceapi.draw.drawFaceExpressions(canvas, resizedResults,0.6)
-      }else{
-	console.log("no results")
-      }
-      
-      
-      const faceDescriptors = [detection.descriptor]
-      
-      //faceapi.draw.drawDetections(canvas,detection)
-      //console.log(detection)
-      
-    }
-    //$(document).ready(function() {
-      // renderNavBar('#navbar', 'face_expression_recognition')
-      //initImageSelectionControls('happy.jpg', true)
-       //initFaceDetectionControls()
-       // run()
-      //const detections1 =  await faceapi.detectAllFaces($('#imgFace').get(0), new faceapi.TinyFaceDetectorOptions())
-      //let detections1 =  faceapi.detectAllFaces($('#imgFace').get(0))
-      //await function(){
-	//await load()
-	//load()
-	//alex()
-      //}
-	  
-    //})
-  </script>
+	<script src="joy.min.js"></script>
+	<script src="face-api.js"></script>
+	<script src="motion.js"></script>
+	<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>-->
+	<script src="main.js"></script>	
+ 
 </html>

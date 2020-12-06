@@ -102,8 +102,8 @@ def buildHandlerClass(myserver):
                 self.end_headers()
                 dest = './public' + self.path
                 print(" ==> RECEIVE request for",dest)
-                if 'model' in self.path:
-                    dest = './public/models' + self.path
+                #if 'model' in self.path:
+                #    dest = './public/models' + self.path
                 print(" /!\ DEST = ",dest)
                 try:
                     file = open(dest,"rb").read()
@@ -208,8 +208,8 @@ class Server:
                                             )[20:24])
     def transmission_video(self):
         if self.webUI:
-            #self.camera = picamera.PiCamera(resolution='320x240', framerate=5)
-            self.camera = picamera.PiCamera(resolution='640x480', framerate=24)
+            self.camera = picamera.PiCamera(resolution='320x240', framerate=5)
+            #self.camera = picamera.PiCamera(resolution='640x480', framerate=24)
             self.camera.start_recording(output, format='mjpeg')
             self.server_stream.serve_forever()
             #self.camera = picamera.PiCamera(resolution='400x300', framerate=15)
