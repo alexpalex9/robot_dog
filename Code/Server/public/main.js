@@ -129,12 +129,17 @@ var init = function(){
 		
 	})
 	
-	console.log("motion detection")
+	console.log("load motion detection")
 	$('#videoContainer').motionDetection({
 		$canvas : $("#motion_overlay"),
 		$source : $("#webcam")
 		
 	});
+	
+	console.log("load a2c")
+	var a2c = actor_critic()
+
+
 	
 	/*
 const options = {
@@ -199,7 +204,6 @@ md.onDetect((other, data) => {
    csActualRatio
     
 }) */
-
 
 }
 

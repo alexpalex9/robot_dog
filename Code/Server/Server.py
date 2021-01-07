@@ -23,7 +23,10 @@ from http import server
 from urllib.parse import urlparse, parse_qs
 import json
 
-        
+# TODO:
+# 1. use flask only, forget about this Server.py + Window client
+# 2. implement a2C : https://naifmehanna.com/2019-02-01-implementing-a2c-algorithm-using-tensorflow-js/
+# 3. recode a2c :  https://www.tensorflow.org/js/guide/save_load   
 class StreamingOutput(object):
     def __init__(self):
         self.frame = None

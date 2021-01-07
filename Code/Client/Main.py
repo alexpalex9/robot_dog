@@ -8,6 +8,13 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from Client import *
 from Calibration import *
+
+from flask import Flask, render_template, request, Response
+from flask_socketio import SocketIO
+import threading
+
+
+
 class MyWindow(QMainWindow,Ui_client):
     def __init__(self):
         super(MyWindow,self).__init__()
@@ -117,7 +124,44 @@ class MyWindow(QMainWindow,Ui_client):
 
         self.drawpoint=[585,135]
         self.initial=True
-
+        
+        
+        self.app = Flask(__name__,
+                    static_url_path='', 
+                    static_folder='public',
+                    template_folder='templates')
+        self.socketio = SocketIO(self.app)
+                
+        @self.app.route('/')
+        def main():
+            return "hello robotdog 2!"
+            #return render_template('main.html', saved_models = saved_models, inp=selected_model)
+        """
+        def gen():
+            while True:
+                ret, jpeg = self.client.image
+                frame = jpeg.tobytes()
+                yield (b'--frame\r\n'
+                       b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+    
+        @app.route('/stream')
+        def video_feed():
+            if self.client.image:
+                return Response(gen(),
+                                mimetype='multipart/x-mixed-replace; boundary=frame')
+                
+        @socketio.on('connect', namespace='/dd')
+        def ws_conn():
+            #c = db.incr('connected')
+            print('connect')
+            socketio.emit('msg', {'count': 4}, namespace='/dd')
+        """
+        
+    def startFlask(self):
+        flaskThread = threading.Thread(self.socketio.run(self.app, "0.0.0.0", port=81))
+        flaskThread.start()
+        print("thread Flask end")
+        
     #keyboard
     def keyPressEvent(self, event):
         if(event.key() == Qt.Key_C):
@@ -1067,8 +1111,29 @@ class ledWindow(QMainWindow,Ui_led):
         rgb = np.array((r, g, b))
         return rgb
 
+
+def launcher(args):
+    app = QApplication([args])
+    myshow=MyWindow()
+    myshow.show()
+    #sys.exit(app.exec_())
+    print("starting Flask")
+    flaskThread = threading.Thread(myshow.startFlask())
+    flaskThread.start()
+    
 if __name__ == '__main__':
+    #print(sys.argv,type(sys.argv))
+    #appThread = threading.Thread(target = launcher, args=sys.argv)
+    #appThread.start()
     app = QApplication(sys.argv)
     myshow=MyWindow()
     myshow.show()
-    sys.exit(app.exec_())
+    #sys.exit(app.exec_())
+    print("thread window")
+    appThread = threading.Thread(target = app.exec_)
+    appThread.start()
+    print("starting Flask ?")
+    flaskThread = threading.Thread(myshow.startFlask())
+    flaskThread.start()
+    
+    

@@ -133,13 +133,18 @@
 		*/
 		
 		function update() {
-			drawVideo();
-			checkMotion();
-			setTimeout(update, settings.pollingFrequency);
+			if (video.naturalHeight!=0){
+				drawVideo();
+				checkMotion();
+				setTimeout(update, settings.pollingFrequency);
+			}
 		}
 
 		function drawVideo() {
-			canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
+			// console.log("isempty?",video.complete,video.naturalHeight);
+			// if (video.naturalHeight!=0){
+				canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
+			// }
 		}
 
 		function checkMotion() {
