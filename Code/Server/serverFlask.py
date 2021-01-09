@@ -1,42 +1,64 @@
 #!/usr/bin/env python
 from flask import Flask, render_template, Response
-from flask_socketio import SocketIO
-
 import io
-from time import time
+import time
+import threading
+import picamera
 
+class Camera(object):
+    thread = None  # background thread that reads frames from camera
+    frame = None  # current frame is stored here by background thread
+    last_access = 0  # time of last client access to the camera
 
-import sys
-PORT = 51
+    def initialize(self):
+        if Camera.thread is None:
+            # start background frame thread
+            Camera.thread = threading.Thread(target=self._thread)
+            Camera.thread.start()
 
-DEV = True
+            # wait until frames start to be available
+            while self.frame is None:
+                time.sleep(0)
 
-if DEV!=True:
-    import picamera
-    from base_camera import BaseCamera
-    class Camera(BaseCamera):
-        @staticmethod
-        def frames():
-            with picamera.PiCamera() as camera:
-                # let camera warm up
-                #time.sleep(2)
-    
-                stream = io.BytesIO()
-                for _ in camera.capture_continuous(stream, 'jpeg',
-                                                     use_video_port=True):
-                    # return current frame
-                    stream.seek(0)
-                    yield stream.read()
-    
-                    # reset stream for next frame
-                    stream.seek(0)
-                    stream.truncate()
+    def get_frame(self):
+        Camera.last_access = time.time()
+        self.initialize()
+        return self.frame
+
+    @classmethod
+    def _thread(cls):
+        with picamera.PiCamera() as camera:
+            # camera setup
+            camera.resolution = (320, 240)
+            #camera.hflip = True
+            #camera.vflip = True
+
+            # let camera warm up
+            #camera.start_preview()
+            #time.sleep(2)
+
+            stream = io.BytesIO()
+            for foo in camera.capture_continuous(stream, 'jpeg',
+                                                 use_video_port=True):
+                # store frame
+                stream.seek(0)
+                cls.frame = stream.read()
+
+                # reset stream for next frame
+                stream.seek(0)
+                stream.truncate()
+
+                # if there hasn't been any clients asking for frames in
+                # the last 10 seconds stop the thread
+                if time.time() - cls.last_access > 10:
+                    break
+        cls.thread = None
+
 
 app = Flask(__name__,
-            static_url_path='', 
+            static_url_path='',
             static_folder='public',
             template_folder='view')
-socketio = SocketIO(app)
 
 @app.route('/')
 def index():
@@ -48,14 +70,10 @@ def gen(camera):
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
-@app.route('/stream')
+@app.route('/stream.mjpg')
 def video_feed():
     return Response(gen(Camera()),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == '__main__':
-    print(sys.argv)
-    #app.run(host='0.0.0.0', debug=True)
-    socketio.run(app, "0.0.0.0", port=PORT)
-    #t2 = threading.Thread(socketio.run(app, "0.0.0.0", port=PORT))
-    #t2.start()
+    app.run(host='0.0.0.0', debug=True)
