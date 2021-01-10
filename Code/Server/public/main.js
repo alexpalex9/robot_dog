@@ -138,9 +138,14 @@ var init = function(){
 	
 	//console.log("load a2c")
 	//var a2c = actor_critic()
-
-
-	
+	/*
+	var $canvas = $('#rgb_canvas')
+	var $rgb = $('#rgb')
+	var canvas =$canvas.get(0)
+	var ctx = canvas.getContext('2d')
+	ctx.drawImage($rgb.get(0), 0, 0, canvas.width, canvas.height);
+	console.log(ctx.getImageData(0, 0, canvas.width, canvas.height))
+	*/
 	/*
 const options = {
     gridSize: {

@@ -12,7 +12,7 @@
 	$.fn.motionDetection = function(options) {
 		
 		var defaults = {
-			pollingFrequency: 250,
+			pollingFrequency: 1000,
 			threshold: 0.25,
 			hide: true,
 			$canvas : $('.motionDetection_overlay'),
@@ -54,7 +54,7 @@
 				cellheight = 48 //48
 				cellheightqty = 10 // 10
 				settings.cellsQty = cellwidthqty * cellheightqty
-				cellArea = 30.72
+				cellArea = cellheight * cellwidth
 				for (var i = 0; i < settings.cellsQty; i++) {
 					var x = Math.floor((i % cellwidthqty) * cellwidth)
 					//var x = Math.floor((i / cellwidthqty)) * cellwidth
@@ -141,8 +141,8 @@
 		function drawVideo() {
 			// console.log("isempty?",video.complete,video.naturalHeight);
 			// if (video.naturalHeight!=0){
-			console.log("draw video")
-				canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
+			//console.log("draw video")
+			canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
 			// }
 		}
 
@@ -150,6 +150,13 @@
 			//previousFrame = (!previousFrame) ? canvasContext.getImageData(0, 0, canvas.width, canvas.height) : currentFrame;
 			currentFrame = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
 			//console.log(currentFrame)
+			/*
+			var newframe  = currentFrame
+			console.log("old",currentFrame.data.length)
+			newframe.data = reframe(currentFrame.data)
+			console.log("new",reframe(currentFrame.data).length)
+			$('#motion_frame1').get(0).getContext('2d').putImageData(newframe,0,0)
+			*/
 			if (!previousFrame){
 				previousFrame = currentFrame;
 			}
@@ -160,7 +167,7 @@
 				settings.onDetection.call(this,data);
 			//}
 		}
-		function reframe(frame){
+		function reframe(frame,log){
 			//settings.cellsQty = 10
 			rate = parseInt(frame.length/(settings.cellsQty));
 			//settings.cellrate = rate
@@ -171,31 +178,34 @@
 			for (var i = 0; i < settings.cellsQty; i++) {
 				var a=0,b=0,c=0,d=0;
 				//for (var j =  i * rate; j < (i+1) * rate / 4; j++) {
+				var count = 0;
 				for (var j =  i * rate; j < (i+1) * rate ; j=j+4) {
-					//console.log(i,j)
+					//if (log==true){console.log("frame=",frame[j])}
 					a = a + frame[j]
 					b = b + frame[j+1]
 					c = c + frame[j+2]
 					d = d + frame[j+3]
+					count = count + 1
 				}
-				//console.log("a=",a)
-				newframe.push(a/rate)
-				newframe.push(b/rate)
-				newframe.push(c/rate)
-				newframe.push(d/rate)
+				if (log==true){console.log("a=",a/count)}
+				newframe.push(a/count)
+				newframe.push(b/count)
+				newframe.push(c/count)
+				newframe.push(d/count)
 			}
-			//console.log(i,j,frame.length)
+			console.log(i,j,frame.length,newframe.length)
 			return newframe
 		}
 		function difference(frame1, frame2) {
 			
 			frame1 = reframe(frame1)
 			frame2 = reframe(frame2)
+			
 			//console.log('frame1',frame1)
 			//console.log('frame2',frame2)
 			var pixelsChanged = 0;
 			//console.log(frame1)
-			frameDiff = []
+			var frameDiff = [];
 			//for (var i = 0; i < (frame1.length / 4); i++) {
 			//console.log('frame1 RERERE.length',frame1.length)
 			for (var i = 0; i < frame1.length ; i = i + 4) {
@@ -204,11 +214,12 @@
 				var avg2 = (frame2[i] + frame2[i+1] + frame2[i+2]) / 3;
 				// The grayscale difference for that pixel
 				var diff = Math.abs(avg1 - avg2);
+				frameDiff.push(diff);
 				//console.log(avg1,avg2,diff)
 				// Count the pixel as changed if above 0x15 threshold
 				pixelsChanged += (diff > 0x15);
 				//pixelsChanged += (diff > 0x15);
-				frameDiff.push(diff)
+				
 			}
 			//console.log(frameDiff)
 			return {pixelsChanged:pixelsChanged,frame:frameDiff,canvas:settings.$canvas[0],settings:settings};

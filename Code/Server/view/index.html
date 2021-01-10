@@ -27,8 +27,12 @@
 		<canvas id="face_overlay" width="640" height="480" ></canvas>
 		<canvas id="motion_draw" width="640" height="480" ></canvas>
 		<canvas id="motion_overlay" width="640" height="480" style="position:absolute;left:0"></canvas>
-			
+		<!--<canvas id="motion_frame1" width="640" height="480" ></canvas>-->
+		
 		</div>
+		<canvas id="rgb_canvas" width="2" height="2">
+		  <img id="rgb" style="width:2px;height:2px" src="rgb.png" ></img>
+		</canvas>
 		<a class="button cmd" data-v="test" data-cmd="CMD_TEST#45">TEST</a>
 		<a class="button cmd" data-v="test" data-cmd="CMD_DUMMY#45">TEST error</a>
 		<a id="face_detection_button" class="button disabled">Face</a>

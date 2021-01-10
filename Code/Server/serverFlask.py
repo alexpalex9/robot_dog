@@ -31,7 +31,7 @@ class Camera(object):
             # camera setup
             #camera.resolution = (320, 240)
             #camera.resolution = (640, 480)
-            camera.resolution = (64, 48)
+            camera.resolution = (640, 480)
             camera.framerate = 24
             #camera.hflip = True
             #camera.vflip = True
