@@ -38,7 +38,7 @@ var init = function(){
 			_this.face_detection.job = setInterval(function(){
 				console.log("face detection")
 				face_detection()
-			  },1000)
+			  },2000)
 		}else{
 			_this.face_detection.$canvas.get(0).getContext('2d').clearRect(0, 0, _this.face_detection.$canvas.get(0).width, _this.face_detection.$canvas.get(0).height);
 			clearInterval(_this.face_detection.job)
@@ -136,8 +136,8 @@ var init = function(){
 		
 	});
 	
-	console.log("load a2c")
-	var a2c = actor_critic()
+	//console.log("load a2c")
+	//var a2c = actor_critic()
 
 
 	
