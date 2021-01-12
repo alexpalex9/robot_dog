@@ -1,217 +1,166 @@
-/**
- * jquery.motionDetection.js
- * @version: v1.0.0
- * @author: Sebastian Marulanda http://marulanda.me
- * @see: https://github.com/smarulanda/jquery.motionDetection
- */
- 
- // séparer canvas drawing en video memory!!
-
 (function($) {
 
 	$.fn.motionDetection = function(options) {
 		
 		var defaults = {
 			pollingFrequency: 1000,
-			threshold: 0.25,
+			threshold: 0.0,
 			hide: true,
-			$canvas : $('.motionDetection_overlay'),
-			$source : $('.motionDetection'),
-			cellsQty : 12,
+			$canvas_draw : $('#motion_draw'),
+			$canvas_overlay : $('#motion_overlay'),
+			$source : $('#webcam'),
+			cellwidthqty : 64,
+			cellheightqty : 48,
 			movementThreshold : 0.1,
 			onDetection: function(data) { 
 				console.log("Motion detected!",data); 
-				
-				//const canvas = ctx.canvas;
-				var canvas = data.canvas
-				//canvas.width = canvas.width;
-				//canvas.height = canvas.height;
-				var ctx = canvas.getContext('2d')
-				
-				//ctx.save();
-				//csActualRatio = 
-				//csActualRatio = canvas.width / canvas.height
-				//cs.x *= csActualRatio;
-				//cs.y *= csActualRatio;
-				
-				
+				var ctx = canvas_overlayContext
 				const grid = data.frame;
-				//console.log(canvas.width,canvas.height)
-				//ctx.clearRect(0, 0, canvas.width, canvas.height);
-				var csratio = grid.length / canvas.width
-				var aspectRatio = canvas.width / canvas.height
-				// to calculate
-				//console.log("settings",settings,data.settings)
-				var cellArea = canvas.width * canvas.height / settings.cellsQty;
-				var cellwidth = Math.sqrt(cellArea) * aspectRatio
-				var cellheight = cellArea / cellwidth
-				//console.log('cell dime',cellArea,cellwidth,cellheight)
-				var cellwidthqty = Math.floor(canvas.width / cellwidth)
-				//console.log("cell dimension",cellwidth,cellheight,cellArea,csratio)
 				
-				cellwidth = 64 // 64
-				cellwidthqty = 10 //10
-				cellheight = 48 //48
-				cellheightqty = 10 // 10
-				settings.cellsQty = cellwidthqty * cellheightqty
-				cellArea = cellheight * cellwidth
+				var cellwidth = settings.cellwidth
+				var cellheight = settings.cellheight
+				var cellwidthqty = settings.cellwidthqty
+				var cellheightqty = settings.cellheightqty
+				
+				ctx.clearRect(0, 0, canvas_overlay.width, canvas_overlay.height);
 				for (var i = 0; i < settings.cellsQty; i++) {
 					var x = Math.floor((i % cellwidthqty) * cellwidth)
-					//var x = Math.floor((i / cellwidthqty)) * cellwidth
-					var y = Math.floor(i / cellheightqty) * cellheight
-					//var y = Math.floor(i % cellheightqty * cellheight)
-					var intensity = grid[i] /10 ;// / cellArea;
-					//console.log('draw',x,y,grid[i],intensity)
-					//ctx.strokeStyle = 'rgba(0, 80, 200, 0.2)';
+					var y = Math.floor(i / cellwidthqty) * cellheight
+					var intensity = grid[i] / 255 ;// / cellArea;
 					ctx.fillStyle = intensity > settings.movementThreshold ? `rgba(0, 80, 200, ${0.1 + intensity})` : 'transparent';
-					//ctx.strokeStyle = ctx.fillStyle;
-					//console.log('draw',x,y,ctx.fillStyle,intensity )
 					ctx.beginPath();
 					
 					ctx.rect(x, y, cellwidth , cellheight);
 					ctx.closePath();
-					//ctx.stroke();
 					ctx.fill();
 				}
-				/*
-				// scale up cell size
-				const cellArea = cs.x * cs.y;
-				cs.x *= csActualRatio;
-				cs.y *= csActualRatio;
-				
-				ctx.strokeStyle = 'rgba(0, 80, 200, 0.2)';
-
-				ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-				grid.forEach((cell, i) => {
-					const x = i % gs.x;
-					const y = Math.floor(i / gs.x);
-					let intensity = cell / cellArea;
-					// higher opacity for cells with more movement
-					ctx.fillStyle = intensity > options.movementThreshold ? `rgba(0, 80, 200, ${0.1 + intensity})` : 'transparent';
-
-					ctx.beginPath();
-					ctx.rect(x * cs.x, y * cs.y, cs.x, cs.y);
-					ctx.closePath();
-					ctx.stroke();
-					ctx.fill();
-				});
-				*/
 			}
 		};
 
 		var settings = $.extend({}, defaults, options);
-
-		var canvas, canvasContext;
+		var canvas_draw, canvas_drawContext, cavans_overlay, canvas_overlayContext;
 		var previousFrame, currentFrame;
+		
+		video = settings.$source[0];
+		canvas_draw = settings.$canvas_draw[0];
+		canvas_draw.width = video.width;
+		canvas_draw.height = video.height;
+		canvas_drawContext = canvas_draw.getContext('2d');
+		
+		canvas_overlay = settings.$canvas_overlay[0];
+		canvas_overlay.width = video.width;
+		canvas_overlay.height = video.height;
+		canvas_overlayContext = canvas_overlay.getContext('2d');
+		
+		settings.cellsQty = settings.cellwidthqty * settings.cellheightqty			
+		settings.cellwidth = canvas_draw.width / settings.cellwidthqty // 64
+		settings.cellheight =  canvas_draw.height / settings.cellheightqty // 64
+		// settings.cellwidthqty = cellwidthqty
+		// settings.cellheightqty = cellheightqty
+
+		function drawVideoCanvas(){
+			// function to show pixelized image, not use, more for debugging
+			var canvas = $('#motion_pixel').get(0)
+			currentFrame = canvasContext.getImageData(0, 0, canvas.width,canvas.height);
+			var ctx = canvas.getContext('2d')	
+			cellwidth = settings.cellwidth
+			cellheight = settings.cellheight
+			cellwidthqty = settings.cellwidthqty
+			cellheightqty = settings.cellheightqty
+			data = reframe(currentFrame.data)
+			
+			for (var i = 0; i < settings.cellsQty * 4; i = i + 4) {
+				var x = Math.floor((i/4 % cellwidthqty) * cellwidth)
+				var y = Math.floor(i/4 / cellwidthqty) * cellheight
+				ctx.fillStyle = "rgba( " + data[i] + "," + data[i+1] + "," + data[i+2] + "," + data[i+3] +" )"
+				ctx.strokeStyle = "rgba(0,0,0,1)";
+				ctx.beginPath();
+				ctx.rect(x, y, cellwidth , cellheight);
+				ctx.closePath();
+				ctx.fill();
+			}
+		}
 
 		return this.each(function() {
-			video = settings.$source[0];
-			canvas = settings.$canvas[0];
-			//console.log(video,canvas)
-			//video.setAttribute("autoplay", true);
-
-			canvas.width = video.width;
-			canvas.height = video.height;
-
-			canvasContext = canvas.getContext('2d');
-			
-			//cellWidth = parseInt(canvas.width/horizontalCells)
-			//cellHeight = parseInt(canvas.height/verticalCells)
-			
-
-			//if (settings.hide) {
-			//	video.style.display = "none";
-				//canvas.style.display = "none";
-			//}
-
-			// setupWebcam();
 			update();
 		});
 		
 		function update() {
-			//console.log('update',settings.pollingFrequency,video.naturalHeight)
 			if (video.naturalHeight!=0){
 				drawVideo();
+				// drawVideoCanvas()
 				checkMotion();
-				
 			}
 			setTimeout(update, settings.pollingFrequency);
 		}
 
 		function drawVideo() {
-			// console.log("isempty?",video.complete,video.naturalHeight);
-			// if (video.naturalHeight!=0){
-			//console.log("draw video")
-			canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
-			// }
+			canvas_drawContext.drawImage(video, 0, 0, canvas_draw.width, canvas_draw.height);
 		}
 
 		function checkMotion() {
-			//previousFrame = (!previousFrame) ? canvasContext.getImageData(0, 0, canvas.width, canvas.height) : currentFrame;
-			currentFrame = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
-			//console.log(currentFrame)
-			/*
-			var newframe  = currentFrame
-			console.log("old",currentFrame.data.length)
-			newframe.data = reframe(currentFrame.data)
-			console.log("new",reframe(currentFrame.data).length)
-			$('#motion_frame1').get(0).getContext('2d').putImageData(newframe,0,0)
-			*/
+			currentFrame = reframe(canvas_drawContext.getImageData(0, 0, canvas_draw.width, canvas_draw.height).data);
 			if (!previousFrame){
 				previousFrame = currentFrame;
 			}
-			var data = difference(previousFrame.data, currentFrame.data);
+			var data = difference(previousFrame, currentFrame);
 			previousFrame = currentFrame;
-			//console.log(data)
-			//if (data.pixelsChanged > (settings.threshold * canvas.width * canvas.height)) {
+			if (data.pixelsChanged > (settings.threshold * settings.cellsQty)) {
 				settings.onDetection.call(this,data);
-			//}
+			}else{
+				canvas_overlayContext.clearRect(0, 0, canvas_overlay.width, canvas_overlay.height);
+			}
 		}
-		function reframe(frame,log){
-			//settings.cellsQty = 10
-			rate = parseInt(frame.length/(settings.cellsQty));
-			//settings.cellrate = rate
-			//settings.cellratio = rate / 4  
-			//console.log("rate",rate)
+
+		function reframe(frame){
 			var newframe = []
-			
+			cellwidth = settings.cellwidth
+			cellheight = settings.cellheight
+			cellwidthqty = settings.cellwidthqty
+			cellheightqty = settings.cellheightqty
+			settings.cellsQty = cellwidthqty * cellheightqty
+			var count = cellheight * cellwidth;
 			for (var i = 0; i < settings.cellsQty; i++) {
-				var a=0,b=0,c=0,d=0;
-				//for (var j =  i * rate; j < (i+1) * rate / 4; j++) {
-				var count = 0;
-				for (var j =  i * rate; j < (i+1) * rate ; j=j+4) {
-					//if (log==true){console.log("frame=",frame[j])}
-					a = a + frame[j]
-					b = b + frame[j+1]
-					c = c + frame[j+2]
-					d = d + frame[j+3]
-					count = count + 1
+				var a=0
+				var b=0
+				var c=0
+				var d=0;
+				var hstart = Math.floor( i /  cellwidthqty ) 				
+				var xstart =  i %  cellwidthqty * cellwidth + (hstart * cellwidth * cellheight * cellwidthqty)
+				var xend =  xstart + cellwidth
+				var ystep = cellwidth * cellwidthqty
+				
+				for (var x = xstart ; x<xend; x++){
+					var ystart = x
+					var yend = x + cellwidth * cellwidthqty * cellheight
+					// console.log("i",i,"index",ystart,yend,"step=",ystep)
+					for (var y = ystart ; y < yend  ; y = y + ystep){
+						var index = y * 4
+						a = a + frame[index];
+						b = b + frame[index+1];
+						c = c + frame[index+2];
+						d = d + frame[index+3];
+
+					}
 				}
-				if (log==true){console.log("a=",a/count)}
+				
 				newframe.push(a/count)
 				newframe.push(b/count)
 				newframe.push(c/count)
 				newframe.push(d/count)
 			}
-			console.log(i,j,frame.length,newframe.length)
+
 			return newframe
 		}
 		function difference(frame1, frame2) {
-			
-			frame1 = reframe(frame1)
-			frame2 = reframe(frame2)
-			
-			//console.log('frame1',frame1)
-			//console.log('frame2',frame2)
 			var pixelsChanged = 0;
-			//console.log(frame1)
 			var frameDiff = [];
-			//for (var i = 0; i < (frame1.length / 4); i++) {
-			//console.log('frame1 RERERE.length',frame1.length)
 			for (var i = 0; i < frame1.length ; i = i + 4) {
 				// Average a pixel's 3 color channels
 				var avg1 = (frame1[i] + frame1[i+1] + frame1[i+2]) / 3;
-				var avg2 = (frame2[i] + frame2[i+1] + frame2[i+2]) / 3;
+				// var avg1 = (frame1[i] + frame1[i+1] + frame1[i+2] + frame1[i+3]) / 3;
+				var avg2 = (frame2[i] + frame2[i+1] + frame2[i+2] ) / 3;
+				// var avg2 = (frame2[i] + frame2[i+1] + frame2[i+2] + frame2[i+3]) / 3;
 				// The grayscale difference for that pixel
 				var diff = Math.abs(avg1 - avg2);
 				frameDiff.push(diff);
@@ -222,7 +171,7 @@
 				
 			}
 			//console.log(frameDiff)
-			return {pixelsChanged:pixelsChanged,frame:frameDiff,canvas:settings.$canvas[0],settings:settings};
+			return {pixelsChanged:pixelsChanged,frame:frameDiff};
 		}
 	
 	}

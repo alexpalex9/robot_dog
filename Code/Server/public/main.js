@@ -87,7 +87,9 @@ var init = function(){
 
     async function face_detection(){
       console.log("detection")
-      var detection =  await faceapi.detectAllFaces($('#webcam').get(0)).withFaceLandmarks().withFaceExpressions().withFaceDescriptors()      
+	  // new faceapi.TinyFaceDetectorOptions()
+		var options =  new faceapi.SsdMobilenetv1Options({ minConfidence: 0.2})
+      var detection =  await faceapi.detectAllFaces($('#webcam').get(0),options).withFaceLandmarks().withFaceExpressions().withFaceDescriptors()       
       //context.clearRect(0, 0, canvas.width, canvas.height);
       _this.face_detection.$canvas.get(0).getContext('2d').clearRect(0, 0, _this.face_detection.$canvas.get(0).width, _this.face_detection.$canvas.get(0).height);
       if (detection.length){
