@@ -383,9 +383,9 @@ class Server:
             
             return True
         else:
-            print("will pass that for test")
-            #self.control.order=data
-            #self.control.timeout=time.time()
+            #print("will pass that for test")
+            self.control.order=data
+            self.control.timeout=time.time()
             return True
             
     def receive_instruction(self):
