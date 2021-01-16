@@ -20,7 +20,6 @@ class Server:
     def __init__(self):
         
         self.tcp_flag=False
-        """
         self.led=Led()
         self.servo=Servo()
         self.adc=ADS7830()
@@ -29,7 +28,6 @@ class Server:
         self.sonic=Ultrasonic()
         self.control.Thread_conditiona.start()
         self.battery_voltage=[8.4,8.4,8.4,8.4,8.4]
-        """
     def get_interface_ip(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         return socket.inet_ntoa(fcntl.ioctl(s.fileno(),
@@ -215,12 +213,12 @@ class Server:
         
 
 if __name__ == '__main__':
-    server=Server()
-    server.turn_on_server()
-    server.tcp_flag=True
-    video=threading.Thread(target=server.transmission_video)
-    video.start()
-    instruction=threading.Thread(target=server.receive_instruction)
+    s = Server()
+    s.turn_on_server()
+    s.tcp_flag=True
+    instruction = threading.Thread(target = s.receive_instruction)
     instruction.start()
+    video=threading.Thread(target=s.transmission_video)
+    video.start()
     #pass
     
