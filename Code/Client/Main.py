@@ -125,7 +125,7 @@ class MyWindow(QMainWindow,Ui_client):
         self.drawpoint=[585,135]
         self.initial=True
         
-        
+        """
         self.app = Flask(__name__,
                     static_url_path='', 
                     static_folder='public',
@@ -136,7 +136,7 @@ class MyWindow(QMainWindow,Ui_client):
         def main():
             return "hello robotdog 2!"
             #return render_template('main.html', saved_models = saved_models, inp=selected_model)
-        """
+        
         def gen():
             while True:
                 ret, jpeg = self.client.image
@@ -1128,12 +1128,12 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     myshow=MyWindow()
     myshow.show()
-    #sys.exit(app.exec_())
-    print("thread window")
-    appThread = threading.Thread(target = app.exec_)
-    appThread.start()
-    print("starting Flask ?")
-    flaskThread = threading.Thread(myshow.startFlask())
-    flaskThread.start()
+    sys.exit(app.exec_())
+    #print("thread window")
+    #appThread = threading.Thread(target = app.exec_)
+    #appThread.start()
+    #print("starting Flask ?")
+    #flaskThread = threading.Thread(myshow.startFlask())
+    #flaskThread.start()
     
     

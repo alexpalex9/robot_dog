@@ -189,19 +189,19 @@ class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
         
         
 class Server:
-    def __init__(self,webUI=True):
+    def __init__(self,webUI=False):
         
         self.tcp_flag=False
         self.webUI = webUI
         
-        #self.led=Led()
-        #self.servo=Servo()
-        #self.adc=ADS7830()
-        #self.buzzer=Buzzer()
-        #self.control=Control()
-        #self.sonic=Ultrasonic()
-        #self.control.Thread_conditiona.start()
-        #self.battery_voltage=[8.4,8.4,8.4,8.4,8.4]
+        self.led=Led()
+        self.servo=Servo()
+        self.adc=ADS7830()
+        self.buzzer=Buzzer()
+        self.control=Control()
+        self.sonic=Ultrasonic()
+        self.control.Thread_conditiona.start()
+        self.battery_voltage=[8.4,8.4,8.4,8.4,8.4]
         
     def get_interface_ip(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -368,8 +368,7 @@ class Server:
         elif cmd.CMD_POWER in data:
             self.measuring_voltage(client)
         elif cmd.CMD_WORKING_TIME in data:
-            print("not working without shied")
-            '''
+            #print("not working without shied")
             if self.control.move_timeout!=0 and self.control.relax_flag==True:
                 if self.control.move_count >180:
                     command=cmd.CMD_WORKING_TIME+'#'+str(180)+'#'+str(round(self.control.move_count-180))+"\n"
@@ -381,7 +380,6 @@ class Server:
             else:
                 command=cmd.CMD_WORKING_TIME+'#'+str(round(self.control.move_count))+'#'+str(0)+"\n"
             self.send_data(client,command)
-            '''
             
             return True
         else:
@@ -425,7 +423,6 @@ class Server:
                 for oneCmd in cmdArray:
                     data = oneCmd.split("#")
                     self.handle_instructions(self.connection1,data)
-                    """
                     if data==None or data[0]=='':
                         continue
                     elif cmd.CMD_BUZZER in data:
@@ -467,7 +464,7 @@ class Server:
                         print("will pass that for test")
                         #self.control.order=data
                         #self.control.timeout=time.time()
-                    """
+                    
             try:    
                 stop_thread(self.thread_power)
             except:
