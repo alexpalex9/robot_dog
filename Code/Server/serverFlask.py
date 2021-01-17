@@ -97,4 +97,4 @@ def ws_cmd(data):
     print('cmd',data)
 
 if __name__ == '__main__':
-    socketio.run(app, "0.0.0.0", port=PORT)
+    socketio.run(app, "0.0.0.0", port=PORT,debug=True)

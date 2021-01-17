@@ -10,8 +10,8 @@ var init = function(){
     //var context = canvas.getContext('2d')  
     
 	$('html').on('click','.cmd',function(){
-		
-			_this.socket.emit('run',  $(this).data('v')) // {'episodes': $('#episodes').val() , });
+			console.log("click emit")
+			_this.socket.emit('cmd',  $(this).data('v')) // {'episodes': $('#episodes').val() , });
 		// console.log("url =",'cmd?cmd=' + $(this).data('cmd') + '&value=' + $(this).data('v'))
 		// $.ajax({
 			// url : '/cmd&cmd=' + $(this).data('cmd') + '&value=' + $(this).data('v'),
