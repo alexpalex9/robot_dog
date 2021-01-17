@@ -8,6 +8,16 @@ import time
 import threading
 import picamera
 
+from Led import *
+from Servo import *
+from Thread import *
+from Buzzer import *
+from Control import *
+from ADS7830 import *
+from Ultrasonic import *
+from Command import COMMAND as cmd
+
+
 PORT = 5000
 
 class Camera(object):
@@ -64,6 +74,16 @@ class Camera(object):
 
 class Server():
     def __init__(self):
+        self.tcp_flag=False
+        self.led=Led()
+        self.servo=Servo()
+        self.adc=ADS7830()
+        self.buzzer=Buzzer()
+        self.control=Control()
+        self.sonic=Ultrasonic()
+        self.control.Thread_conditiona.start()
+        self.battery_voltage=[8.4,8.4,8.4,8.4,8.4]
+        
         app = Flask(__name__,
                     static_url_path='',
                     static_folder='public',
@@ -98,7 +118,7 @@ class Server():
             cmdArray=allData.split('\n')
             
             print(cmdArray)
-            """
+          
             if cmdArray[-1] !="":
                 cmdArray==cmdArray[:-1]
             for oneCmd in cmdArray:
@@ -143,7 +163,7 @@ class Server():
                 else:
                     self.control.order=data
                     self.control.timeout=time.time()
-            """
+           
         socketio.run(app, "0.0.0.0", port=PORT,debug=True)
 if __name__ == '__main__':
     server = Server()
