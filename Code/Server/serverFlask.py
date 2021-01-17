@@ -6,15 +6,19 @@ from flask_socketio import SocketIO
 import io
 import time
 import threading
-import picamera
 
-from Led import *
-from Servo import *
+DEV = True
+if DEV==False:
+    import picamera
+    from Led import *
+    from Servo import *
+    
+    from Buzzer import *
+    from Control import *
+    from ADS7830 import *
+    from Ultrasonic import *
+
 from Thread import *
-from Buzzer import *
-from Control import *
-from ADS7830 import *
-from Ultrasonic import *
 from Command import COMMAND as cmd
 
 
@@ -75,15 +79,16 @@ class Camera(object):
 class Server():
     def __init__(self):
         self.tcp_flag=False
-        self.led=Led()
-        self.servo=Servo()
-        self.adc=ADS7830()
-        self.buzzer=Buzzer()
-        self.control=Control()
-        self.sonic=Ultrasonic()
-        self.control.Thread_conditiona.start()
-        self.battery_voltage=[8.4,8.4,8.4,8.4,8.4]
         
+        if DEV==False:
+            self.led=Led()
+            self.servo=Servo()
+            self.adc=ADS7830()
+            self.buzzer=Buzzer()
+            self.control=Control()
+            self.sonic=Ultrasonic()
+            self.control.Thread_conditiona.start()
+            self.battery_voltage=[8.4,8.4,8.4,8.4,8.4]
         app = Flask(__name__,
                     static_url_path='',
                     static_folder='public',
@@ -102,8 +107,11 @@ class Server():
         
         @app.route('/stream.mjpg')
         def video_feed():
-            return Response(gen(Camera()),
-                            mimetype='multipart/x-mixed-replace; boundary=frame')
+            if DEV==False:
+                return Response(gen(Camera()),
+                                mimetype='multipart/x-mixed-replace; boundary=frame')
+            else:
+                return "DEV"
         
         @socketio.on('connect', namespace='/robot')
         def ws_conn():
@@ -116,8 +124,11 @@ class Server():
         @socketio.on('cmd', namespace='/robot')
         def ws_cmd(allData):
             cmdArray=allData.split('\n')
-            
             print(cmdArray)
+            if DEV==True:
+                print("Dev, no cmd allowed")
+                return
+            
           
             if cmdArray[-1] !="":
                 cmdArray==cmdArray[:-1]

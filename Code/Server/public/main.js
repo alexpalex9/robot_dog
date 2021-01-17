@@ -2,7 +2,7 @@ var init = function(){
 	var _this = {
 		face_detection :{
 			$canvas : $('#face_overlay')
-		}
+		},
 		COMMAND : {
 		    CMD_MOVE_STOP : "CMD_MOVE_STOP",
 			CMD_MOVE_FORWARD : "CMD_MOVE_FORWARD" ,
@@ -24,6 +24,11 @@ var init = function(){
 			CMD_ATTITUDE : "CMD_ATTITUDE",
 			CMD_RELAX : "CMD_RELAX",
 			CMD_WORKING_TIME : "CMD_WORKING_TIME"	
+			
+		},
+		joy_move : {
+			x :0,
+			y : 0
 			
 		}
 	};
@@ -86,6 +91,31 @@ var init = function(){
 	var joy1X = document.getElementById("joy1X");
 	var joy1Y = document.getElementById("joy1Y");
 
+	setInterval(function(){ 
+		var cmdArray = []
+		var x = Joy1.GetX(); 
+		var y = Joy1.GetY(); 
+		var ratio = 5;
+		if (x!=_this.joy_move.x && y!=_this.joy_move.x){
+			// console.log(x,y);
+			if (x==0 && y==0){
+				// _this.socket.emit('cmd',  _this.COMMAND.CMD_MOVE_STOP)
+				cmdArray.push(_this.COMMAND.CMD_MOVE_STOP)
+			}
+			if (x>0){
+				// _this.socket.emit('cmd',  _this.COMMAND.CMD_MOVE_FORWARD & "#" & x)
+				// console.log(_this.COMMAND.CMD_MOVE_FORWARD + "#" + x)
+				cmdArray.push(_this.COMMAND.CMD_MOVE_FORWARD + "#" + x/ratio)
+			}
+			if (x<0){
+				// _this.socket.emit('cmd',  _this.COMMAND.CMD_MOVE_BACKWARD & "#" & -x)
+				cmdArray.push(_this.COMMAND.CMD_MOVE_BACKWARD + "#" + -x/ratio)
+			}
+			console.log("send CMD",cmdArray)
+		}
+		
+	
+	}, 50);
 	setInterval(function(){ joy1IinputPosX.value=Joy1.GetPosX(); }, 50);
 	setInterval(function(){ joy1InputPosY.value=Joy1.GetPosY(); }, 50);
 	setInterval(function(){ joy1Direzione.value=Joy1.GetDir(); }, 50);
