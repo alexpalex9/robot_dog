@@ -4,6 +4,7 @@ var init = function(){
 			$canvas : $('#face_overlay')
 		}
 	};
+	var url = "http://" + document.domain + ":" + location.port;
 	_this.socket = io.connect(url + "/robot");
 	//var canvas = $('#webcam_overlay').get(0)
     //var context = canvas.getContext('2d')  
