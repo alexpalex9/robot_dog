@@ -123,7 +123,7 @@ class Server():
         
         @socketio.on('cmd', namespace='/robot')
         def ws_cmd(allData):
-            cmdArray=allData.split('\n')
+            cmdArray=allData #.split('\n')
             print(cmdArray)
             if DEV==True:
                 print("Dev, no cmd allowed")
@@ -133,7 +133,7 @@ class Server():
             if cmdArray[-1] !="":
                 cmdArray==cmdArray[:-1]
             for oneCmd in cmdArray:
-                data=oneCmd.split("#")
+                data = oneCmd.split("#")
                 if data==None or data[0]=='':
                     continue
                 elif cmd.CMD_BUZZER in data:
