@@ -93,24 +93,29 @@ var init = function(){
 
 	setInterval(function(){ 
 		var cmdArray = []
+		//var cmdArray = ['CMD_WORKING_TIME','']
 		var x = Joy1.GetX(); 
 		var y = Joy1.GetY(); 
-		var ratio = 5;
+		var ratio = 2;
 		if (x!=_this.joy_move.x && y!=_this.joy_move.x){
 			cmdArray.push(_this.COMMAND.CMD_MOVE_STOP + "#8")
 			// console.log(x,y);
 			if (x==0 && y==0){
-				// _this.socket.emit('cmd',  _this.COMMAND.CMD_MOVE_STOP)
-				// cmdArray.push(_this.COMMAND.CMD_MOVE_STOP)
+				//should stop but already in command
 			}
 			if (y>0){
-				// _this.socket.emit('cmd',  _this.COMMAND.CMD_MOVE_FORWARD & "#" & x)
-				// console.log(_this.COMMAND.CMD_MOVE_FORWARD + "#" + x)
 				cmdArray.push(_this.COMMAND.CMD_MOVE_FORWARD + "#" + parseInt(y/ratio))
 			}
 			if (y<0){
 				// _this.socket.emit('cmd',  _this.COMMAND.CMD_MOVE_BACKWARD & "#" & -x)
 				cmdArray.push(_this.COMMAND.CMD_MOVE_BACKWARD + "#" + parseInt(-y/ratio))
+			}
+			if (x>0){
+				cmdArray.push(_this.COMMAND.CMD_MOVE_RIGHT + "#" + parseInt(y/ratio))
+			}
+			if (x<0){
+				// _this.socket.emit('cmd',  _this.COMMAND.CMD_MOVE_BACKWARD & "#" & -x)
+				cmdArray.push(_this.COMMAND.CMD_MOVE_LEFT + "#" + parseInt(-y/ratio))
 			}
 			console.log("send CMD",cmdArray)
 			_this.socket.emit('cmd',  cmdArray)
