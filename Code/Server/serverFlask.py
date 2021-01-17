@@ -144,7 +144,7 @@ class Server():
                     self.control.order=data
                     self.control.timeout=time.time()
             """
-        socketio.run(self.app, "0.0.0.0", port=PORT,debug=True)
+        socketio.run(app, "0.0.0.0", port=PORT,debug=True)
 if __name__ == '__main__':
     server = Server()
     
