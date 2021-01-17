@@ -97,10 +97,11 @@ var init = function(){
 		var y = Joy1.GetY(); 
 		var ratio = 5;
 		if (x!=_this.joy_move.x && y!=_this.joy_move.x){
+			cmdArray.push(_this.COMMAND.CMD_MOVE_STOP)
 			// console.log(x,y);
 			if (x==0 && y==0){
 				// _this.socket.emit('cmd',  _this.COMMAND.CMD_MOVE_STOP)
-				cmdArray.push(_this.COMMAND.CMD_MOVE_STOP)
+				// cmdArray.push(_this.COMMAND.CMD_MOVE_STOP)
 			}
 			if (x>0){
 				// _this.socket.emit('cmd',  _this.COMMAND.CMD_MOVE_FORWARD & "#" & x)
@@ -112,6 +113,9 @@ var init = function(){
 				cmdArray.push(_this.COMMAND.CMD_MOVE_BACKWARD + "#" + -x/ratio)
 			}
 			console.log("send CMD",cmdArray)
+			_this.socket.emit('cmd',  cmdArray)
+			_this.joy_move.x = x
+			_this.joy_move.y = y
 		}
 		
 	

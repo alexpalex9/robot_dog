@@ -7,7 +7,7 @@ import io
 import time
 import threading
 
-DEV = True
+DEV = False
 if DEV==False:
     import picamera
     from Led import *
