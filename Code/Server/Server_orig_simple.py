@@ -152,7 +152,7 @@ class Server:
                 break
             else:
                 cmdArray=allData.split('\n')
-                #print(cmdArray)
+                print(cmdArray)
                 if cmdArray[-1] !="":
                     cmdArray==cmdArray[:-1]
             
