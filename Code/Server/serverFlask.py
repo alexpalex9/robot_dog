@@ -1,9 +1,14 @@
 #!/usr/bin/env python
 from flask import Flask, render_template, Response
+from flask_socketio import SocketIO
+
+
 import io
 import time
 import threading
 import picamera
+
+PORT = 5000
 
 class Camera(object):
     thread = None  # background thread that reads frames from camera
@@ -62,6 +67,7 @@ app = Flask(__name__,
             static_url_path='',
             static_folder='public',
             template_folder='view')
+socketio = SocketIO(app)
 
 @app.route('/')
 def index():
@@ -78,5 +84,17 @@ def video_feed():
     return Response(gen(Camera()),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
+@socketio.on('connect', namespace='/robot')
+def ws_conn():
+    print('connect')
+
+@socketio.on('disconnect', namespace='/robot')
+def ws_disconn():
+    print('disconnect')
+
+@socketio.on('cmd', namespace='/robot')
+def ws_cmd(data):
+    print('cmd',data)
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    socketio.run(app, "0.0.0.0", port=PORT)

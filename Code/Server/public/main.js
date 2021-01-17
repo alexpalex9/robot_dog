@@ -4,32 +4,34 @@ var init = function(){
 			$canvas : $('#face_overlay')
 		}
 	};
+	_this.socket = io.connect(url + "/robot");
 	//var canvas = $('#webcam_overlay').get(0)
     //var context = canvas.getContext('2d')  
     
 	$('html').on('click','.cmd',function(){
-		console.log("url =",'cmd?cmd=' + $(this).data('cmd') + '&value=' + $(this).data('v'))
-		$.ajax({
-			url : '/cmd&cmd=' + $(this).data('cmd') + '&value=' + $(this).data('v'),
-			//url : '/cmd',
-			type : 'GET',
-			dataType : 'json', //'html',
-			data : {
-				cmd : $(this).data('cmd'),
-				value : $(this).data('v')
+		
+			_this.socket.emit('run',  $(this).data('v')) // {'episodes': $('#episodes').val() , });
+		// console.log("url =",'cmd?cmd=' + $(this).data('cmd') + '&value=' + $(this).data('v'))
+		// $.ajax({
+			// url : '/cmd&cmd=' + $(this).data('cmd') + '&value=' + $(this).data('v'),
+			// type : 'GET',
+			// dataType : 'json', //'html',
+			// data : {
+				// cmd : $(this).data('cmd'),
+				// value : $(this).data('v')
 				
-			},
-			timeout : 50000,		
-			success : function (data, status) {
-				console.log("success",data)
-				console.log(typeof(data))
-			},
-			error: function(xhr,error) {
-				console.log("error in ajax request",error)
-			},
-			complete:function(){
-			}
-		});
+			// },
+			// timeout : 50000,		
+			// success : function (data, status) {
+				// console.log("success",data)
+				// console.log(typeof(data))
+			// },
+			// error: function(xhr,error) {
+				// console.log("error in ajax request",error)
+			// },
+			// complete:function(){
+			// }
+		// });
 	})
 	$('html').on('click','#face_detection_button:not(.disabled)',function(){
 		if (_this.face_detection.job===undefined){
