@@ -97,20 +97,20 @@ var init = function(){
 		var y = Joy1.GetY(); 
 		var ratio = 5;
 		if (x!=_this.joy_move.x && y!=_this.joy_move.x){
-			cmdArray.push(_this.COMMAND.CMD_MOVE_STOP)
+			cmdArray.push(_this.COMMAND.CMD_MOVE_STOP + "#8")
 			// console.log(x,y);
 			if (x==0 && y==0){
 				// _this.socket.emit('cmd',  _this.COMMAND.CMD_MOVE_STOP)
 				// cmdArray.push(_this.COMMAND.CMD_MOVE_STOP)
 			}
-			if (x>0){
+			if (y>0){
 				// _this.socket.emit('cmd',  _this.COMMAND.CMD_MOVE_FORWARD & "#" & x)
 				// console.log(_this.COMMAND.CMD_MOVE_FORWARD + "#" + x)
-				cmdArray.push(_this.COMMAND.CMD_MOVE_FORWARD + "#" + x/ratio)
+				cmdArray.push(_this.COMMAND.CMD_MOVE_FORWARD + "#" + parseInt(y/ratio))
 			}
-			if (x<0){
+			if (y<0){
 				// _this.socket.emit('cmd',  _this.COMMAND.CMD_MOVE_BACKWARD & "#" & -x)
-				cmdArray.push(_this.COMMAND.CMD_MOVE_BACKWARD + "#" + -x/ratio)
+				cmdArray.push(_this.COMMAND.CMD_MOVE_BACKWARD + "#" + parseInt(-y/ratio))
 			}
 			console.log("send CMD",cmdArray)
 			_this.socket.emit('cmd',  cmdArray)
