@@ -126,7 +126,7 @@ class Server:
         if self.control.move_flag!=2:
             command=cmd.CMD_RELAX+"#"+str(self.control.move_flag)+"\n"
             self.send_data(self.connection1,command)
-            self.control.move_flag= 2  
+            self.control.move_flag= 2
                   
     def receive_instruction(self):
         try:
