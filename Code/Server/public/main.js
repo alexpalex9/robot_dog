@@ -156,9 +156,9 @@ var init = function(){
 						}
 					}else{
 						_this.joy_move.diagonal.current = "x"
-						if (x>0){
+						if ((x>0 && y>0) || (x<0 && y>0)){
 							cmdArrayD.push(_this.COMMAND.CMD_TURN_RIGHT + "#" + parseInt(x/ratio))
-						}else if (x<0){
+						}else if ((x<0 && y>0) || (x>0 && y<0)){
 							cmdArrayD.push(_this.COMMAND.CMD_TURN_LEFT + "#" + parseInt(-x/ratio))
 						}
 					}
