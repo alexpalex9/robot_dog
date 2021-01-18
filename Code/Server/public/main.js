@@ -30,8 +30,9 @@ var init = function(){
 		joy_move : {
 			x :0,
 			y : 0,
-			diagonal : {}
-			
+			diagonal : {},
+			ratio : 3,
+			sensitivity : 33
 		}
 	};
 	var url = "http://" + document.domain + ":" + location.port;
@@ -101,39 +102,38 @@ var init = function(){
 		//var cmdArray = ['CMD_WORKING_TIME','']
 		var x = Joy1.GetX();
 		var y = Joy1.GetY();
-		var ratio = 3;
-		var sensitivity = 33
+		
 		// if (x!=_this.joy_move.x && y!=_this.joy_move.x){
 		// console.log("x",,Math.abs(x-_this.joy_move.x)>sensitivity || Math.abs(y-_this.joy_move.x)>sensitivity)
 			// || (x==0 && y==0 && (x!=_this.joy_move.x || y!=_this.joy_move.y)))
 		// console.log((x==0 && y==0 && (x!=_this.joy_move.x || y!=_this.joy_move.y)))
-		if ((Math.abs(x-_this.joy_move.x)>sensitivity || Math.abs(y-_this.joy_move.y)>sensitivity)
+		if ((Math.abs(x-_this.joy_move.x)>_this.joy_move.sensitivity || Math.abs(y-_this.joy_move.y)>_this.joy_move.sensitivity)
 			|| (x==0 && y==0 && (x!=_this.joy_move.x || y!=_this.joy_move.y)) ){
 			// console.log("clear Interval",x,y,Math.abs(x)-0<sensitivity,Math.abs(y)<sensitivity)
 			clearInterval(_this.joy_move.diagonal.interval)
 			// delete _this.joy_move.diagonal.interval
 			_this.joy_move.diagonal.flag = false
 			// console.log(x,y);
-			if (Math.abs(x)-0<sensitivity && Math.abs(y)-0<sensitivity){
+			if (Math.abs(x)-0<_this.joy_move.sensitivity && Math.abs(y)-0<_this.joy_move.sensitivity){
 
 				cmdArray.push(_this.COMMAND.CMD_MOVE_STOP + "#8")
 				_this.socket.emit('cmd',  cmdArray)
-			}else if (y>0 && Math.abs(x)-sensitivity<0){
-				cmdArray.push(_this.COMMAND.CMD_MOVE_FORWARD + "#" + parseInt(y/ratio))
+			}else if (y>0 && Math.abs(x)-_this.joy_move.sensitivity<0){
+				cmdArray.push(_this.COMMAND.CMD_MOVE_FORWARD + "#" + parseInt(y/_this.joy_move.ratio))
 				_this.socket.emit('cmd',  cmdArray)
 			}
-			else if (y<0 && Math.abs(x)-sensitivity<0){
+			else if (y<0 && Math.abs(x)-_this.joy_move.sensitivity<0){
 				// _this.socket.emit('cmd',  _this.COMMAND.CMD_MOVE_BACKWARD & "#" & -x)
-				cmdArray.push(_this.COMMAND.CMD_MOVE_BACKWARD + "#" + parseInt(-y/ratio))
+				cmdArray.push(_this.COMMAND.CMD_MOVE_BACKWARD + "#" + parseInt(-y/_this.joy_move.ratio))
 				_this.socket.emit('cmd',  cmdArray)
 			}
-			else if (x>0 && Math.abs(y)-sensitivity<0){
-				cmdArray.push(_this.COMMAND.CMD_TURN_RIGHT + "#" + parseInt(x/ratio))
+			else if (x>0 && Math.abs(y)-_this.joy_move.sensitivity<0){
+				cmdArray.push(_this.COMMAND.CMD_TURN_RIGHT + "#" + parseInt(x/_this.joy_move.ratio))
 				_this.socket.emit('cmd',  cmdArray)
 			}
-			else if (x<0 && Math.abs(y)-sensitivity<0){
+			else if (x<0 && Math.abs(y)-_this.joy_move.sensitivity<0){
 				// _this.socket.emit('cmd',  _this.COMMAND.CMD_MOVE_BACKWARD & "#" & -x)
-				cmdArray.push(_this.COMMAND.CMD_TURN_LEFT + "#" + parseInt(-x/ratio))
+				cmdArray.push(_this.COMMAND.CMD_TURN_LEFT + "#" + parseInt(-x/_this.joy_move.ratio))
 				_this.socket.emit('cmd',  cmdArray)
 			}else{
 				console.log("MIXED COMMAND")
@@ -189,17 +189,17 @@ var init = function(){
 			_this.joy_move.diagonal.time = 2000
 			//cmdArray.push(_this.COMMAND.CMD_MOVE_STOP + "#8")
 			if (y>0){
-				cmdArrayD.push(_this.COMMAND.CMD_MOVE_FORWARD + "#" + parseInt(y/ratio))
+				cmdArrayD.push(_this.COMMAND.CMD_MOVE_FORWARD + "#" + parseInt(y/_this.joy_move.ratio))
 			}else if (y<0){
-				cmdArrayD.push(_this.COMMAND.CMD_MOVE_BACKWARD + "#" + parseInt(y/ratio))
+				cmdArrayD.push(_this.COMMAND.CMD_MOVE_BACKWARD + "#" + parseInt(y/_this.joy_move.ratio))
 			}
 		}else{
 			_this.joy_move.diagonal.current = "x"
 			_this.joy_move.diagonal.time = 1000
 			if ((x>0 && y>0) || (x<0 && y>0)){
-				cmdArrayD.push(_this.COMMAND.CMD_TURN_RIGHT + "#" + parseInt(x/ratio))
+				cmdArrayD.push(_this.COMMAND.CMD_TURN_RIGHT + "#" + parseInt(x/_this.joy_move.ratio))
 			}else if ((x<0 && y>0) || (x>0 && y<0)){
-				cmdArrayD.push(_this.COMMAND.CMD_TURN_LEFT + "#" + parseInt(-x/ratio))
+				cmdArrayD.push(_this.COMMAND.CMD_TURN_LEFT + "#" + parseInt(-x/_this.joy_move.ratio))
 			}
 		}
 		_this.socket.emit('cmd', cmdArrayD)
