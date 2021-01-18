@@ -129,9 +129,9 @@ class Server():
                 print("Dev, no cmd allowed")
                 return
             
-          
-            if cmdArray[-1] !="":
-                cmdArray==cmdArray[:-1]
+            if len(cmdArray)>0:
+                if cmdArray[-1] !="":
+                    cmdArray==cmdArray[:-1]
             for oneCmd in cmdArray:
                 data = oneCmd.split("#")
                 if data==None or data[0]=='':
@@ -175,7 +175,7 @@ class Server():
                     self.control.order=data
                     self.control.timeout=time.time()
            
-        socketio.run(app, "0.0.0.0", port=PORT,debug=True)
+        socketio.run(app, "0.0.0.0", port=PORT,debug=False)
 if __name__ == '__main__':
     server = Server()
     
