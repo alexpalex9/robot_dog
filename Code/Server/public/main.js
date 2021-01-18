@@ -112,7 +112,7 @@ var init = function(){
 			// console.log("clear Interval",x,y,Math.abs(x)-0<sensitivity,Math.abs(y)<sensitivity)
 			clearInterval(_this.joy_move.diagonal.interval)
 			// delete _this.joy_move.diagonal.interval
-			
+			_this.joy_move.diagonal.flag = false
 			// console.log(x,y);
 			if (Math.abs(x)-0<sensitivity && Math.abs(y)-0<sensitivity){
 
@@ -137,35 +137,35 @@ var init = function(){
 				_this.socket.emit('cmd',  cmdArray)
 			}else{
 				console.log("MIXED COMMAND")
+				_this.joy_move.diagonal.flag = true
+				diagonalJoy(x,y)
 				// mix of x and y
 				// cmdArray.push(_this.COMMAND.CMD_MOVE_FORWARD + "#" + parseInt(x/ratio))
-				_this.joy_move.diagonal.current = "x"
-				_this.joy_move.diagonal.interval = setInterval(function(){
-					console.log("mix job")
-					var cmdArrayD = [];
-					//cmdArrayD.push(_this.COMMAND.CMD_MOVE_STOP + "#8")
-					//var cmdArray.push(_this.COMMAND.CMD_MOVE_LEFT + "#" + parseInt(-x/ratio))
-					var cmdArray = [];
-					if (_this.joy_move.diagonal.current=='x'){
-						_this.joy_move.diagonal.current = "y"
-						
-						//cmdArray.push(_this.COMMAND.CMD_MOVE_STOP + "#8")
-						if (y>0){
-							cmdArrayD.push(_this.COMMAND.CMD_MOVE_FORWARD + "#" + parseInt(y/ratio))
-						}else if (y<0){
-							cmdArrayD.push(_this.COMMAND.CMD_MOVE_BACKWARD + "#" + parseInt(y/ratio))
-						}
-					}else{
-						_this.joy_move.diagonal.current = "x"
-						if ((x>0 && y>0) || (x<0 && y>0)){
-							cmdArrayD.push(_this.COMMAND.CMD_TURN_RIGHT + "#" + parseInt(x/ratio))
-						}else if ((x<0 && y>0) || (x>0 && y<0)){
-							cmdArrayD.push(_this.COMMAND.CMD_TURN_LEFT + "#" + parseInt(-x/ratio))
-						}
-					}
-					_this.socket.emit('cmd', cmdArrayD)
+				// _this.joy_move.diagonal.current = "x"
+				
+				// _this.joy_move.diagonal.interval = setInterval(function(){
+					// console.log("mix job")
+					// _this.joy_move.diagonal.flag = true
+					// var cmdArrayD = [];
+					// var cmdArray = [];
+					// if (_this.joy_move.diagonal.current=='x'){
+						// _this.joy_move.diagonal.current = "y"
+						// if (y>0){
+							// cmdArrayD.push(_this.COMMAND.CMD_MOVE_FORWARD + "#" + parseInt(y/ratio))
+						// }else if (y<0){
+							// cmdArrayD.push(_this.COMMAND.CMD_MOVE_BACKWARD + "#" + parseInt(y/ratio))
+						// }
+					// }else{
+						// _this.joy_move.diagonal.current = "x"
+						// if ((x>0 && y>0) || (x<0 && y>0)){
+							// cmdArrayD.push(_this.COMMAND.CMD_TURN_RIGHT + "#" + parseInt(x/ratio))
+						// }else if ((x<0 && y>0) || (x>0 && y<0)){
+							// cmdArrayD.push(_this.COMMAND.CMD_TURN_LEFT + "#" + parseInt(-x/ratio))
+						// }
+					// }
+					// _this.socket.emit('cmd', cmdArrayD)
 					
-				},1000)
+				// },1000)
 			}
 			// console.log("send CMD",cmdArray)
 			_this.socket.emit('cmd',  cmdArray)
@@ -175,6 +175,41 @@ var init = function(){
 		
 	
 	}, 250);
+	
+	function diagonalJoy(x,y){
+		if (!_this.joy_move.diagonal.current){
+			_this.joy_move.diagonal.current = "x"	
+		}
+		console.log("mix job")
+		
+		var cmdArrayD = [];
+		var cmdArray = [];
+		if (_this.joy_move.diagonal.current=='x'){
+			_this.joy_move.diagonal.current = "y"
+			_this.joy_move.diagonal.time = 2000
+			//cmdArray.push(_this.COMMAND.CMD_MOVE_STOP + "#8")
+			if (y>0){
+				cmdArrayD.push(_this.COMMAND.CMD_MOVE_FORWARD + "#" + parseInt(y/ratio))
+			}else if (y<0){
+				cmdArrayD.push(_this.COMMAND.CMD_MOVE_BACKWARD + "#" + parseInt(y/ratio))
+			}
+		}else{
+			_this.joy_move.diagonal.current = "x"
+			_this.joy_move.diagonal.time = 1000
+			if ((x>0 && y>0) || (x<0 && y>0)){
+				cmdArrayD.push(_this.COMMAND.CMD_TURN_RIGHT + "#" + parseInt(x/ratio))
+			}else if ((x<0 && y>0) || (x>0 && y<0)){
+				cmdArrayD.push(_this.COMMAND.CMD_TURN_LEFT + "#" + parseInt(-x/ratio))
+			}
+		}
+		_this.socket.emit('cmd', cmdArrayD)
+		if (_this.joy_move.diagonal.flag==true){
+			setTimeout(function(){
+				diagonalJoy(x,y)
+			},_this.joy_move.diagonal.time)
+		}
+		
+	}
 	setInterval(function(){ joy1IinputPosX.value=Joy1.GetPosX(); }, 50);
 	setInterval(function(){ joy1InputPosY.value=Joy1.GetPosY(); }, 50);
 	setInterval(function(){ joy1Direzione.value=Joy1.GetDir(); }, 50);
