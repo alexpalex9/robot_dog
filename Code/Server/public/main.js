@@ -142,7 +142,7 @@ var init = function(){
 				_this.joy_move.diagonal.interval = setInterval(function(){
 					console.log("mix job")
 					var cmdArrayD = [];
-					cmdArrayD.push(_this.COMMAND.CMD_MOVE_STOP + "#8")
+					//cmdArrayD.push(_this.COMMAND.CMD_MOVE_STOP + "#8")
 					//var cmdArray.push(_this.COMMAND.CMD_MOVE_LEFT + "#" + parseInt(-x/ratio))
 					var cmdArray = [];
 					if (_this.joy_move.diagonal.current=='x'){
@@ -164,7 +164,7 @@ var init = function(){
 					}
 					_this.socket.emit('cmd', cmdArrayD)
 					
-				},4000)
+				},1000)
 			}
 			// console.log("send CMD",cmdArray)
 			_this.socket.emit('cmd',  cmdArray)
