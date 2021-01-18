@@ -101,7 +101,7 @@ var init = function(){
 		//var cmdArray = ['CMD_WORKING_TIME','']
 		var x = Joy1.GetX();
 		var y = Joy1.GetY();
-		var ratio = 2;
+		var ratio = 3;
 		var sensitivity = 33
 		// if (x!=_this.joy_move.x && y!=_this.joy_move.x){
 		// console.log("x",,Math.abs(x-_this.joy_move.x)>sensitivity || Math.abs(y-_this.joy_move.x)>sensitivity)
