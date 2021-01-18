@@ -1,5 +1,6 @@
+var _this;
 var init = function(){
-	var _this = {
+	_this = {
 		face_detection :{
 			$canvas : $('#face_overlay')
 		},
@@ -28,7 +29,8 @@ var init = function(){
 		},
 		joy_move : {
 			x :0,
-			y : 0
+			y : 0,
+			diagonal : {}
 			
 		}
 	};
@@ -92,46 +94,86 @@ var init = function(){
 	var joy1X = document.getElementById("joy1X");
 	var joy1Y = document.getElementById("joy1Y");
 
+
+	
 	setInterval(function(){ 
 		var cmdArray = []
 		//var cmdArray = ['CMD_WORKING_TIME','']
-		var x = Joy1.GetX(); 
-		var y = Joy1.GetY(); 
+		var x = Joy1.GetX();
+		var y = Joy1.GetY();
 		var ratio = 2;
-		var sensitivity = 10
+		var sensitivity = 33
 		// if (x!=_this.joy_move.x && y!=_this.joy_move.x){
 		// console.log("x",,Math.abs(x-_this.joy_move.x)>sensitivity || Math.abs(y-_this.joy_move.x)>sensitivity)
 			// || (x==0 && y==0 && (x!=_this.joy_move.x || y!=_this.joy_move.y)))
 		// console.log((x==0 && y==0 && (x!=_this.joy_move.x || y!=_this.joy_move.y)))
 		if ((Math.abs(x-_this.joy_move.x)>sensitivity || Math.abs(y-_this.joy_move.y)>sensitivity)
 			|| (x==0 && y==0 && (x!=_this.joy_move.x || y!=_this.joy_move.y)) ){
+			// console.log("clear Interval",x,y,Math.abs(x)-0<sensitivity,Math.abs(y)<sensitivity)
+			clearInterval(_this.joy_move.diagonal.interval)
+			// delete _this.joy_move.diagonal.interval
 			cmdArray.push(_this.COMMAND.CMD_MOVE_STOP + "#8")
 			// console.log(x,y);
-			if (x==0 && y==0){
+			if (Math.abs(x)-0<sensitivity && Math.abs(y)-0<sensitivity){
 				//should stop but already in command
-			}
-			if (y>0){
+				_this.socket.emit('cmd',  cmdArray)
+			}else if (y>0 && Math.abs(x)-sensitivity<0){
 				cmdArray.push(_this.COMMAND.CMD_MOVE_FORWARD + "#" + parseInt(y/ratio))
+				_this.socket.emit('cmd',  cmdArray)
 			}
-			if (y<0){
+			else if (y<0 && Math.abs(x)-sensitivity<0){
 				// _this.socket.emit('cmd',  _this.COMMAND.CMD_MOVE_BACKWARD & "#" & -x)
 				cmdArray.push(_this.COMMAND.CMD_MOVE_BACKWARD + "#" + parseInt(-y/ratio))
+				_this.socket.emit('cmd',  cmdArray)
 			}
-			if (x>0){
+			else if (x>0 && Math.abs(y)-sensitivity<0){
 				cmdArray.push(_this.COMMAND.CMD_MOVE_RIGHT + "#" + parseInt(x/ratio))
+				_this.socket.emit('cmd',  cmdArray)
 			}
-			if (x<0){
+			else if (x<0 && Math.abs(y)-sensitivity<0){
 				// _this.socket.emit('cmd',  _this.COMMAND.CMD_MOVE_BACKWARD & "#" & -x)
 				cmdArray.push(_this.COMMAND.CMD_MOVE_LEFT + "#" + parseInt(-x/ratio))
+				_this.socket.emit('cmd',  cmdArray)
+			}else{
+				console.log("MIXED COMMAND")
+				// mix of x and y
+				// cmdArray.push(_this.COMMAND.CMD_MOVE_FORWARD + "#" + parseInt(x/ratio))
+				_this.joy_move.diagonal.current = "x"
+				_this.joy_move.diagonal.interval = setInterval(function(){
+					console.log("mix job")
+					var cmdArrayD = [];
+					cmdArrayD.push(_this.COMMAND.CMD_MOVE_STOP + "#8")
+					//var cmdArray.push(_this.COMMAND.CMD_MOVE_LEFT + "#" + parseInt(-x/ratio))
+					var cmdArray = [];
+					if (_this.joy_move.diagonal.current=='x'){
+						_this.joy_move.diagonal.current = "y"
+						
+						//cmdArray.push(_this.COMMAND.CMD_MOVE_STOP + "#8")
+						if (y>0){
+							cmdArrayD.push(_this.COMMAND.CMD_MOVE_FORWARD + "#" + parseInt(y/ratio))
+						}else if (y<0){
+							cmdArrayD.push(_this.COMMAND.CMD_MOVE_BACKWARD + "#" + parseInt(y/ratio))
+						}
+					}else{
+						_this.joy_move.diagonal.current = "x"
+						if (x>0){
+							cmdArrayD.push(_this.COMMAND.CMD_MOVE_RIGHT + "#" + parseInt(x/ratio))
+						}else if (x<0){
+							cmdArrayD.push(_this.COMMAND.CMD_MOVE_LEFT + "#" + parseInt(-x/ratio))
+						}
+					}
+					_this.socket.emit('cmd', cmdArrayD)
+					
+				},4000)
 			}
-			console.log("send CMD",cmdArray)
+			// console.log("send CMD",cmdArray)
 			_this.socket.emit('cmd',  cmdArray)
 			_this.joy_move.x = x
 			_this.joy_move.y = y
 		}
 		
 	
-	}, 1000);
+	}, 250);
 	setInterval(function(){ joy1IinputPosX.value=Joy1.GetPosX(); }, 50);
 	setInterval(function(){ joy1InputPosY.value=Joy1.GetPosY(); }, 50);
 	setInterval(function(){ joy1Direzione.value=Joy1.GetDir(); }, 50);
