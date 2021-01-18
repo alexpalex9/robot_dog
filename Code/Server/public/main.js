@@ -112,10 +112,11 @@ var init = function(){
 			// console.log("clear Interval",x,y,Math.abs(x)-0<sensitivity,Math.abs(y)<sensitivity)
 			clearInterval(_this.joy_move.diagonal.interval)
 			// delete _this.joy_move.diagonal.interval
-			cmdArray.push(_this.COMMAND.CMD_MOVE_STOP + "#8")
+			
 			// console.log(x,y);
 			if (Math.abs(x)-0<sensitivity && Math.abs(y)-0<sensitivity){
-				//should stop but already in command
+
+				cmdArray.push(_this.COMMAND.CMD_MOVE_STOP + "#8")
 				_this.socket.emit('cmd',  cmdArray)
 			}else if (y>0 && Math.abs(x)-sensitivity<0){
 				cmdArray.push(_this.COMMAND.CMD_MOVE_FORWARD + "#" + parseInt(y/ratio))
