@@ -7,7 +7,7 @@ import io
 import time
 import threading
 #FLASK_DEBUG=0
-DEV = True
+DEV = False
 if DEV==False:
     import picamera
     from Led import *
