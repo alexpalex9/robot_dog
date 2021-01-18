@@ -85,6 +85,7 @@ var init = function(){
 		externalStrokeColor  : "#818181"
 		});
 
+	// https://github.com/bobboteck/JoyStick
 	var joy1IinputPosX = document.getElementById("joy1PosizioneX");
 	var joy1InputPosY = document.getElementById("joy1PosizioneY");
 	var joy1Direzione = document.getElementById("joy1Direzione");
@@ -97,7 +98,13 @@ var init = function(){
 		var x = Joy1.GetX(); 
 		var y = Joy1.GetY(); 
 		var ratio = 2;
-		if (x!=_this.joy_move.x && y!=_this.joy_move.x){
+		var sensitivity = 10
+		// if (x!=_this.joy_move.x && y!=_this.joy_move.x){
+		// console.log("x",,Math.abs(x-_this.joy_move.x)>sensitivity || Math.abs(y-_this.joy_move.x)>sensitivity)
+			// || (x==0 && y==0 && (x!=_this.joy_move.x || y!=_this.joy_move.y)))
+		// console.log((x==0 && y==0 && (x!=_this.joy_move.x || y!=_this.joy_move.y)))
+		if ((Math.abs(x-_this.joy_move.x)>sensitivity || Math.abs(y-_this.joy_move.y)>sensitivity)
+			|| (x==0 && y==0 && (x!=_this.joy_move.x || y!=_this.joy_move.y)) ){
 			cmdArray.push(_this.COMMAND.CMD_MOVE_STOP + "#8")
 			// console.log(x,y);
 			if (x==0 && y==0){
@@ -111,11 +118,11 @@ var init = function(){
 				cmdArray.push(_this.COMMAND.CMD_MOVE_BACKWARD + "#" + parseInt(-y/ratio))
 			}
 			if (x>0){
-				cmdArray.push(_this.COMMAND.CMD_MOVE_RIGHT + "#" + parseInt(y/ratio))
+				cmdArray.push(_this.COMMAND.CMD_MOVE_RIGHT + "#" + parseInt(x/ratio))
 			}
 			if (x<0){
 				// _this.socket.emit('cmd',  _this.COMMAND.CMD_MOVE_BACKWARD & "#" & -x)
-				cmdArray.push(_this.COMMAND.CMD_MOVE_LEFT + "#" + parseInt(-y/ratio))
+				cmdArray.push(_this.COMMAND.CMD_MOVE_LEFT + "#" + parseInt(-x/ratio))
 			}
 			console.log("send CMD",cmdArray)
 			_this.socket.emit('cmd',  cmdArray)
@@ -124,7 +131,7 @@ var init = function(){
 		}
 		
 	
-	}, 50);
+	}, 1000);
 	setInterval(function(){ joy1IinputPosX.value=Joy1.GetPosX(); }, 50);
 	setInterval(function(){ joy1InputPosY.value=Joy1.GetPosY(); }, 50);
 	setInterval(function(){ joy1Direzione.value=Joy1.GetDir(); }, 50);

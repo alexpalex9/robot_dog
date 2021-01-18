@@ -6,8 +6,8 @@ from flask_socketio import SocketIO
 import io
 import time
 import threading
-
-DEV = False
+#FLASK_DEBUG=0
+DEV = True
 if DEV==False:
     import picamera
     from Led import *
