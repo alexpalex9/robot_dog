@@ -127,12 +127,12 @@ var init = function(){
 				_this.socket.emit('cmd',  cmdArray)
 			}
 			else if (x>0 && Math.abs(y)-sensitivity<0){
-				cmdArray.push(_this.COMMAND.CMD_MOVE_RIGHT + "#" + parseInt(x/ratio))
+				cmdArray.push(_this.COMMAND.CMD_TURN_RIGHT + "#" + parseInt(x/ratio))
 				_this.socket.emit('cmd',  cmdArray)
 			}
 			else if (x<0 && Math.abs(y)-sensitivity<0){
 				// _this.socket.emit('cmd',  _this.COMMAND.CMD_MOVE_BACKWARD & "#" & -x)
-				cmdArray.push(_this.COMMAND.CMD_MOVE_LEFT + "#" + parseInt(-x/ratio))
+				cmdArray.push(_this.COMMAND.CMD_TURN_LEFT + "#" + parseInt(-x/ratio))
 				_this.socket.emit('cmd',  cmdArray)
 			}else{
 				console.log("MIXED COMMAND")
@@ -157,9 +157,9 @@ var init = function(){
 					}else{
 						_this.joy_move.diagonal.current = "x"
 						if (x>0){
-							cmdArrayD.push(_this.COMMAND.CMD_MOVE_RIGHT + "#" + parseInt(x/ratio))
+							cmdArrayD.push(_this.COMMAND.CMD_TURN_RIGHT + "#" + parseInt(x/ratio))
 						}else if (x<0){
-							cmdArrayD.push(_this.COMMAND.CMD_MOVE_LEFT + "#" + parseInt(-x/ratio))
+							cmdArrayD.push(_this.COMMAND.CMD_TURN_LEFT + "#" + parseInt(-x/ratio))
 						}
 					}
 					_this.socket.emit('cmd', cmdArrayD)
