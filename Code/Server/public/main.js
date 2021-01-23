@@ -274,9 +274,10 @@ var init = function(){
 		
 	})
 	*/
+	console.log("init face detection")
 	_this.faceDetctor = $('#face_detection_button').faceDetection({})
 	
-	console.log("load motion detection")
+	console.log("init motion detection")
 	$('#videoContainer').motionDetection({
 		$canvas : $("#motion_overlay"),
 		$source : $("#webcam")

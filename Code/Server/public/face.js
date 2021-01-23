@@ -40,6 +40,7 @@
 			_this.removeClass('disabled')
 		})
 		_this.on('click',function(){
+			console.log('click')
 			if (_this.hasClass('disabled')==false){
 				_this.toggleClass('active')
 			}
@@ -50,8 +51,9 @@
 		});
 		
 		function update() {
-			// console.log(settings.$canvas_overlay.get(0))
+			console.log("update")
 			if (_this.hasClass('active')){
+				
 				face_detection()
 				setTimeout(update, settings.pollingFrequency);
 			}else{

@@ -43,7 +43,7 @@ class Camera(object):
         Camera.last_access = time.time()
         self.initialize()
         return self.frame
-
+    """
     @classmethod
     def _thread(cls):
         with picamera.PiCamera() as camera:
@@ -75,7 +75,7 @@ class Camera(object):
                 if time.time() - cls.last_access > 10:
                     break
         cls.thread = None
-
+    """
 class Server():
     def __init__(self):
         self.tcp_flag=False
