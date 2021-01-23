@@ -11,10 +11,14 @@ import time
 import threading
 #FLASK_DEBUG=0
 
-if len(sys.argv)>0:
-    DEV = bool(sys.argv[1])
-    CAM = bool(sys.argv[2])
+while len(sys.argv)<3:
+    sys.argv.append(False)
 
+
+DEV = bool(int(sys.argv[1]))
+CAM = bool(int(sys.argv[2]))
+
+    
 if DEV==False:
     import picamera
     from Led import *
