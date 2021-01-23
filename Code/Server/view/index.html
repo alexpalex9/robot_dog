@@ -23,7 +23,8 @@
 		<!-- <center><img src="stream.mjpg" width="640" height="480"></center> -->
 		<div id="videoContainer">
 		<!-- <video id="webcam" width="640" height="480" autoplay style="display:none" ></video>     -->
-		<img class="motionDetection" id="webcam" crossorigin width="640" height="480" src="stream.mjpg" ></img>
+		<!-- <img class="motionDetection" id="webcam" crossorigin width="640" height="480" src="stream.mjpg" ></img> -->
+		<img class="motionDetection" id="webcam" crossorigin  src="stream.mjpg" ></img>
 		<!-- <img class="motionDetection" id="webcam" crossorigin width="100" height="50" src="fly.jpg" ></img> -->
 		<!--<img id="webcam" crossorigin width="640" height="480" src="face.jpg" ></img>-->
 		<!-- <img id="webcam" crossorigin width="640" height="480" src="https://i.imgur.com/PBfpKi5.jpeg" ></img> -->
@@ -33,52 +34,28 @@
 		<!--<canvas id="motion_frame1" width="640" height="480" ></canvas>-->
 		
 		</div>
-		<canvas id="rgb_canvas" width="2" height="2">
-		  <img id="rgb" style="width:2px;height:2px" src="rgb.png" ></img>
-		</canvas>
-		<a class="button cmd" data-cmd="CMD_MOVE_FORWARD#8">MOVE FORWARD</a>
-		<a class="button cmd" data-cmd="CMD_MOVE_LEFT#8">TEST error</a>
-		<a id="face_detection_button" class="button">Face</a>
-		<a id="motion_detection_button" class="button">Motion</a>
-		<a id="face_detection_button" class="button">Follow</a>
+		<div id="commandContainer">
+			<a class="button cmd" data-cmd="CMD_MOVE_FORWARD#8">MOVE FORWARD</a>
+			<a class="button cmd" data-cmd="CMD_MOVE_LEFT#8">TEST error</a>
+			<a id="face_detection_button" class="button">Face</a>
+			<a id="motion_detection_button" class="button">Motion</a>
+			<a id="face_detection_button" class="button">Follow</a>
+		</div>
 		
-			<!-- Example of FIXED or ABSOLUTE position -->
-			<!-- <div id="joy3Div" style="width:200px;height:200px;margin:50px;position:fixed;bottom:30px;left:50px;"></div> -->
-			<!-- <div style="position:fixed;bottom:125px;left:750px;"> -->
-				<!-- Posizione X:<input id="joy3PosizioneX" type="text" /><br /> -->
-				<!-- Posizione Y:<input id="joy3PosizioneY" type="text" /><br /> -->
-				<!-- Direzione:<input id="joy3Direzione" type="text" /><br /> -->
-				<!-- X :<input id="joy3X" type="text" /></br> -->
-				<!-- Y :<input id="joy3Y" type="text" /> -->
-			<!-- </div> -->
-			<!-- Example of two JoyStick integrated in the page structure -->
-			<div class="row">
-				<div class="columnLateral">
+		
+			<div id="JoystickContainer" style="clear:both;">
+				<div class="joystick left">
 					<h2>MOVEMENT</h2>
-					<div id="joy1Div" style="width:120px;height:120px;margin:50px"></div>
-					Posizione X:<input id="joy1PosizioneX" type="text" /><br />
-					Posizione Y:<input id="joy1PosizioneY" type="text" /><br />
-					Direzione:<input id="joy1Direzione" type="text" /><br />
-					X :<input id="joy1X" type="text" /></br>
-					Y :<input id="joy1Y" type="text" />
+					<div id="joyMove" style="width:120px;height:120px"></div>
 				</div>
-				<div class="columnCetral">
-					<h2>ROLL</h2>
-					<div id="joyDivRoll"></div>
+				<div class="joystick center">
+					<h2>ATTITUDE</h2>
+					<div id="joyAttitude" style="width:120px;height:120px"></div>
 				</div>
-				<div class="columnCetral">
+				<div class="joystick right">
 					<h2>HEAD</h2>
-					<div id="joyDivHead"></div>
-					will move head and Pitch?
+					<div id="joyHead" style="width:120px;height:120px"></div>
 				</div>
-				<div class="columnLateral">
-					<div id="joy2Div"></div>
-					Posizione X:<input id="joy2PosizioneX" type="text" /></br>
-					Posizione Y:<input id="joy2PosizioneY" type="text" /></br>
-					Direzione:<input id="joy2Direzione" type="text" /></br>
-					X :<input id="joy2X" type="text" /></br>
-					Y :<input id="joy2Y" type="text" />
-				</div>			
 			</div>
 		</div>
 	</body>

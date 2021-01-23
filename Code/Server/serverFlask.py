@@ -7,7 +7,9 @@ import io
 import time
 import threading
 #FLASK_DEBUG=0
-DEV = False
+DEV = True
+CAM = True
+
 if DEV==False:
     import picamera
     from Led import *
@@ -18,8 +20,10 @@ if DEV==False:
     from ADS7830 import *
     from Ultrasonic import *
 else:
-    import cv2
-    localcamera = cv2.VideoCapture(0)
+    if CAM==True:
+        import cv2
+        localcamera = cv2.VideoCapture(0)
+    
 from Thread import *
 from Command import COMMAND as cmd
 
@@ -101,28 +105,30 @@ class Server():
         def index():
             return render_template('index.html')
         
-        def gen(camera):
+        def gen(camera=None):
             while True:
                 if DEV==False:
                     frame = camera.get_frame()
                     yield (b'--frame\r\n'
                            b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
                 else:
-                    success, frame = localcamera.read()  # read the camera frame
-                    if not success:
-                        print("failed local camera")
-                        break
-                    else:
-                        ret, buffer = cv2.imencode('.jpg', frame)
-                        frame = buffer.tobytes()
-                        yield (b'--frame\r\n'
-                               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
-
+                    read_return_code, frame = localcamera.read()
+                    encode_return_code, image_buffer = cv2.imencode('.jpg', frame)
+                    io_buf = io.BytesIO(image_buffer)
+                    yield (b'--frame\r\n'
+                           b'Content-Type: image/jpeg\r\n\r\n' + io_buf.read() + b'\r\n')
 
         @app.route('/stream.mjpg')
         def video_feed():
-            return Response(gen(Camera()),
+            if DEV==False:
+                return Response(gen(Camera()),
                                 mimetype='multipart/x-mixed-replace; boundary=frame')
+            else:
+                if CAM==True:
+                    return Response(gen(),
+                                mimetype='multipart/x-mixed-replace; boundary=frame')
+                else:
+                    return 'dev'
             
         @socketio.on('connect', namespace='/robot')
         def ws_conn():

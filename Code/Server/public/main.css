@@ -7,38 +7,42 @@ body
 	margin: 0px;
 	padding: 0px;
 	font-family: monospace;
+	overflow-x:hidden
 }
-.row
-{
-	display: inline-flex;
-	clear: both;
+#videoContainer {
+    max-width:640px;
+	width:100%
+	position:relative;
+    /*background-image: url(load1.gif);*/
+    text-align: left;
+    border:480px;
+    margin:0 auto;
+	position: relative;
 }
-.columnLateral
-{
-  float: left;
-  width: 15%;
-  min-width: 300px;
+#webcam{
+	max-width:640px;
+	width:100%
+	
+	
 }
-.columnCetral
-{
-  float: left;
-  width: 70%;
-  min-width: 300px;
+.joystick{
+	text-align:center;
+	display:inline-block;
 }
-#joy2Div
-{
-	width:200px;
-	height:200px;
-	margin:50px
+
+#commandContainer{
+	width:100%;
+	text-align:100%;
 }
-#joystick
-{
-	border: 1px solid #FF0000;
+
+#JoystickContainer{
+	width:100%;
+	text-align:center;
 }
-#joystick2
-{
-	border: 1px solid #0000FF;
-}
+#JoystickContainer .left{float:left;}
+#JoystickContainer .right{float:right;}
+#JoystickContainer .center{margin:0 auto;}
+
 
 a.button{
 display:inline-block;
@@ -64,14 +68,7 @@ color:grey;
 background: #3C3C3C;
 }
 
-#videoContainer {
-    width:640px;
-	position:relative;
-    /*background-image: url(load1.gif);*/
-    text-align: left;
-    border:480px;
-    margin:0 auto;
-}
+
 #face_overlay{
 	position:absolute;
 	top:0;

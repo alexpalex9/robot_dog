@@ -10,9 +10,9 @@
 			minConfidence : 0.2,
 			$canvas_overlay : $('#face_overlay'),
 			$source : $('#webcam'),
-			onDetection: function(data) {
-				console.log("face detected!",data);
-				const resizedResults = faceapi.resizeResults(detection, $('#webcam').get(0))
+			onDetection: function(detection) {
+				console.log("face detected!",detection);
+				const resizedResults = faceapi.resizeResults(detection, settings.$source.get(0))
 				console.log("erase")
 				// settings.$canvas_overlay.get(0).getContext('2d').clearRect(0, 0, _this.$canvas_overlay.get(0).width, _this.$canvas_overlay.get(0).height);
 				console.log("draw")
@@ -58,9 +58,9 @@
 		});
 		
 		function update() {
+			
 			if (video.naturalHeight!=0){
-				console.log("update")
-				if (_this.hasClass('active')){		
+				if (_this.hasClass('active')){
 					face_detection()
 				}else{
 					// console.log(settings.$canvas_overlay.get(0))
@@ -73,10 +73,10 @@
 		}
 
 		async function face_detection(){
-			console.log("detection")
+			console.log("check face")
 			var options =  new faceapi.SsdMobilenetv1Options({ minConfidence: settings.minConfidence})
 			var detection =  await faceapi.detectAllFaces($('#webcam').get(0),options).withFaceLandmarks().withFaceExpressions().withFaceDescriptors()       
-			settings.$canvas_overlay.get(0).getContext('2d').clearRect(0, 0, _this.$canvas_overlay.get(0).width, _this.$canvas_overlay.get(0).height);
+			settings.$canvas_overlay.get(0).getContext('2d').clearRect(0, 0, settings.$canvas_overlay.get(0).width, settings.$canvas_overlay.get(0).height);
 			if (detection.length){
 				settings.onDetection.call(this,detection);
 			}else{

@@ -38,7 +38,7 @@
 		};
 
 		var settings = $.extend({}, defaults, options);
-		var canvas_draw, canvas_drawContext, cavans_overlay, canvas_overlayContext;
+		var canvas_draw, canvas_drawContext, canvas_overlay, canvas_overlayContext;
 		var previousFrame, currentFrame;
 		
 		var video = settings.$source[0];
@@ -91,6 +91,7 @@
 		});
 		
 		function update() {
+			
 			if (video.naturalHeight!=0){
 				if (_this.hasClass('active')){
 					drawVideo();
@@ -109,6 +110,7 @@
 		}
 
 		function checkMotion() {
+			console.log("check motion")
 			currentFrame = reframe(canvas_drawContext.getImageData(0, 0, canvas_draw.width, canvas_draw.height).data);
 			if (!previousFrame){
 				previousFrame = currentFrame;
@@ -118,7 +120,7 @@
 			if (data.pixelsChanged > (settings.threshold * settings.cellsQty)) {
 				settings.onDetection.call(this,data);
 			}else{
-				canvas_overlayContext.clearRect(0, 0, canvas_overlay.width, canvas_overlay.height);
+				canvas_overlayContext.clearRect(0, 0, settings.$canvas_overlay.get(0).width, settings.$canvas_overlay.get(0).height);
 			}
 		}
 

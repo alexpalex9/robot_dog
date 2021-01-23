@@ -34,6 +34,10 @@ var init = function(){
 			ratio : 3,
 			sensitivity : 33
 		},
+		joy_attitude : {
+			x :0,
+			y:0
+		},
 		follow : {
 			flag : false
 		}
@@ -74,7 +78,8 @@ var init = function(){
 	*/
 	// Create JoyStick object into the DIV 'joy1Div'
 	console.log("init Joystick")
-	var Joy1 = new JoyStick('joy1Div',{
+	var JoyMove = new JoyStick('joyMove',{
+		title: "joystickMove", 
 		internalFillColor :"#818181",
 		internalStrokeColor : "#818181",
 		externalStrokeColor  : "#818181"
@@ -90,13 +95,8 @@ var init = function(){
 	setInterval(function(){
 		var cmdArray = []
 		//var cmdArray = ['CMD_WORKING_TIME','']
-		var x = Joy1.GetX();
-		var y = Joy1.GetY();
-		
-		// if (x!=_this.joy_move.x && y!=_this.joy_move.x){
-		// console.log("x",,Math.abs(x-_this.joy_move.x)>sensitivity || Math.abs(y-_this.joy_move.x)>sensitivity)
-			// || (x==0 && y==0 && (x!=_this.joy_move.x || y!=_this.joy_move.y)))
-		// console.log((x==0 && y==0 && (x!=_this.joy_move.x || y!=_this.joy_move.y)))
+		var x = JoyMove.GetX();
+		var y = JoyMove.GetY();
 		if ((Math.abs(x-_this.joy_move.x)>_this.joy_move.sensitivity || Math.abs(y-_this.joy_move.y)>_this.joy_move.sensitivity)
 			|| (x==0 && y==0 && (x!=_this.joy_move.x || y!=_this.joy_move.y)) ){
 			// console.log("clear Interval",x,y,Math.abs(x)-0<sensitivity,Math.abs(y)<sensitivity)
@@ -131,35 +131,8 @@ var init = function(){
 				console.log("MIXED COMMAND")
 				_this.joy_move.diagonal.flag = true
 				diagonalJoy(x,y)
-				// mix of x and y
-				// cmdArray.push(_this.COMMAND.CMD_MOVE_FORWARD + "#" + parseInt(x/ratio))
-				// _this.joy_move.diagonal.current = "x"
-				
-				// _this.joy_move.diagonal.interval = setInterval(function(){
-					// console.log("mix job")
-					// _this.joy_move.diagonal.flag = true
-					// var cmdArrayD = [];
-					// var cmdArray = [];
-					// if (_this.joy_move.diagonal.current=='x'){
-						// _this.joy_move.diagonal.current = "y"
-						// if (y>0){
-							// cmdArrayD.push(_this.COMMAND.CMD_MOVE_FORWARD + "#" + parseInt(y/ratio))
-						// }else if (y<0){
-							// cmdArrayD.push(_this.COMMAND.CMD_MOVE_BACKWARD + "#" + parseInt(y/ratio))
-						// }
-					// }else{
-						// _this.joy_move.diagonal.current = "x"
-						// if ((x>0 && y>0) || (x<0 && y>0)){
-							// cmdArrayD.push(_this.COMMAND.CMD_TURN_RIGHT + "#" + parseInt(x/ratio))
-						// }else if ((x<0 && y>0) || (x>0 && y<0)){
-							// cmdArrayD.push(_this.COMMAND.CMD_TURN_LEFT + "#" + parseInt(-x/ratio))
-						// }
-					// }
-					// _this.socket.emit('cmd', cmdArrayD)
-					
-				// },1000)
 			}
-			// console.log("send CMD",cmdArray)
+			console.log("send CMD",cmdArray)
 			_this.socket.emit('cmd',  cmdArray)
 			_this.joy_move.x = x
 			_this.joy_move.y = y
@@ -188,9 +161,9 @@ var init = function(){
 		}else{
 			_this.joy_move.diagonal.current = "x"
 			_this.joy_move.diagonal.time = 1000
-			if ((x>0 && y>0) || (x<0 && y>0)){
+			if ((x>0 && y>0) || (x>0 && y>0)){
 				cmdArrayD.push(_this.COMMAND.CMD_TURN_RIGHT + "#" + parseInt(x/_this.joy_move.ratio))
-			}else if ((x<0 && y>0) || (x>0 && y<0)){
+			}else if ((x<0 && y>0) || (x<0 && y<0)){
 				cmdArrayD.push(_this.COMMAND.CMD_TURN_LEFT + "#" + parseInt(-x/_this.joy_move.ratio))
 			}
 		}
@@ -202,30 +175,46 @@ var init = function(){
 		}
 		
 	}
-	setInterval(function(){ joy1IinputPosX.value=Joy1.GetPosX(); }, 50);
-	setInterval(function(){ joy1InputPosY.value=Joy1.GetPosY(); }, 50);
-	setInterval(function(){ joy1Direzione.value=Joy1.GetDir(); }, 50);
-	setInterval(function(){ joy1X.value=Joy1.GetX(); }, 50);
-	setInterval(function(){ joy1Y.value=Joy1.GetY(); }, 50);
+	// setInterval(function(){ joy1IinputPosX.value=Joy1.GetPosX(); }, 50);
+	// setInterval(function(){ joy1InputPosY.value=Joy1.GetPosY(); }, 50);
+	// setInterval(function(){ joy1Direzione.value=Joy1.GetDir(); }, 50);
+	// setInterval(function(){ joy1X.value=Joy1.GetX(); }, 50);
+	// setInterval(function(){ joy1Y.value=Joy1.GetY(); }, 50);
 
 	// Create JoyStick object into the DIV 'joy2Div'
-	var joy2Param = { "title": "joystick2", "autoReturnToCenter": false };
-	var Joy2 = new JoyStick('joy2Div', joy2Param);
 
-	var joy2IinputPosX = document.getElementById("joy2PosizioneX");
-	var joy2InputPosY = document.getElementById("joy2PosizioneY");
-	var joy2Direzione = document.getElementById("joy2Direzione");
-	var joy2X = document.getElementById("joy2X");
-	var joy2Y = document.getElementById("joy2Y");
-	//Joy2.onTouchMove({
-	//		targetTouches : [{pageX:50,pageY:0}]
-	//})
-	setInterval(function(){ joy2IinputPosX.value=Joy2.GetPosX(); }, 50);
-	setInterval(function(){ joy2InputPosY.value=Joy2.GetPosY(); }, 50);
-	setInterval(function(){ joy2Direzione.value=Joy2.GetDir(); }, 50);
-	setInterval(function(){ joy2X.value=Joy2.GetX(); }, 50);
-	setInterval(function(){ joy2Y.value=Joy2.GetY(); }, 50);
+	var JoyAttitude = new JoyStick('joyAttitude', { 
+		title: "joystickAttitude", 
+		autoReturnToCenter: true ,
+		internalFillColor :"#818181",
+		internalStrokeColor : "#818181",
+		externalStrokeColor  : "#818181"
+	});
+	setInterval(function(){
+		var x = JoyAttitude.GetX();
+		var y = JoyAttitude.GetY();
+		if ((x!=0 && y!=0) || x!=_this.joy_attitude.x || _this.joy_attitude.y!=y){
+			cmdArrayD = []
+			console.log(x,y)
+			cmdArrayD.push(_this.COMMAND.CMD_ATTITUDE + '#0#' + parseInt(x/5) + '#' + parseInt(y/5))
+			console.log(cmdArrayD)
+			_this.socket.emit('cmd', cmdArrayD)
+			
+			
+		}
+		_this.joy_attitude.x = x
+		_this.joy_attitude.y = y
+			
+		
+	},250)
 
+	var JoyHead = new JoyStick('joyHead',{  
+		autoReturnToCenter: true ,
+		title: "joystickHead", 
+		internalFillColor :"#818181",
+		internalStrokeColor : "#818181",
+		externalStrokeColor  : "#818181"
+	});
 	/*
     async function face_detection(){
       console.log("detection")
@@ -278,7 +267,7 @@ var init = function(){
 	_this.faceDetctor = $('#face_detection_button').faceDetection({})
 	
 	console.log("init motion detection")
-	$('#videoContainer').motionDetection({
+	$('#motion_detection_button').motionDetection({
 		$canvas : $("#motion_overlay"),
 		$source : $("#webcam")
 	});
