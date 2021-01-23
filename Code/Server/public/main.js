@@ -196,7 +196,7 @@ var init = function(){
 		if ((x!=0 && y!=0) || x!=_this.joy_attitude.x || _this.joy_attitude.y!=y){
 			cmdArrayD = []
 			console.log(x,y)
-			cmdArrayD.push(_this.COMMAND.CMD_ATTITUDE + '#0#' + parseInt(x/5) + '#' + parseInt(y/5))
+			cmdArrayD.push(_this.COMMAND.CMD_ATTITUDE + '#0#' + parseInt(-y/5) + '#' + parseInt(x/5))
 			console.log(cmdArrayD)
 			_this.socket.emit('cmd', cmdArrayD)
 			
