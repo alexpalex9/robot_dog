@@ -64,6 +64,7 @@
 				_this.toggleClass('active')
 			}
 		})
+		_this.removeClass('disabled')
 		function drawVideoCanvas(){
 			// function to show pixelized image, not use, more for debugging
 			var canvas = $('#motion_pixel').get(0)
