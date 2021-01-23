@@ -162,7 +162,7 @@
 				newframe.push(c/count)
 				newframe.push(d/count)
 			}
-			print(newframe)
+			console.log(newframe)
 			return newframe
 		}
 		function difference(frame1, frame2) {
