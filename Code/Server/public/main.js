@@ -128,9 +128,9 @@ var init = function(){
 				cmdArray.push(_this.COMMAND.CMD_TURN_LEFT + "#" + parseInt(-x/_this.joy_move.ratio))
 				_this.socket.emit('cmd',  cmdArray)
 			}else{
-				console.log("MIXED COMMAND")
-				_this.joy_move.diagonal.flag = true
-				diagonalJoy(x,y)
+				// console.log("MIXED COMMAND")
+				// _this.joy_move.diagonal.flag = true
+				// diagonalJoy(x,y)
 			}
 			console.log("send CMD",cmdArray)
 			_this.socket.emit('cmd',  cmdArray)
