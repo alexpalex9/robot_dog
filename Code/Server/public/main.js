@@ -273,7 +273,7 @@ var init = function(){
 			$source : $("#webcam")
 		});
 	
-	}
+	})
 }
 
 $(init())
