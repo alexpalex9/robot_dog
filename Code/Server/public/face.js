@@ -6,7 +6,7 @@
 		_this.addClass('disabled')
 		console.log("face",this,faceapi)
 		var defaults = {
-			pollingFrequency: 1000,
+			pollingFrequency: 5000,
 			minConfidence : 0.2,
 			$canvas_overlay : $('#face_overlay'),
 			$source : $('#webcam'),
@@ -23,7 +23,10 @@
 		
 		var settings = $.extend({}, defaults, options);
 		
+		var video = settings.$source[0];
+		
 		var path = '/models/';
+		console.log("loading models")
 		Promise.all([
 		  //faceapi.loadFaceLandmarkModel(path),
 		  //faceapi.loadFaceRecognitionModel(path),
@@ -38,6 +41,9 @@
 		]).then(function(){
 			console.log("model loaded")
 			_this.removeClass('disabled')
+		}).catch(function(e){
+			console.log("error loading model",e)
+			
 		})
 		_this.on('click',function(){
 			console.log('click')
@@ -47,20 +53,22 @@
 		})
 	
 		return this.each(function() {
+			// console.log('return')
 			update();
 		});
 		
 		function update() {
-			console.log("update")
-			if (_this.hasClass('active')){
-				
-				face_detection()
-				setTimeout(update, settings.pollingFrequency);
-			}else{
-				// console.log(settings.$canvas_overlay.get(0))
-				settings.$canvas_overlay.get(0).getContext('2d').clearRect(0, 0, settings.$canvas_overlay.get(0).width, settings.$canvas_overlay.get(0).height);
-				
+			if (video.naturalHeight!=0){
+				console.log("update")
+				if (_this.hasClass('active')){		
+					face_detection()
+				}else{
+					// console.log(settings.$canvas_overlay.get(0))
+					settings.$canvas_overlay.get(0).getContext('2d').clearRect(0, 0, settings.$canvas_overlay.get(0).width, settings.$canvas_overlay.get(0).height);
+					
+				}
 			}
+			setTimeout(update, settings.pollingFrequency);
 			
 		}
 
@@ -72,7 +80,7 @@
 			if (detection.length){
 				settings.onDetection.call(this,detection);
 			}else{
-				console.log("no results")
+				console.log("no face results")
 			}
 				  
 		}

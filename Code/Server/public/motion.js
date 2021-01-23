@@ -1,9 +1,9 @@
 (function($) {
 
 	$.fn.motionDetection = function(options) {
-		
+		var _this = this;
 		var defaults = {
-			pollingFrequency: 1000,
+			pollingFrequency: 5000,
 			threshold: 0.0,
 			hide: true,
 			$canvas_draw : $('#motion_draw'),
@@ -41,7 +41,7 @@
 		var canvas_draw, canvas_drawContext, cavans_overlay, canvas_overlayContext;
 		var previousFrame, currentFrame;
 		
-		video = settings.$source[0];
+		var video = settings.$source[0];
 		canvas_draw = settings.$canvas_draw[0];
 		canvas_draw.width = video.width;
 		canvas_draw.height = video.height;
@@ -57,7 +57,12 @@
 		settings.cellheight =  canvas_draw.height / settings.cellheightqty // 64
 		// settings.cellwidthqty = cellwidthqty
 		// settings.cellheightqty = cellheightqty
-
+		_this.on('click',function(){
+			console.log('click')
+			if (_this.hasClass('disabled')==false){
+				_this.toggleClass('active')
+			}
+		})
 		function drawVideoCanvas(){
 			// function to show pixelized image, not use, more for debugging
 			var canvas = $('#motion_pixel').get(0)
@@ -87,9 +92,14 @@
 		
 		function update() {
 			if (video.naturalHeight!=0){
-				drawVideo();
+				if (_this.hasClass('active')){
+					drawVideo();
+					checkMotion();
+				}else{
+					settings.$canvas_overlay.get(0).getContext('2d').clearRect(0, 0, settings.$canvas_overlay.get(0).width, settings.$canvas_overlay.get(0).height);
+				}
 				// drawVideoCanvas()
-				checkMotion();
+				
 			}
 			setTimeout(update, settings.pollingFrequency);
 		}

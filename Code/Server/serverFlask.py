@@ -17,7 +17,9 @@ if DEV==False:
     from Control import *
     from ADS7830 import *
     from Ultrasonic import *
-
+else:
+    import cv2
+    localcamera = cv2.VideoCapture(0)
 from Thread import *
 from Command import COMMAND as cmd
 
@@ -43,7 +45,7 @@ class Camera(object):
         Camera.last_access = time.time()
         self.initialize()
         return self.frame
-    """
+
     @classmethod
     def _thread(cls):
         with picamera.PiCamera() as camera:
@@ -75,7 +77,7 @@ class Camera(object):
                 if time.time() - cls.last_access > 10:
                     break
         cls.thread = None
-    """
+
 class Server():
     def __init__(self):
         self.tcp_flag=False
@@ -101,18 +103,27 @@ class Server():
         
         def gen(camera):
             while True:
-                frame = camera.get_frame()
-                yield (b'--frame\r\n'
-                       b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-        
+                if DEV==False:
+                    frame = camera.get_frame()
+                    yield (b'--frame\r\n'
+                           b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+                else:
+                    success, frame = localcamera.read()  # read the camera frame
+                    if not success:
+                        print("failed local camera")
+                        break
+                    else:
+                        ret, buffer = cv2.imencode('.jpg', frame)
+                        frame = buffer.tobytes()
+                        yield (b'--frame\r\n'
+                               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
+
+
         @app.route('/stream.mjpg')
         def video_feed():
-            if DEV==False:
-                return Response(gen(Camera()),
+            return Response(gen(Camera()),
                                 mimetype='multipart/x-mixed-replace; boundary=frame')
-            else:
-                return "DEV"
-        
+            
         @socketio.on('connect', namespace='/robot')
         def ws_conn():
             print('connect')
@@ -175,7 +186,8 @@ class Server():
                     self.control.order=data
                     self.control.timeout=time.time()
            
-        socketio.run(app, "0.0.0.0", port=PORT,debug=False)
+        socketio.run(app, "0.0.0.0", port=PORT,debug=True)
+        
 if __name__ == '__main__':
     server = Server()
     
