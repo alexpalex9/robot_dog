@@ -55,6 +55,7 @@ var init = function(){
 			$(this).addClass('active')
 		}
 	})
+	/*
 	$('html').on('click','#face_detection_button:not(.disabled)',function(){
 		if (_this.face_detection.job===undefined){
 			console.log("launch face detection")
@@ -70,6 +71,7 @@ var init = function(){
 			delete _this.face_detection.job
 		}
 	})
+	*/
 	// Create JoyStick object into the DIV 'joy1Div'
 	console.log("init Joystick")
 	var Joy1 = new JoyStick('joy1Div',{
@@ -224,7 +226,7 @@ var init = function(){
 	setInterval(function(){ joy2X.value=Joy2.GetX(); }, 50);
 	setInterval(function(){ joy2Y.value=Joy2.GetY(); }, 50);
 
-
+	/*
     async function face_detection(){
       console.log("detection")
 	  // new faceapi.TinyFaceDetectorOptions()
@@ -251,7 +253,7 @@ var init = function(){
 		  
 	}
 	
-	/*
+	
 	console.log("load face api models")
 	path = '/'
     path = '/models/'
