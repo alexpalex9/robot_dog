@@ -102,7 +102,7 @@ var init = function(){
 			// console.log("clear Interval",x,y,Math.abs(x)-0<sensitivity,Math.abs(y)<sensitivity)
 			clearInterval(_this.joy_move.diagonal.interval)
 			// stop line command position to be reviewed
-			cmdArray.push(_this.COMMAND.CMD_MOVE_STOP + "#8")
+			// cmdArray.push(_this.COMMAND.CMD_MOVE_STOP + "#8")
 			// delete _this.joy_move.diagonal.interval
 			_this.joy_move.diagonal.flag = false
 			// console.log(x,y);
