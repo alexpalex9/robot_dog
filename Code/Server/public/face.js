@@ -24,6 +24,9 @@
 		var settings = $.extend({}, defaults, options);
 		
 		var video = settings.$source[0];
+		canvas_overlay = settings.$canvas_overlay[0];
+		canvas_overlay.width = video.width;
+		canvas_overlay.height = video.height;
 		
 		var path = '/models/';
 		console.log("loading models")

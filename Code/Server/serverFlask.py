@@ -14,6 +14,7 @@ import threading
 #if len(sys.argv)<3:
 #    sys.argv.append(False)
 
+"""
 try:
     DEV = bool(int(sys.argv[1]))
 except:
@@ -23,9 +24,9 @@ try:
     CAM=sys.argv[2]
 except:
     CAM = False
-
-    
-
+"""
+DEV=True
+CAM=True
 if DEV==False:
     import picamera
     from Led import *
