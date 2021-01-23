@@ -7,7 +7,7 @@ import io
 import time
 import threading
 #FLASK_DEBUG=0
-DEV = False
+DEV = True
 CAM = True
 
 if DEV==False:

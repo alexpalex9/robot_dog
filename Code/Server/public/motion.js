@@ -43,6 +43,7 @@
 		
 		var video = settings.$source[0];
 		canvas_draw = settings.$canvas_draw[0];
+		console.log("set canvas draw",video.width,video.height)
 		canvas_draw.width = video.width;
 		canvas_draw.height = video.height;
 		canvas_drawContext = canvas_draw.getContext('2d');

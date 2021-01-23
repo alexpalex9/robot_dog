@@ -31,7 +31,7 @@ var init = function(){
 			x :0,
 			y : 0,
 			diagonal : {},
-			ratio : 3,
+			ratio : 4,
 			sensitivity : 33
 		},
 		joy_attitude : {
@@ -102,7 +102,7 @@ var init = function(){
 			// console.log("clear Interval",x,y,Math.abs(x)-0<sensitivity,Math.abs(y)<sensitivity)
 			clearInterval(_this.joy_move.diagonal.interval)
 			// stop line command position to be reviewed
-			// cmdArray.push(_this.COMMAND.CMD_MOVE_STOP + "#8")
+			cmdArray.push(_this.COMMAND.CMD_MOVE_STOP + "#8")
 			// delete _this.joy_move.diagonal.interval
 			_this.joy_move.diagonal.flag = false
 			// console.log(x,y);
@@ -263,16 +263,17 @@ var init = function(){
 		
 	})
 	*/
-	console.log("init face detection")
-	_this.faceDetctor = $('#face_detection_button').faceDetection({})
+	$("#webcam").one("load", function() {
+		console.log("init face detection")
+		_this.faceDetctor = $('#face_detection_button').faceDetection({})
+		
+		console.log("init motion detection")
+		$('#motion_detection_button').motionDetection({
+			$canvas : $("#motion_overlay"),
+			$source : $("#webcam")
+		});
 	
-	console.log("init motion detection")
-	$('#motion_detection_button').motionDetection({
-		$canvas : $("#motion_overlay"),
-		$source : $("#webcam")
-	});
-	
-	
+	}
 }
 
 $(init())
