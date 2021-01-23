@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+
+import sys
+print(sys.argv)
 from flask import Flask, render_template, Response
 from flask_socketio import SocketIO
 
@@ -7,8 +10,10 @@ import io
 import time
 import threading
 #FLASK_DEBUG=0
-DEV = False
-CAM = True
+
+if len(sys.argv)>0:
+    DEV = bool(sys.argv[1])
+    CAM = bool(sys.argv[2])
 
 if DEV==False:
     import picamera

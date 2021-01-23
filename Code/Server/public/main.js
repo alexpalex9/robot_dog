@@ -263,6 +263,14 @@ var init = function(){
 		
 	})
 	*/
+	$("img").one("load", function() {
+		console.log("img loaded")
+	}).each(function() {
+	  if(this.complete) {
+		  $(this).load(); // For jQuery < 3.0 
+		  // $(this).trigger('load'); // For jQuery >= 3.0 
+	  }
+	});
 	$("#webcam").one("load", function() {
 		console.log("init face detection")
 		_this.faceDetctor = $('#face_detection_button').faceDetection({})
