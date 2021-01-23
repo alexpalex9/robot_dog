@@ -33,6 +33,9 @@ var init = function(){
 			diagonal : {},
 			ratio : 3,
 			sensitivity : 33
+		},
+		follow : {
+			flag : false
 		}
 	};
 	var url = "http://" + document.domain + ":" + location.port;
@@ -43,27 +46,14 @@ var init = function(){
 	$('html').on('click','.cmd',function(){
 			console.log("click emit")
 			_this.socket.emit('cmd',  $(this).data('cmd')) // {'episodes': $('#episodes').val() , });
-		// console.log("url =",'cmd?cmd=' + $(this).data('cmd') + '&value=' + $(this).data('v'))
-		// $.ajax({
-			// url : '/cmd&cmd=' + $(this).data('cmd') + '&value=' + $(this).data('v'),
-			// type : 'GET',
-			// dataType : 'json', //'html',
-			// data : {
-				// cmd : $(this).data('cmd'),
-				// value : $(this).data('v')
-				
-			// },
-			// timeout : 50000,		
-			// success : function (data, status) {
-				// console.log("success",data)
-				// console.log(typeof(data))
-			// },
-			// error: function(xhr,error) {
-				// console.log("error in ajax request",error)
-			// },
-			// complete:function(){
-			// }
-		// });
+	})
+	$('html').on('click','#follow',function(){
+		if (_this.follow.flag==true){
+			$(this).removeClass('active')
+			
+		}else{
+			$(this).addClass('active')
+		}
 	})
 	$('html').on('click','#face_detection_button:not(.disabled)',function(){
 		if (_this.face_detection.job===undefined){
@@ -94,10 +84,8 @@ var init = function(){
 	var joy1Direzione = document.getElementById("joy1Direzione");
 	var joy1X = document.getElementById("joy1X");
 	var joy1Y = document.getElementById("joy1Y");
-
-
 	
-	setInterval(function(){ 
+	setInterval(function(){
 		var cmdArray = []
 		//var cmdArray = ['CMD_WORKING_TIME','']
 		var x = Joy1.GetX();
@@ -111,12 +99,14 @@ var init = function(){
 			|| (x==0 && y==0 && (x!=_this.joy_move.x || y!=_this.joy_move.y)) ){
 			// console.log("clear Interval",x,y,Math.abs(x)-0<sensitivity,Math.abs(y)<sensitivity)
 			clearInterval(_this.joy_move.diagonal.interval)
+			// stop line command position to be reviewed
+			cmdArray.push(_this.COMMAND.CMD_MOVE_STOP + "#8")
 			// delete _this.joy_move.diagonal.interval
 			_this.joy_move.diagonal.flag = false
 			// console.log(x,y);
 			if (Math.abs(x)-0<_this.joy_move.sensitivity && Math.abs(y)-0<_this.joy_move.sensitivity){
 
-				cmdArray.push(_this.COMMAND.CMD_MOVE_STOP + "#8")
+				// cmdArray.push(_this.COMMAND.CMD_MOVE_STOP + "#8")
 				_this.socket.emit('cmd',  cmdArray)
 			}else if (y>0 && Math.abs(x)-_this.joy_move.sensitivity<0){
 				cmdArray.push(_this.COMMAND.CMD_MOVE_FORWARD + "#" + parseInt(y/_this.joy_move.ratio))
@@ -260,7 +250,8 @@ var init = function(){
 		  //console.log(detection)
 		  
 	}
-
+	
+	/*
 	console.log("load face api models")
 	path = '/'
     path = '/models/'
@@ -280,88 +271,16 @@ var init = function(){
 		$('#face_detection_button').removeClass('disabled')
 		
 	})
+	*/
+	_this.faceDetctor = $('#face_detection_button').faceDetection({})
 	
 	console.log("load motion detection")
 	$('#videoContainer').motionDetection({
 		$canvas : $("#motion_overlay"),
 		$source : $("#webcam")
-		
 	});
 	
-	//console.log("load a2c")
-	//var a2c = actor_critic()
-	/*
-	var $canvas = $('#rgb_canvas')
-	var $rgb = $('#rgb')
-	var canvas =$canvas.get(0)
-	var ctx = canvas.getContext('2d')
-	ctx.drawImage($rgb.get(0), 0, 0, canvas.width, canvas.height);
-	console.log(ctx.getImageData(0, 0, canvas.width, canvas.height))
-	*/
-	/*
-const options = {
-    gridSize: {
-        x: 16*2,
-        y: 12*2,
-    },
-    debug: true,
-    pixelDiffThreshold: 0.3,
-    movementThreshold: 0.0012,
-    fps: 30,
-    canvasOutputElem: document.getElementById('dest')
-}
-
-var overlay = document.getElementById('overlay');
-const ctx = overlay.getContext('2d');
-let timeoutClear;
-
-const md = new MotionDetect('src', options);
-
-// on motion detected, draw grid
-md.onDetect((other, data) => {
-    clearTimeout(timeoutClear);
-
-    const canvas = ctx.canvas;
-    canvas.width = other.canvas.width;
-    canvas.height = other.canvas.height;
-
-    ctx.save();
-    const grid = data.motions;
-    const gs = data.gd.size;
-    const cs = data.gd.cellSize;
-    const csActualRatio = data.gd.actualCellSizeRatio;
-
-    // scale up cell size
-    const cellArea = cs.x * cs.y;
-    cs.x *= csActualRatio;
-    cs.y *= csActualRatio;
-
-    ctx.strokeStyle = 'rgba(0, 80, 200, 0.2)';
-
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    grid.forEach((cell, i) => {
-        const x = i % gs.x;
-        const y = Math.floor(i / gs.x);
-        let intensity = cell / cellArea;
-        // higher opacity for cells with more movement
-        ctx.fillStyle = intensity > options.movementThreshold ? `rgba(0, 80, 200, ${0.1 + intensity})` : 'transparent';
-
-        ctx.beginPath();
-        ctx.rect(x * cs.x, y * cs.y, cs.x, cs.y);
-        ctx.closePath();
-        ctx.stroke();
-        ctx.fill();
-    });
-
-    ctx.restore();
-
-    timeoutClear = setTimeout(()=>{
-        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    }, 1000);
-   csActualRatio
-    
-}) */
-
+	
 }
 
 $(init())

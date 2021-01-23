@@ -39,6 +39,7 @@
 		<a class="button cmd" data-cmd="CMD_MOVE_FORWARD#8">MOVE FORWARD</a>
 		<a class="button cmd" data-cmd="CMD_MOVE_LEFT#8">TEST error</a>
 		<a id="face_detection_button" class="button disabled">Face</a>
+		<a id="face_detection_button" class="button">Follow</a>
 		
 			<!-- Example of FIXED or ABSOLUTE position -->
 			<!-- <div id="joy3Div" style="width:200px;height:200px;margin:50px;position:fixed;bottom:30px;left:50px;"></div> -->
@@ -61,6 +62,10 @@
 					Y :<input id="joy1Y" type="text" />
 				</div>
 				<div class="columnCetral">
+					<h2>ROLL</h2>
+					<div id="joyDivRoll"></div>
+				</div>
+				<div class="columnCetral">
 					<h2>HEAD</h2>
 					<div id="joyDivHead"></div>
 					will move head and Pitch?
@@ -80,6 +85,7 @@
 	<script src="joy.min.js"></script>
 	<script src="face-api.js"></script>
 	<script src="motion.js"></script>
+	<script src="face.js"></script>
 	<!--<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.8.2/dist/tf.min.js"></script>-->
 	<!--<script src="a2c.js"></script>-->
 	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.0/socket.io.min.js"></script>
