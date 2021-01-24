@@ -119,7 +119,13 @@ class Server():
                     static_folder='public',
                     template_folder='view')
         socketio = SocketIO(app)
-    
+        def send_data(self,connect,data):
+            try:
+                socketio.emit('cmd',data)
+                #print("send",data)
+            except Exception as e:
+                print(e)
+            
         @app.route('/')
         def index():
             return render_template('index.html')
@@ -192,7 +198,7 @@ class Server():
                     self.servo.setServoAngle(15,int(data[1]))
                 elif cmd.CMD_SONIC in data:
                     command=cmd.CMD_SONIC+'#'+str(self.sonic.getDistance())+"\n"
-                    self.send_data(self.connection1,command)
+                    socketio.emit('sonic',data)
                 elif cmd.CMD_POWER in data:
                     self.measuring_voltage(self.connection1)
                 elif cmd.CMD_WORKING_TIME in data: 
