@@ -3,17 +3,17 @@
 	$.fn.motionDetection = function(options) {
 		var _this = this;
 		var defaults = {
-			pollingFrequency:500,
+			pollingFrequency: 100,
 			threshold: 0.0,
 			hide: true,
-			$canvas_draw : $('#motion_draw'),
 			$canvas_overlay : $('#motion_overlay'),
+			// $canvas_pixelated : $('#motion_pixel'),
 			$source : $('#webcam'),
 			cellwidthqty : 64,
 			cellheightqty : 32, // 10 it works good
 			movementThreshold : 0.1,
 			onDetection: function(data) { 
-				// console.log("Motion detected!",data); 
+				console.log("Motion detected!",data); 
 				var ctx = canvas_overlayContext
 				const grid = data.frame;
 				
@@ -43,6 +43,10 @@
 		
 		var video = settings.$source[0];
 		// console.log('video width',video.width)
+		
+		$(this).after('<canvas id="' + settings.$source.attr('id') + '_draw' + '"  style="display:none"></canvas>')
+		settings.$canvas_draw = $('#' + settings.$source.attr('id') + '_draw')
+		
 		_this.init = function(){
 			
 			canvas_draw = settings.$canvas_draw[0];
@@ -76,7 +80,7 @@
 		// drawVideoCanvas()
 		function drawVideoCanvas(){
 			// function to show pixelized image, not use, more for debugging
-			var canvas = $('#motion_pixel').get(0)
+			var canvas = settings.$canvas_pixelated.get(0)
 			canvas.width = video.width
 			canvas.height = video.height
 			currentFrame = canvas_drawContext.getImageData(0, 0, canvas.width,canvas.height);
@@ -110,7 +114,9 @@
 				if (_this.hasClass('active')){
 					drawVideo();
 					checkMotion();
-					drawVideoCanvas()
+					if (settings.$canvas_pixelated!=undefined){
+						drawVideoCanvas()
+					}
 				}else{
 					settings.$canvas_overlay.get(0).getContext('2d').clearRect(0, 0, settings.$canvas_overlay.get(0).width, settings.$canvas_overlay.get(0).height);
 				}

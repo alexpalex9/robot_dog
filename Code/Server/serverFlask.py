@@ -14,19 +14,18 @@ import threading
 #if len(sys.argv)<3:
 #    sys.argv.append(False)
 
-"""
-try:
-    DEV = bool(int(sys.argv[1]))
-except:
+
+if len(sys.argv)>=2:
+    DEV = ((sys.argv[1]=='True') or (sys.argv[1]=='true') or (sys.argv[1]=='y') or (sys.argv[1]=='yes'))
+else:
     DEV  = False
     
-try:
-    CAM=sys.argv[2]
-except:
+if len(sys.argv)>=3:
+    CAM = ((sys.argv[1]=='True') or (sys.argv[1]=='true') or (sys.argv[1]=='y') or (sys.argv[1]=='yes'))
+else:
     CAM = False
-"""
-DEV=True
-CAM=True
+
+
 if DEV==False:
     import picamera
     from Led import *
@@ -37,9 +36,12 @@ if DEV==False:
     from ADS7830 import *
     from Ultrasonic import *
 else:
+    print('/!\\ Developper mode')
     if CAM==True:
         import cv2
         localcamera = cv2.VideoCapture(0)
+    else:
+        print('/!\\ Camera disabled')
     
 from Thread import *
 from Command import COMMAND as cmd
@@ -129,11 +131,11 @@ class Server():
                     yield (b'--frame\r\n'
                            b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
                 else:
-                    read_return_code, frame = localcamera.read()
-                    encode_return_code, image_buffer = cv2.imencode('.jpg', frame)
-                    io_buf = io.BytesIO(image_buffer)
+                    success, image = localcamera.read()
+                    ret, jpeg = cv2.imencode('.jpg', image)
+                    frame = jpeg.tobytes()
                     yield (b'--frame\r\n'
-                           b'Content-Type: image/jpeg\r\n\r\n' + io_buf.read() + b'\r\n')
+                           b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
         @app.route('/stream.mjpg')
         def video_feed():
@@ -209,7 +211,7 @@ class Server():
                     self.control.order=data
                     self.control.timeout=time.time()
            
-        socketio.run(app, "0.0.0.0", port=PORT,debug=True)
+        socketio.run(app, "0.0.0.0", port=PORT,debug=True)        
         
 if __name__ == '__main__':
     server = Server()

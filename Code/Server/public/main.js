@@ -62,23 +62,7 @@ var init = function(){
 			$(this).addClass('active')
 		}
 	})
-	/*
-	$('html').on('click','#face_detection_button:not(.disabled)',function(){
-		if (_this.face_detection.job===undefined){
-			console.log("launch face detection")
-			$('#face_detection_button').addClass("active")
-			_this.face_detection.job = setInterval(function(){
-				console.log("face detection")
-				face_detection()
-			  },2000)
-		}else{
-			_this.face_detection.$canvas.get(0).getContext('2d').clearRect(0, 0, _this.face_detection.$canvas.get(0).width, _this.face_detection.$canvas.get(0).height);
-			clearInterval(_this.face_detection.job)
-			$('#face_detection_button').removeClass("active")
-			delete _this.face_detection.job
-		}
-	})
-	*/
+
 	// Create JoyStick object into the DIV 'joy1Div'
 	console.log("init Joystick")
 	var JoyMove = new JoyStick('joyMove',{
@@ -218,6 +202,19 @@ var init = function(){
 		internalStrokeColor : "#818181",
 		externalStrokeColor  : "#818181"
 	});
+	setInterval(function(){
+		var x = JoyAttitude.GetX();
+		var y = JoyAttitude.GetY();
+		if ((x!=0 && y!=0) || x!=_this.joy_attitude.x || _this.joy_attitude.y!=y){
+			cmdArrayD = []
+			console.log(x,y)
+			cmdArrayD.push(_this.COMMAND.CMD_ATTITUDE + '#0#' + parseInt(-y/5) + '#' + parseInt(x/5))
+			console.log(cmdArrayD)
+			_this.socket.emit('cmd', cmdArrayD)
+		}
+		_this.joy_attitude.x = x
+		_this.joy_attitude.y = y				
+	},250)
 	/*
     async function face_detection(){
       console.log("detection")
@@ -285,6 +282,7 @@ var init = function(){
 	$(window).on("resize",function(){
 		console.log("windows resized")
 		_this.motionDetctor.init()
+		_this.faceDetctor.init()
 	})
 	
 	// })

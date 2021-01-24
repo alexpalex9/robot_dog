@@ -6,7 +6,7 @@
 		_this.addClass('disabled')
 		console.log("face",this,faceapi)
 		var defaults = {
-			pollingFrequency: 5000,
+			pollingFrequency: 1000,
 			minConfidence : 0.2,
 			$canvas_overlay : $('#face_overlay'),
 			$source : $('#webcam'),
@@ -23,10 +23,9 @@
 		
 		var settings = $.extend({}, defaults, options);
 		
-		var video = settings.$source[0];
-		canvas_overlay = settings.$canvas_overlay[0];
-		canvas_overlay.width = video.width;
-		canvas_overlay.height = video.height;
+		var video, canvas_overlay = {} ;
+		
+		
 		
 		var path = '/models/';
 		console.log("loading models")
@@ -48,6 +47,16 @@
 			console.log("error loading model",e)
 			
 		})
+		
+		_this.init = function(){
+			video = settings.$source[0];
+			canvas_overlay = settings.$canvas_overlay[0];
+			canvas_overlay.width = video.width;
+			canvas_overlay.height = video.height;
+		}
+		_this.init()
+		
+		
 		_this.on('click',function(){
 			console.log('click')
 			if (_this.hasClass('disabled')==false){
