@@ -3,7 +3,7 @@
 import sys
 print(sys.argv)
 from flask import Flask, render_template, Response
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, send, emit
 
 
 import io
@@ -37,6 +37,7 @@ if DEV==False:
     from Ultrasonic import *
 else:
     print('/!\\ Developper mode')
+    import random
     if CAM==True:
         import cv2
         localcamera = cv2.VideoCapture(0)
@@ -118,14 +119,7 @@ class Server():
                     static_url_path='',
                     static_folder='public',
                     template_folder='view')
-        socketio = SocketIO(app)
-        def send_data(self,connect,data):
-            try:
-                socketio.emit('cmd',data)
-                #print("send",data)
-            except Exception as e:
-                print(e)
-            
+        socketio = SocketIO(app)            
         @app.route('/')
         def index():
             return render_template('index.html')
@@ -167,9 +161,9 @@ class Server():
         def ws_cmd(allData):
             cmdArray=allData #.split('\n')
             print(cmdArray)
-            if DEV==True:
-                print("Dev, no cmd allowed")
-                return
+            #if DEV==True:
+            #    print("Dev, no cmd allowed")
+            #    return
             
             if len(cmdArray)>0:
                 if cmdArray[-1] !="":
@@ -198,9 +192,11 @@ class Server():
                     self.servo.setServoAngle(15,int(data[1]))
                 elif cmd.CMD_SONIC in data:
                     #command = cmd.CMD_SONIC+'#'+str(self.sonic.getDistance())+"\n"
-                    sonic = self.sonic.getDistance()
-                    print("emit sonic",sonic)
-                    socketio.emit('sonic',sonic)
+                    if DEV==False:
+                        sonic = self.sonic.getDistance()
+                    else:
+                        sonic = random.randrange(0, 20)
+                    emit('sonic',sonic)
                 elif cmd.CMD_POWER in data:
                     self.measuring_voltage(self.connection1)
                 elif cmd.CMD_WORKING_TIME in data: 

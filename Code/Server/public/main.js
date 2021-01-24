@@ -52,7 +52,7 @@ var init = function(){
 			sensitivity : 5
 		},
 		sonar : {
-			pollingFrequency : 250
+			pollingFrequency : 1000
 		},
 		follow : {
 			flag : false
@@ -328,7 +328,7 @@ var init = function(){
 	})
 	_this.socket.on("sonic",function(data){
 		console.log("sonic",data)
-		$("#sonar_button").html(data)
+		$("#sonar_button").html(data + " cm")
 	})
 	// })
 }
