@@ -11,7 +11,7 @@ body
 }
 #videoContainer {
     max-width:640px;
-	width:100%
+	width:100%;
 	position:relative;
     /*background-image: url(load1.gif);*/
     text-align: left;
@@ -21,9 +21,10 @@ body
 }
 #webcam{
 	max-width:640px;
-	width:100%
-	
-	
+	width:100%;
+	/* width : 	; */
+	/* height: 20px; */
+
 }
 .joystick{
 	text-align:center;
