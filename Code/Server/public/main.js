@@ -321,7 +321,7 @@ var init = function(){
 			_this.sonar.job = setInterval(function(){
 				console.log("emit sonic")
 				_this.socket.emit('cmd', [_this.COMMAND.CMD_SONIC])
-			},_this.sonar.pollingFrequency)				
+			},_this.sonar.pollingFrequency)	
 		}
 		
 	})
