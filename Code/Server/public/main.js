@@ -1,3 +1,6 @@
+// head 50 to 180 CMD_HEAD
+
+
 var _this;
 var init = function(){
 	_this = {
@@ -35,11 +38,21 @@ var init = function(){
 			y : 0,
 			diagonal : {},
 			ratio : 4,
-			sensitivity : 33
+			sensitivity : 20
 		},
 		joy_attitude : {
 			x :0,
 			y:0
+		},
+		joy_head : {
+			x :0,
+			y:0,
+			maxAngle:180,
+			minAngle:45,
+			sensitivity : 5
+		},
+		sonar : {
+			pollingFrequency : 250
 		},
 		follow : {
 			flag : false
@@ -91,29 +104,29 @@ var init = function(){
 			// stop line command position to be reviewed
 			cmdArray.push(_this.COMMAND.CMD_MOVE_STOP + "#8")
 			// delete _this.joy_move.diagonal.interval
-			_this.joy_move.diagonal.flag = false
+			// _this.joy_move.diagonal.flag = false
 			// console.log(x,y);
 			if (Math.abs(x)-0<_this.joy_move.sensitivity && Math.abs(y)-0<_this.joy_move.sensitivity){
 
 				// cmdArray.push(_this.COMMAND.CMD_MOVE_STOP + "#8")
-				_this.socket.emit('cmd',  cmdArray)
+				// _this.socket.emit('cmd',  cmdArray)
 			}else if (y>0 && Math.abs(x)-_this.joy_move.sensitivity<0){
 				cmdArray.push(_this.COMMAND.CMD_MOVE_FORWARD + "#" + parseInt(y/_this.joy_move.ratio))
-				_this.socket.emit('cmd',  cmdArray)
+				// _this.socket.emit('cmd',  cmdArray)
 			}
 			else if (y<0 && Math.abs(x)-_this.joy_move.sensitivity<0){
 				// _this.socket.emit('cmd',  _this.COMMAND.CMD_MOVE_BACKWARD & "#" & -x)
 				cmdArray.push(_this.COMMAND.CMD_MOVE_BACKWARD + "#" + parseInt(-y/_this.joy_move.ratio))
-				_this.socket.emit('cmd',  cmdArray)
+				// _this.socket.emit('cmd',  cmdArray)
 			}
 			else if (x>0 && Math.abs(y)-_this.joy_move.sensitivity<0){
 				cmdArray.push(_this.COMMAND.CMD_TURN_RIGHT + "#" + parseInt(x/_this.joy_move.ratio))
-				_this.socket.emit('cmd',  cmdArray)
+				// _this.socket.emit('cmd',  cmdArray)
 			}
 			else if (x<0 && Math.abs(y)-_this.joy_move.sensitivity<0){
 				// _this.socket.emit('cmd',  _this.COMMAND.CMD_MOVE_BACKWARD & "#" & -x)
 				cmdArray.push(_this.COMMAND.CMD_TURN_LEFT + "#" + parseInt(-x/_this.joy_move.ratio))
-				_this.socket.emit('cmd',  cmdArray)
+				// _this.socket.emit('cmd',  cmdArray)
 			}else{
 				// console.log("MIXED COMMAND")
 				// _this.joy_move.diagonal.flag = true
@@ -180,6 +193,7 @@ var init = function(){
 	setInterval(function(){
 		var x = JoyAttitude.GetX();
 		var y = JoyAttitude.GetY();
+		
 		if ((x!=0 && y!=0) || x!=_this.joy_attitude.x || _this.joy_attitude.y!=y){
 			cmdArrayD = []
 			console.log(x,y)
@@ -202,18 +216,28 @@ var init = function(){
 		internalStrokeColor : "#818181",
 		externalStrokeColor  : "#818181"
 	});
+	_this.joy_head.a = (_this.joy_head.maxAngle - _this.joy_head.minAngle)/200
+	_this.joy_head.b = _this.joy_head.maxAngle/2 + _this.joy_head.minAngle/2 
+				
 	setInterval(function(){
-		var x = JoyAttitude.GetX();
-		var y = JoyAttitude.GetY();
-		if ((x!=0 && y!=0) || x!=_this.joy_attitude.x || _this.joy_attitude.y!=y){
-			cmdArrayD = []
-			console.log(x,y)
-			cmdArrayD.push(_this.COMMAND.CMD_ATTITUDE + '#0#' + parseInt(-y/5) + '#' + parseInt(x/5))
-			console.log(cmdArrayD)
-			_this.socket.emit('cmd', cmdArrayD)
+		var x = JoyHead.GetX();
+		var y = JoyHead.GetY();
+		if ((Math.abs(x-_this.joy_head.x)>_this.joy_head.sensitivity || Math.abs(y-_this.joy_head.y)>_this.joy_head.sensitivity)){
+			cmdArray = []
+			// if (Math.abs(x)-0<_this.joy_head.sensitivity && Math.abs(y)-0<_this.joy_head.sensitivity){
+				
+				
+			// }else if ((y>0 || y<0 ) && Math.abs(x)-_this.joy_head.sensitivity<0){
+				var value = parseInt(y * _this.joy_head.a + _this.joy_head.b)
+				cmdArray.push(_this.COMMAND.CMD_HEAD + "#" + value)
+			// }else if ((x>0 || x<0 ) && Math.abs(y)-_this.joy_head.sensitivity<0){
+				cmdArray.push(_this.COMMAND.CMD_ATTITUDE + '#0#0#' + parseInt(x/5))
+			// }
+			console.log(cmdArray)
+			_this.socket.emit('cmd', cmdArray)
 		}
-		_this.joy_attitude.x = x
-		_this.joy_attitude.y = y				
+		_this.joy_head.x = x
+		_this.joy_head.y = y				
 	},250)
 	/*
     async function face_detection(){
@@ -285,6 +309,26 @@ var init = function(){
 		_this.faceDetctor.init()
 	})
 	
+	
+	$("#sonar_button").on('click',function(){
+		// var $this = this
+		console.log($(this).hasClass('active'))
+		if($(this).hasClass("active")){
+			$(this).removeClass("active")
+			clearInterval(_this.sonar.job)
+		}else{
+			$(this).addClass("active")
+			_this.sonar.job = setInterval(function(){
+				console.log("emit sonic")
+				_this.socket.emit('cmd', [_this.COMMAND.CMD_SONIC])
+			},_this.sonar.pollingFrequency)				
+		}
+		
+	})
+	_this.socket.on("sonic",function(data){
+		console.log("sonic",data)
+		$("#sonar_button").html(data)
+	})
 	// })
 }
 

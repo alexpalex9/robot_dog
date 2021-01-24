@@ -180,6 +180,7 @@ class Client:
     def receive_data(self):
         data=""
         data=self.client_socket1.recv(1024).decode('utf-8')
+        print("receive data",data)
         return data
  
 if __name__ == '__main__':

@@ -21,7 +21,7 @@ else:
     DEV  = False
     
 if len(sys.argv)>=3:
-    CAM = ((sys.argv[1]=='True') or (sys.argv[1]=='true') or (sys.argv[1]=='y') or (sys.argv[1]=='yes'))
+    CAM = ((sys.argv[2]=='True') or (sys.argv[2]=='true') or (sys.argv[2]=='y') or (sys.argv[2]=='yes'))
 else:
     CAM = False
 
