@@ -316,6 +316,7 @@ var init = function(){
 		if($(this).hasClass("active")){
 			$(this).removeClass("active")
 			clearInterval(_this.sonar.job)
+			$("#sonar_button").html("Sonic")
 		}else{
 			$(this).addClass("active")
 			_this.sonar.job = setInterval(function(){

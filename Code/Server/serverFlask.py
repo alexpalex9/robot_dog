@@ -198,7 +198,9 @@ class Server():
                     self.servo.setServoAngle(15,int(data[1]))
                 elif cmd.CMD_SONIC in data:
                     #command = cmd.CMD_SONIC+'#'+str(self.sonic.getDistance())+"\n"
-                    socketio.emit('sonic',self.sonic.getDistance())
+                    sonic = self.sonic.getDistance()
+                    print("emit sonic",sonic)
+                    socketio.emit('sonic',sonic)
                 elif cmd.CMD_POWER in data:
                     self.measuring_voltage(self.connection1)
                 elif cmd.CMD_WORKING_TIME in data: 
