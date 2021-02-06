@@ -249,7 +249,9 @@ var init = function(){
 	});
 	
 	_this.setServoAngle = function(servo,angle){
-		_this.socket.emit('set servos angle', { servo : angle })
+		data = {}
+		data[servo] = angle
+		_this.socket.emit('set servos angle', data)
 	};
 	_this.setServosAngle = function(data){
 		_this.socket.emit('set servos angle', data)

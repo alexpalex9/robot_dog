@@ -3,8 +3,10 @@ import Adafruit_PCA9685
 import time 
 class Servo:
     def __init__(self):
-        self.angleMin=18
-        self.angleMax=162
+        #self.angleMin=18
+        self.angleMin=0
+        #self.angleMax=162
+        self.angleMax=120
         self.pwm = Adafruit_PCA9685.PCA9685()   
         self.pwm.set_pwm_freq(50)               # Set the cycle frequency of PWM
         self.values = {}

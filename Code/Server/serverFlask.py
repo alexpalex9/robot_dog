@@ -161,8 +161,9 @@ class Server():
         @socketio.on('get state', namespace='/robot')
         def get_state():
             if DEV==False:
+                #print("servo value";self.control.servo.values())
                 emit('state',{
-                    'server':self.control.servo.values()
+                    'server':self.control.servo.values
                 })
             else:
                 emit('state',{
@@ -176,7 +177,7 @@ class Server():
             print('set servos angle',data)
             for servo in data:
                 if DEV==False:
-                    self.control.servo.setServoAngle(servo,data[servo])
+                    self.control.servo.setServoAngle(int(servo),data[servo])
                 else:
                     pass
         
