@@ -18,36 +18,34 @@
 	
 	<div class="center-content page-container">
 		<h1 style="text-align:center">
-		<img src='/icon.png' style="height:50px"></img> Raspberry Pi robot dog Freenove
+		<img src='images/dog_client.png' style="height:50px;float:left;"></img> Robot dog Freenove
 		</h1>
 		<div id="videoContainer">
-		<img class="motionDetection" id="webcam" crossorigin  src="stream.mjpg" ></img>
+		<img class="motionDetection" id="webcam" src="stream.mjpg" ></img>
 		<canvas id="face_overlay"  style="position:absolute;left:0;top:0" ></canvas>
 		<canvas id="motion_overlay" style="position:absolute;left:0;top:0"></canvas>
 		
 		</div>
 		<div id="commandContainer">
-			<a class="button cmd" data-cmd="CMD_MOVE_FORWARD#8">MOVE FORWARD</a>
-			<a class="button cmd" data-cmd="CMD_MOVE_LEFT#8">TEST error</a>
 			<a id="face_detection_button" class="button disabled">Face</a>
 			<a id="motion_detection_button" class="button disabled">Motion</a>
-			<a id="face_detection_button" class="button">Follow</a>
 			<a id="sonar_button" class="button">Sonar</a>
 		</div>
 		
 		
 			<div id="JoystickContainer" style="clear:both;">
+				
 				<div class="joystick left">
-					<h2>MOVEMENT</h2>
-					<div id="joyMove" style="width:120px;height:120px"></div>
-				</div>
-				<div class="joystick center">
 					<h2>ATTITUDE</h2>
 					<div id="joyAttitude" style="width:120px;height:120px"></div>
 				</div>
-				<div class="joystick right">
+				<div class="joystick center">
 					<h2>HEAD</h2>
 					<div id="joyHead" style="width:120px;height:120px"></div>
+				</div>
+				<div class="joystick right">
+					<h2>MOVEMENT</h2>
+					<div id="joyMove" style="width:120px;height:120px"></div>
 				</div>
 			</div>
 		</div>

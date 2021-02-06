@@ -58,7 +58,6 @@
 		
 		
 		_this.on('click',function(){
-			console.log('click')
 			if (_this.hasClass('disabled')==false){
 				_this.toggleClass('active')
 			}

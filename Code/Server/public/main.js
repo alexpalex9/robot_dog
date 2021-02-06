@@ -3,7 +3,9 @@
 
 var _this;
 var init = function(){
+	console.log("DOM ready, launch init")
 	_this = {
+		servosState : {},
 		face_detection :{
 			$canvas : $('#face_overlay')
 		},
@@ -76,8 +78,6 @@ var init = function(){
 		}
 	})
 
-	// Create JoyStick object into the DIV 'joy1Div'
-	console.log("init Joystick")
 	var JoyMove = new JoyStick('joyMove',{
 		title: "joystickMove", 
 		internalFillColor :"#818181",
@@ -239,6 +239,21 @@ var init = function(){
 		_this.joy_head.x = x
 		_this.joy_head.y = y				
 	},250)
+	
+	setInterval(function(){
+		_this.socket.emit('get state')
+	},250);
+	_this.socket.on("state",function(data){
+		_this.servosState = data
+		// console.log("state",data)
+	});
+	
+	_this.setServoAngle = function(servo,angle){
+		_this.socket.emit('set servos angle', { servo : angle })
+	};
+	_this.setServosAngle = function(data){
+		_this.socket.emit('set servos angle', data)
+	};
 	/*
     async function face_detection(){
       console.log("detection")
@@ -288,25 +303,19 @@ var init = function(){
 	})
 	*/
 	// $("#webcam").one("load", function() {
-	function load(){
-		
-	}
-	$("#webcam").one("load", function() {
-		console.log("init face detection")
-		_this.faceDetctor = $('#face_detection_button').faceDetection({})
-		
-		console.log("init motion detection")
-		_this.motionDetctor = $('#motion_detection_button').motionDetection({
-			$canvas : $("#motion_overlay"),
-			$source : $("#webcam")
-		});
-		console.log(_this.motionDetctor)
-	})
+	// var webcamerror = function(elemt){
+		// $(elemt).attr("src", "/images/dog_client.png");
+	// }
+	
 	
 	$(window).on("resize",function(){
 		console.log("windows resized")
-		_this.motionDetctor.init()
-		_this.faceDetctor.init()
+		if (_this.motionDetctor){
+			_this.motionDetctor.init()
+		}
+		if (_this.faceDetctor){
+			_this.faceDetctor.init()
+		}
 	})
 	
 	
@@ -331,6 +340,25 @@ var init = function(){
 		$("#sonar_button").html(data + " cm")
 	})
 	// })
+	
+	$("#webcam").on("error", function() {
+		console.log("webcam error")
+		$(this).unbind("error").unbind("load").attr("src", "/images/dog_client.png");
+	})
+	
+	$("#webcam").one("load", function() {
+		console.log("init face detection")
+		_this.faceDetctor = $('#face_detection_button').faceDetection({})
+		
+		console.log("init motion detection")
+		_this.motionDetctor = $('#motion_detection_button').motionDetection({
+			$canvas : $("#motion_overlay"),
+			$source : $("#webcam")
+		});
+	})
+	// $("#webcam").attr('src','stream.mjpg')
 }
 
 $(init())
+
+	

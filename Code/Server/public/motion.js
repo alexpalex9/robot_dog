@@ -3,7 +3,7 @@
 	$.fn.motionDetection = function(options) {
 		var _this = this;
 		var defaults = {
-			pollingFrequency: 100,
+			pollingFrequency: 250,
 			threshold: 0.0,
 			hide: true,
 			$canvas_overlay : $('#motion_overlay'),
@@ -50,7 +50,7 @@
 		_this.init = function(){
 			
 			canvas_draw = settings.$canvas_draw[0];
-			console.log("set canvas draw",video.width,video.height)
+			// console.log("set canvas draw",video.width,video.height)
 			canvas_draw.width = video.width;
 			canvas_draw.height = video.height;
 			canvas_drawContext = canvas_draw.getContext('2d');
@@ -67,7 +67,7 @@
 			// settings.cellwidthqty = cellwidthqty
 			// settings.cellheightqty = cellheightqty
 			_this.on('click',function(){
-				console.log('click')
+				// console.log('click')
 				if (_this.hasClass('disabled')==false){
 					_this.toggleClass('active')
 				}
@@ -123,7 +123,7 @@
 				
 				
 			}else{
-				console.log("height is 0")
+				// console.log("height is 0")
 			}
 			setTimeout(update, settings.pollingFrequency);
 		}

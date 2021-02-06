@@ -9,6 +9,7 @@ from flask_socketio import SocketIO, send, emit
 import io
 import time
 import threading
+import datetime
 #FLASK_DEBUG=0
 
 #if len(sys.argv)<3:
@@ -156,6 +157,28 @@ class Server():
         @socketio.on('disconnect', namespace='/robot')
         def ws_disconn():
             print('disconnect')
+        
+        @socketio.on('get state', namespace='/robot')
+        def get_state():
+            if DEV==False:
+                emit('state',{
+                    'server':self.control.servo.values()
+                })
+            else:
+                emit('state',{
+                    'server':{
+                        1 : 45,
+                        2 : 10
+                    }
+                })
+        @socketio.on('set servos angle', namespace='/robot')
+        def set_servos(data):
+            print('set servos angle',data)
+            for servo in data:
+                if DEV==False:
+                    self.control.servo.setServoAngle(servo,data[servo])
+                else:
+                    pass
         
         @socketio.on('cmd', namespace='/robot')
         def ws_cmd(allData):

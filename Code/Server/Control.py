@@ -32,6 +32,7 @@ class Control:
         self.Thread_conditiona=threading.Thread(target=self.condition)
         self.calibration()
         self.relax(True)
+        
     def readFromTxt(self,filename):
         file1 = open(filename + ".txt", "r")
         list_row = file1.readlines()

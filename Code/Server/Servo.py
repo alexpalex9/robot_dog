@@ -7,6 +7,7 @@ class Servo:
         self.angleMax=162
         self.pwm = Adafruit_PCA9685.PCA9685()   
         self.pwm.set_pwm_freq(50)               # Set the cycle frequency of PWM
+        self.values = {}
     #Convert the input angle to the value of pca9685
     def map(self,value,fromLow,fromHigh,toLow,toHigh):
         return (toHigh-toLow)*(value-fromLow) / (fromHigh-fromLow) + toLow
@@ -17,6 +18,7 @@ class Servo:
             angle=self.angleMax
         date=self.map(angle,0,180,102,512)
         #print(date,date/4096*0.02)
+        self.values[channel] = angle
         self.pwm.set_pwm(channel, 0, int(date))
  
 # Main program logic follows:
