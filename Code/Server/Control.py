@@ -398,6 +398,10 @@ class Control:
         y=self.map(int(y),-20,20,-10,10)
         pos=self.postureBalance(r,p,y,0)
         self.changeCoordinates('Attitude Angle',pos=pos)
+        
+    def getGyro(self):
+        return self.imu.imuUpdate()
+    
     def IMU6050(self):
         self.balance_flag=True
         self.order=['','','','','']

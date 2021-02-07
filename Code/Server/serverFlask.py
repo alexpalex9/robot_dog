@@ -177,6 +177,16 @@ class Server():
                         2 : 10
                     }
                 })
+        @socketio.on('gyro', namespace='/robot')
+        def get_gyro():
+            print("Get Gyro")
+            x,y,z = self.control.getGyro()
+            return {
+                'x':x,
+                'y':y,
+                'z':z
+            }
+            
         @socketio.on('set servos angle', namespace='/robot')
         def set_servos(data):
             print('set servos angle',data)

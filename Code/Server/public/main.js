@@ -56,8 +56,9 @@ var init = function(){
 			sensitivity : 5
 		},
 		sonar : {
-			pollingFrequency : 1000
+			pollingFrequency : 100
 		},
+		gyro : {},
 		follow : {
 			flag : false
 		},
@@ -363,7 +364,14 @@ var init = function(){
 		$("#sonar_button").html(data + " cm")
 		_this.sonar.value = data
 	})
-	// })
+
+	_this.gyro.job = setInterval(function(){
+		// console.log("emit sonic")
+		_this.socket.emit('gyro')
+	},250)	
+	_this.socket.on("gyro",function(data){
+		console.log("gyro",data)
+	})
 	
 	$("#webcam").on("error", function() {
 		console.log("webcam error")

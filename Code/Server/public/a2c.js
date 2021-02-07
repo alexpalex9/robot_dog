@@ -248,13 +248,22 @@ function Environment(depth) {
 		// console.log("step en",new_angle)
 		_this.servos.setAngles(new_angle)
 		
-		// var done = false
-		console.log("wait")
-		var i = 0
-		while (i<5000){
-			i = i +1
+		console.log("check set angle")
+		var done = false
+		while (done==false){
+			var isdone = true;
+			for (s in _this.servos.values){
+				if (_this.servos.values[s]!=new_angle[s]){
+					isdone = false;
+				}
+				
+			}
+			done = isdone;
+			
 		}
-		console.log("wait done")
+		
+		
+		console.log("check set angle done")
 		// _this.servos.setAngles({
 			// '2':action[0],
 			// '3':action[1],
@@ -514,7 +523,30 @@ function actor_critic() {
 		  // [12, 23, 54, 56, 100],
 		  // [12, 23, 54, 56, 78]
 		// ]
-		
+		function Sonic(data, timeout = 10000) {
+			return new Promise((resolve, reject) => {
+				let timer;
+
+				_this.socket.emit('cmd', [_this.COMMAND.CMD_SONIC])
+
+				function responseHandler(message) {
+					// resolve promise with the value we got
+					resolve(message);
+					clearTimeout(timer);
+				}
+
+				_this.socket.once('sonic', responseHandler); 
+
+				// set timeout so if a response is not received within a 
+				// reasonable amount of time, the promise will reject
+				timer = setTimeout(() => {
+					reject(new Error("timeout waiting for msg"));
+					socket.removeListener('sonic', responseHandler);
+				}, timeout);
+
+			});
+		}
+
 						
 		setInterval(function(){
 			if (_this.a2c.active==true){
@@ -528,23 +560,40 @@ function actor_critic() {
 				action = action_tensor.dataSync()
 				
 				// console.log(action)
-				var dist = _this.sonar.value
-				var next_state = environment.step(state,action);
+				// var dist =JSON.parse(JSON.stringify( _this.sonar.value))
+				
+	
+				Sonic().then(function(data){
+					sonicBefore = data
+				
+					var next_state = environment.step(state,action);
 				
 				
 				
-				var next_state_tensor = tf.tensor(state).expandDims(0);
-				reward = (_this.sonar.value - dist) / 10
-				console.log("REWARD",_this.sonar.value,dist)
-				// reward = 0.5
+					var next_state_tensor = tf.tensor(state).expandDims(0);
+					
+					Sonic().then(function(data){
+						sonicAfter = data
+						
+						reward = (sonicAfter - sonicBefore) / 10 
+						console.log("REWARD",sonicBefore,sonicAfter)
+						// reward = 0.5
+						
+						// agent.train_model(state, action, reward, next_state, done);
+						agent.train_model(state_tensor, action_tensor, reward, next_state_tensor, false);
 				
-				// agent.train_model(state, action, reward, next_state, done);
-				agent.train_model(state_tensor, action_tensor, reward, next_state_tensor, false);
-		
-				// console.log(state,next_state)
-				state = next_state
+						// console.log(state,next_state)
+						state = next_state
+					})
+					
+					
+					
+					
+					
+				})
+
 			}	
-		},1000)
+		},5000)
 		
 		// next_state = var state = [
 				  // [11, 23, 34, 45, 96],
