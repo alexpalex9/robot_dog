@@ -208,7 +208,7 @@ function Environment(depth) {
 	}
 
 	this.step = function(state,action){
-		// console.log(action)
+		console.log(action)
 		var l = state[0].length - 1
 		// next_state = Array.from(state);
 		var next_state = [];
