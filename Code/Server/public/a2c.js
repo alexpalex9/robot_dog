@@ -245,7 +245,7 @@ function Environment(depth) {
 			s = s +1
 		}
 		
-		// console.log("step en",new_angle)
+		console.log("new angles",new_angle)
 		_this.servos.setAngles(new_angle)
 		
 		console.log("check set angle")
@@ -523,6 +523,32 @@ function actor_critic() {
 		  // [12, 23, 54, 56, 100],
 		  // [12, 23, 54, 56, 78]
 		// ]
+		function Gyro(data, timeout = 10000) {
+			return new Promise((resolve, reject) => {
+				let timer;
+
+				_this.socket.emit('gyro')
+
+				function responseHandler(message) {
+					// resolve promise with the value we got
+					resolve(message);
+					clearTimeout(timer);
+				}
+
+				_this.socket.once('gyro', responseHandler); 
+
+				// set timeout so if a response is not received within a 
+				// reasonable amount of time, the promise will reject
+				timer = setTimeout(() => {
+					reject(new Error("timeout waiting for msg"));
+					socket.removeListener('gyro', responseHandler);
+				}, timeout);
+
+			});
+		}
+
+
+
 		function Sonic(data, timeout = 10000) {
 			return new Promise((resolve, reject) => {
 				let timer;

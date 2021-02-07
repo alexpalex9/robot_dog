@@ -370,7 +370,8 @@ var init = function(){
 		_this.socket.emit('gyro')
 	},250)	
 	_this.socket.on("gyro",function(data){
-		console.log("gyro",data)
+		// console.log("gyro",data)
+		_this.gyro.value = data
 	})
 	
 	$("#webcam").on("error", function() {
