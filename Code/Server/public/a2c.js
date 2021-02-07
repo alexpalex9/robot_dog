@@ -135,8 +135,8 @@
 }
 
 // module.exports = new Math_utils();
-function Environment() {
-	
+function Environment(depth) {
+	console.log("init Env",depth)
 	this.getData = function(){
 		return _this.servos.state
 		
@@ -174,24 +174,37 @@ function Environment() {
 		_this.servos.setAngles({
 			'2':90,
 			'3':90,
-			'6':90,
+			'5':90,
 			'6':90,
 			'9':90,
 			'10':90,
 			'12':90,
 			'13':90,
 		});
-		states = {
-			'2':0,
-			'3':0,
-			'6':0,
-			'6':0,
-			'9':0,
-			'10':0,
-			'12':0,
-			'13':0,
+		this.initial_states = {
+			'2':90,
+			'3':90,
+			'5':90,
+			'6':90,
+			'9':90,
+			'9':90,
+			'10':90,
+			'12':90,
+			'13':90,
 		}
 		
+		
+		var statesA = []
+		for (var s in this.initial_states){
+			statesA.push([])
+			for (var d=0;d<depth;d++){
+				statesA[statesA.length-1].push(90)
+			}
+			
+		}
+		
+		console.log("init statesA",statesA)
+		return statesA
 	}
 
 	this.step = function(state,action){
@@ -201,7 +214,9 @@ function Environment() {
 		var next_state = [];
 		
 		var new_angle = {}
-		for (var s in state){
+		// for (var s in state){
+		var s = 0
+		for (var ss in this.initial_states){
 			
 			next_state.push(Array.from(state[s]));
 			
@@ -216,19 +231,21 @@ function Environment() {
 			var st = next_state[s][l] + act
 			
 			
-			if (st > 90 + 45){
-				st =  90 + 45
+			if (st > 90 + 20){
+				st =  90 + 20
 			}
-			if (st < 90 - 45){
-				st =  90 - 45
+			if (st < 90 - 20){
+				st =  90 - 20
 			}
 			
 			next_state[s] = next_state[s].slice(1)
 			next_state[s].push(st)
 			new_angle[s] = st
+			
+			s = s +1
 		}
 		
-		console.log(new_angle,next_state,action)
+		console.log("step en",new_angle,next_state,action)
 		_this.servos.setAngles(new_angle)
 		
 		// var done = false
@@ -424,11 +441,14 @@ function actor_critic() {
 
 
 	async function main(offline=false) {
-		environment = new Environment()
+		
+		const DEPTH = 5
+		environment = new Environment(DEPTH)
 		let episode_done = false;
 		environment.init();
 
-		var state = environment.getData();
+		// var state = environment.getData();
+		var state = environment.init();
 		// const AMOUNT_ACTIONS = data.actions_index.length;
 		const AMOUNT_ACTIONS = 8;
 		const STATE_SIZE = 2; // 0 -> 120 / step 10
@@ -483,16 +503,16 @@ function actor_critic() {
 		// console.log(action)
 		// agent.train_model([0], action, reward, next_state, done);
 		
-		var state = [
-		  [11, 23, 34, 45, 96],
-		  [12, 23, 43, 56, 50],
-		  [12, 23, 56, 67, 80],
-		  [13, 34, 56, 45, 70],
-		  [12, 23, 54, 56, 60],
-		  [12, 23, 54, 56, 50],
-		  [12, 23, 54, 56, 100],
-		  [12, 23, 54, 56, 78]
-		]
+		// var state = [
+		  // [11, 23, 34, 45, 96],
+		  // [12, 23, 43, 56, 50],
+		  // [12, 23, 56, 67, 80],
+		  // [13, 34, 56, 45, 70],
+		  // [12, 23, 54, 56, 60],
+		  // [12, 23, 54, 56, 50],
+		  // [12, 23, 54, 56, 100],
+		  // [12, 23, 54, 56, 78]
+		// ]
 		
 						
 		setInterval(function(){
@@ -514,7 +534,7 @@ function actor_critic() {
 				
 				var next_state_tensor = tf.tensor(state).expandDims(0);
 				reward = (_this.sonar.value - dist) / 10
-				
+				console.log("REWARD",_this.sonar.value,dist)
 				// reward = 0.5
 				
 				// agent.train_model(state, action, reward, next_state, done);
