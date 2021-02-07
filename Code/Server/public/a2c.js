@@ -574,7 +574,8 @@ function actor_critic() {
 		}
 
 						
-		setInterval(function(){
+		// setInterval(function(){
+		while(true){
 			if (_this.a2c.active==true){
 				
 				const state_tensor = tf.tensor(state).expandDims(0)
@@ -619,7 +620,8 @@ function actor_critic() {
 				})
 
 			}	
-		},5000)
+		}
+		// },5000)
 		
 		// next_state = var state = [
 				  // [11, 23, 34, 45, 96],
