@@ -3,6 +3,7 @@
 // tf.js tutorials : https://www.tensorflow.org/js/tutorials
  
  
+ // https://github.com/naifmeh/smartbotjs/blob/remotecrawlers/algorithm/environment.js
  // actions
  // 0 : do nothing
  // 1 : move front
@@ -136,45 +137,128 @@
 // module.exports = new Math_utils();
 function Environment() {
 	
-	
-	function init_states() {
-		let utils = require(__dirname+'/utils.js').algo_utils;
+	this.getData = function(){
+		return _this.servos.state
+		
+	}
+	this.init = function () {
+		// let utils = require(__dirname+'/utils.js').algo_utils;
 
-		states = [];
+		// states = [];
 
-		for(let key in boolean_states_attributes) {
-			if(boolean_states_attributes[`${key}`] === true) {
-				states.push([true, false]);
-			}
-		}
+		// for(let key in boolean_states_attributes) {
+			// if(boolean_states_attributes[`${key}`] === true) {
+				// states.push([true, false]);
+			// }
+		// }
 
-		for(let key in numeric_states_attributes) {
-			if(numeric_states_attributes[`${key}`] === true) {
-				let max = 0;
-				if(`${key}` === 'ua_count')
-					max = MAX_UA_USE;
-				else if(`${key}` === 'ip_count')
-					max = MAX_IP_USE;
-				else if(`${key}` === 'domain_count')
-					max = MAX_DOMAIN_COUNT;
+		// for(let key in numeric_states_attributes) {
+			// if(numeric_states_attributes[`${key}`] === true) {
+				// let max = 0;
+				// if(`${key}` === 'ua_count')
+					// max = MAX_UA_USE;
+				// else if(`${key}` === 'ip_count')
+					// max = MAX_IP_USE;
+				// else if(`${key}` === 'domain_count')
+					// max = MAX_DOMAIN_COUNT;
 
-				states.push(utils.generate_step_array(max, Math.ceil(max/10)));
-			}
-		}
+				// states.push(utils.generate_step_array(max, Math.ceil(max/10)));
+			// }
+		// }
 
 		// let cartesian = require('cartesian');
-		states = cartesian(states);
-		N_STATES = states.length;
-		return states;
-
+		// states = cartesian(states);
+		// N_STATES = states.length;
+		// return states;
+		console.log("sey angl")
+		_this.servos.setAngles({
+			'2':90,
+			'3':90,
+			'6':90,
+			'6':90,
+			'9':90,
+			'10':90,
+			'12':90,
+			'13':90,
+		});
+		states = {
+			'2':0,
+			'3':0,
+			'6':0,
+			'6':0,
+			'9':0,
+			'10':0,
+			'12':0,
+			'13':0,
+		}
+		
 	}
 
+	this.step = function(state,action){
+		console.log(action)
+		var l = state[0].length - 1
+		// next_state = Array.from(state);
+		var next_state = [];
+		
+		var new_angle = {}
+		for (var s in state){
+			
+			next_state.push(Array.from(state[s]));
+			
+			// var act = parseFloat(action[parseInt(s)]-0.5 * 5)
+			
+			if (action[parseInt(s)]-0.5>0){
+				act = 5
+			}
+			if (action[parseInt(s)]-0.5<0){
+				act = -5
+			}
+			var st = next_state[s][l] + act
+			
+			
+			if (st > 90 + 45){
+				st =  90 + 45
+			}
+			if (st < 90 - 45){
+				st =  90 - 45
+			}
+			
+			next_state[s] = next_state[s].slice(1)
+			next_state[s].push(st)
+			new_angle[s] = st
+		}
+		
+		console.log(new_angle,next_state,action)
+		_this.servos.setAngles(new_angle)
+		
+		// var done = false
+		var i = 0
+		while (i<5000){
+			i = i +1 
+		}
+		
+		// _this.servos.setAngles({
+			// '2':action[0],
+			// '3':action[1],
+			// '6':action[2],
+			// '6':action[3],
+			// '9':action[4],
+			// '10':action[5],
+			// '12':action[6],
+			// '13':action[7]
+		// })
+		// wait for angle set on reobot
+		// setTimeout(function(){
+			return next_state
+		// },500)
+		
+	}
 
 }
 function actor_critic() {
 	// const tf = require('@tensorflow/tfjs-node-gpu');
 	let zeros = (w, h, v=0) => Array.from(new Array(h), _ => Array(w).fill(v));
-	
+	// tf.enableDebugMode()
 	class A2CAgent {
 		constructor(state_size, action_size) {
 			this.render = false;
@@ -190,15 +274,19 @@ function actor_critic() {
 			this.critic = this.build_critic();
 		
 		}
-
+		
 		build_actor() {
 			const model = tf.sequential();
 			
 			model.add(tf.layers.dense({
-				units: 24,
+				// units: 24,
+				units: 1,
 				activation: 'relu',
 				kernelInitializer:'glorotUniform',
-				inputShape:[9, 12], //oneHotShape
+				inputShape:[8, 5], //oneHotShape
+				// inputShape:[1, 1], //oneHotShape
+				// inputShape:[1, 2], //oneHotShape
+				// inputShape:[5, 5], //oneHotShape
 			}));
 			
 			model.add(tf.layers.flatten());
@@ -227,7 +315,9 @@ function actor_critic() {
 				units: 24,
 				activation: 'relu',
 				kernelInitializer:'glorotUniform',
-				inputShape: [9, 12], //oneHot shape
+				// inputShape: [9, 12], //oneHot shape
+				// inputShape: [1, 1], //oneHot shape
+				inputShape: [8,5], //oneHot shape
 			}));
 
 			model.add(tf.layers.flatten());
@@ -262,29 +352,38 @@ function actor_critic() {
 
 		get_action(state, actions) {
 			// const math_utils = require('../utils/math_utils');
+			console.log(this.format_state(state))
+			// let oneHotState = tf.oneHot(this.format_state(state), 12);
+			let oneHotState = tf.oneHot(this.format_state(state), 2);
 			
-			let oneHotState = tf.oneHot(this.format_state(state), 12);
-			
-			let policy = this.actor.predict(oneHotState.reshape([1,9,12]), {
+			let policy = this.actor.predict(oneHotState.reshape([1,2,1]), {
 				batchSize:1,
 			});
 			
 			let policy_flat = policy.dataSync();
 			
-			return math_utils.weightedRandomItem(actions, policy_flat);
+			// return math_utils.weightedRandomItem(actions, policy_flat);
+			return actions;
 		}
 
 		train_model(state, action, reward, next_state, done) {
-			let target = zeros(1, this.value_size);
+			let target = zeros(8, 1);
 			let advantages = zeros(1, this.action_size);
 
-			let oneHotState = tf.oneHot(this.format_state(state), 12);
-			let oneHotNextState = tf.oneHot(this.format_state(next_state), 12);
-			oneHotState = oneHotState.reshape([1, 9, 12])
-			oneHotNextState = oneHotNextState.reshape([1, 9, 12])
-			let value = this.critic.predict(oneHotState).flatten().get(0);
-			let next_value = this.critic.predict(oneHotNextState).flatten().get(0);
-			console.log(action) //Pb nbr d'actions dans advantages
+			// let oneHotState = tf.oneHot(this.format_state(state), 12);
+			// let oneHotNextState = tf.oneHot(this.format_state(next_state), 12);
+			// oneHotState = oneHotState.reshape([1, 9, 12])
+			// oneHotState = oneHotState.reshape([1, 8, 5])
+			// oneHotNextState = oneHotNextState.reshape([1, 9, 12])
+			// oneHotNextState = oneHotNextState.reshape([1, 8, 5])
+			var oneHotState = state
+			var oneHotNextState = next_state
+			let value = this.critic.predict(oneHotState).flatten().dataSync();
+			// console.log(value.data())
+			// console.log(value.dataSync())
+			// let next_value = this.critic.predict(oneHotNextState).flatten().get(0);
+			let next_value = this.critic.predict(oneHotNextState).flatten().dataSync();
+			// console.log(action) //Pb nbr d'actions dans advantages
 			if(done) {
 				advantages[action] = [reward - value];
 				target[0] = reward;
@@ -293,14 +392,25 @@ function actor_critic() {
 				target[0] = reward + this.discount_factor * next_value;
 			}
 
+			// var thisAgent = this;
+			// thisAgent.done = false
+			// while( thisAgent.done == false){
+				// console.log(thisAgent.done)
+				this.actor.fit(oneHotState, tf.tensor(advantages).reshape([1,8]), {
+					epochs:1,
+				})
+				// .then(function(i){
+					// console.log("fit actore done",i)
+				this.critic.fit(oneHotState, tf.tensor(target), {
+					epochs:1,
+				}).then(function(h){
+					console.log("Loss after Epoch : " + h.history.loss[0]);
+					console.log("reward after Epoch : " + reward);
+					// thisAgent.done = true
+				})
+				// });
+			// }
 			
-			this.actor.fit(oneHotState, tf.tensor(advantages).reshape([1,2047]), {
-				epochs:1,
-			});
-
-			this.critic.fit(oneHotState, tf.tensor(target), {
-				epochs:1,
-			});
 			
 		}
 	}
@@ -314,17 +424,19 @@ function actor_critic() {
 
 
 	async function main(offline=false) {
+		environment = new Environment()
 		let episode_done = false;
-		if(!offline)
-			await environment.init_env();
+		environment.init();
 
-		let data = environment.getEnvironmentData();
-		const AMOUNT_ACTIONS = data.actions_index.length;
-		const STATE_SIZE = 12;
-
+		var state = environment.getData();
+		// const AMOUNT_ACTIONS = data.actions_index.length;
+		const AMOUNT_ACTIONS = 8;
+		const STATE_SIZE = 2; // 0 -> 120 / step 10
+	
 		let agent = new A2CAgent(STATE_SIZE, AMOUNT_ACTIONS);
 		let reward_plotting = {};
 		let episode_length = 0;
+		/*
 		for(let i = 0; i < Object.values(data.websites).length; i++) {
 			episode_done = false;
 			reward_plotting[i] = 0;
@@ -366,7 +478,92 @@ function actor_critic() {
 		return Promise.resolve({
 			reward_plotting: reward_plotting,
 		});
+		*/
+		// var action = agent.get_action([0],[-5,5]);
+		// console.log(action)
+		// agent.train_model([0], action, reward, next_state, done);
+		
+		var state = [
+		  [11, 23, 34, 45, 96],
+		  [12, 23, 43, 56, 50],
+		  [12, 23, 56, 67, 80],
+		  [13, 34, 56, 45, 70],
+		  [12, 23, 54, 56, 60],
+		  [12, 23, 54, 56, 50],
+		  [12, 23, 54, 56, 100],
+		  [12, 23, 54, 56, 78]
+		]
+		
+						
+		setInterval(function(){
+			if (_this.a2c.active==true){
+				
+				const state_tensor = tf.tensor(state).expandDims(0)
+
+				// var action = agent.get_action(xs,[-5,5]);
+				var action_tensor = agent.actor.predict(state_tensor, {
+						batchSize:1,
+					});
+				action = action_tensor.dataSync()
+				
+				// console.log(action)
+				var dist = _this.sonar.value
+				var next_state = environment.step(state,action);
+				
+				
+				
+				var next_state_tensor = tf.tensor(state).expandDims(0);
+				reward = (_this.sonar.value - dist) / 10
+				
+				// reward = 0.5
+				
+				// agent.train_model(state, action, reward, next_state, done);
+				agent.train_model(state_tensor, action_tensor, reward, next_state_tensor, false);
+		
+				// console.log(state,next_state)
+				state = next_state
+			}	
+		},1000)
+		
+		// next_state = var state = [
+				  // [11, 23, 34, 45, 96],
+				  // [12, 23, 43, 56, 23],
+				  // [12, 23, 56, 67, 56],
+				  // [13, 34, 56, 45, 67],
+				  // [12, 23, 54, 56, 78],
+				  // [12, 23, 54, 56, 78],
+				  // [12, 23, 54, 56, 78],
+				  // [12, 23, 54, 56, 78]
+				// ]
+		// const xs = tf.tensor(state).expandDims(0)
+		// this.actor.fit(xs, tf.tensor(advantages).reshape([1,2047]), {
+				// epochs:1,
+			// });
+
+
+		// var value = critic.actor.predict(xs, {
+				// batchSize:1,
+			// }).flatten().get(0)
+			
+			
+			// this.critic.fit(oneHotState, tf.tensor(target), {
+				// epochs:1,
+			// });
+			
+			
+			
+		// https://towardsdatascience.com/how-to-train-a-neural-network-on-chrome-using-tensorflow-js-76dcd1725032
+		// var action = agent.actor.predict(tf.tensor2d([10,10,10], [1,3]));
+		// var action = agent.actor.predict(tf.tensor2d([1,2,3,4,5,6,7,8,9,10,11,12], [12, 1]));
+		
+		// agent.actor.save('localstorage://actor_model');
+		// agent.critic.save('localstorage://critic_model');
+		
+		// const model = await tf.loadLayersModel('localstorage://actor_model');
+		// console.log(model)
 	}
+
+
 
 	return {
 		main: main,

@@ -5,7 +5,9 @@ var _this;
 var init = function(){
 	console.log("DOM ready, launch init")
 	_this = {
-		servosState : {},
+		servos : {
+			state : {}
+		},
 		face_detection :{
 			$canvas : $('#face_overlay')
 		},
@@ -58,6 +60,9 @@ var init = function(){
 		},
 		follow : {
 			flag : false
+		},
+		a2c : {
+			active : false
 		}
 	};
 	var url = "http://" + document.domain + ":" + location.port;
@@ -244,16 +249,16 @@ var init = function(){
 		_this.socket.emit('get state')
 	},250);
 	_this.socket.on("state",function(data){
-		_this.servosState = data
+		_this.servos.state = data
 		// console.log("state",data)
 	});
 	
-	_this.setServoAngle = function(servo,angle){
+	_this.servos.setAngle = function(servo,angle){
 		data = {}
 		data[servo] = angle
 		_this.socket.emit('set servos angle', data)
 	};
-	_this.setServosAngle = function(data){
+	_this.servos.setAngles = function(data){
 		_this.socket.emit('set servos angle', data)
 	};
 	/*
@@ -312,14 +317,30 @@ var init = function(){
 	
 	$(window).on("resize",function(){
 		console.log("windows resized")
-		if (_this.motionDetctor){
+		if (_this.motionDetctor!=undefined){
+		if (_this.motionDetctor.init!=undefined){
 			_this.motionDetctor.init()
 		}
-		if (_this.faceDetctor){
+		}
+		if (_this.faceDetctor!=undefined){
+		if (_this.faceDetctor.init!=undefined){
 			_this.faceDetctor.init()
 		}
+		}
 	})
-	
+	$("#train_button").on('click',function(){
+		// var $this = this
+		// console.log($(this).hasClass('active'))
+		if($(this).hasClass("active")){
+			$(this).removeClass("active")
+			_this.a2c.active = false
+
+		}else{
+			$(this).addClass("active")
+			_this.a2c.active = true
+		}
+		
+	})
 	
 	$("#sonar_button").on('click',function(){
 		// var $this = this
@@ -331,7 +352,7 @@ var init = function(){
 		}else{
 			$(this).addClass("active")
 			_this.sonar.job = setInterval(function(){
-				console.log("emit sonic")
+				// console.log("emit sonic")
 				_this.socket.emit('cmd', [_this.COMMAND.CMD_SONIC])
 			},_this.sonar.pollingFrequency)	
 		}
@@ -340,6 +361,7 @@ var init = function(){
 	_this.socket.on("sonic",function(data){
 		console.log("sonic",data)
 		$("#sonar_button").html(data + " cm")
+		_this.sonar.value = data
 	})
 	// })
 	
