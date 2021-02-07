@@ -203,12 +203,12 @@ function Environment(depth) {
 			
 		}
 		
-		console.log("init statesA",statesA)
+		// console.log("init statesA",statesA)
 		return statesA
 	}
 
 	this.step = function(state,action){
-		console.log(action)
+		// console.log(action)
 		var l = state[0].length - 1
 		// next_state = Array.from(state);
 		var next_state = [];
@@ -240,7 +240,7 @@ function Environment(depth) {
 			
 			next_state[s] = next_state[s].slice(1)
 			next_state[s].push(st)
-			new_angle[s] = st
+			new_angle[ss] = st
 			
 			s = s +1
 		}
@@ -445,7 +445,7 @@ function actor_critic() {
 		const DEPTH = 5
 		environment = new Environment(DEPTH)
 		let episode_done = false;
-		environment.init();
+		// environment.init();
 
 		// var state = environment.getData();
 		var state = environment.init();
