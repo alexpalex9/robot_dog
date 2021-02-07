@@ -181,11 +181,11 @@ class Server():
         def get_gyro():
             print("Get Gyro")
             x,y,z = self.control.getGyro()
-             emit('gyro',{
+            emit('gyro',{
                 'x':x,
                 'y':y,
                 'z':z
-            }
+            })
             
         @socketio.on('set servos angle', namespace='/robot')
         def set_servos(data):
