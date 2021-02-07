@@ -528,8 +528,9 @@ function actor_critic() {
 		  // [12, 23, 54, 56, 100],
 		  // [12, 23, 54, 56, 78]
 		// ]
-		var AA = {};
-		AA.gyro = function(data, timeout = 10000) {
+		// var AA = {};
+		// AA.
+		gyro = function(data, timeout = 10000) {
 			return new Promise((resolve, reject) => {
 				let timer;
 
@@ -607,7 +608,8 @@ function actor_critic() {
 					
 					Sonic().then(function(data){
 						sonicAfter = data
-						AA.gyro().then(function(gryo){
+						// AA.
+						gyro().then(function(gyro){
 							reward = (sonicAfter - sonicBefore) / 10 + 1 - gyro.x / 100 + 1 - gyro.y / 100 + 1 - gyro.z / 100
 							console.log("REWARD",sonicBefore,sonicAfter,gyro)
 							// reward = 0.5
