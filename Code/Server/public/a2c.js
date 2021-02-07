@@ -287,7 +287,8 @@ function actor_critic() {
 	let zeros = (w, h, v=0) => Array.from(new Array(h), _ => Array(w).fill(v));
 	// tf.enableDebugMode()
 	class A2CAgent {
-		constructor(state_size, action_size) {
+		constructor(state_size, action_size,depth) {
+			console.log("constructor A2C")
 			this.render = false;
 			this.state_size = state_size;
 			this.action_size = action_size;
@@ -296,13 +297,17 @@ function actor_critic() {
 			this.discount_factor = 0.99;
 			this.actor_learningr = 0.001;
 			this.critic_learningr = 0.005;
-
+			this.depth = depth
+			// console.log("Contructu actor",this.depth,depth)
 			this.actor = this.build_actor();
 			this.critic = this.build_critic();
-		
+			
+
 		}
 		
 		build_actor() {
+			
+			// console.log("DEPT actore",this.depth)
 			const model = tf.sequential();
 			
 			model.add(tf.layers.dense({
@@ -310,7 +315,7 @@ function actor_critic() {
 				units: 1,
 				activation: 'relu',
 				kernelInitializer:'glorotUniform',
-				inputShape:[8, 5], //oneHotShape
+				inputShape:[8, this.depth], //oneHotShape
 				// inputShape:[1, 1], //oneHotShape
 				// inputShape:[1, 2], //oneHotShape
 				// inputShape:[5, 5], //oneHotShape
@@ -334,7 +339,7 @@ function actor_critic() {
 			return model;
 		}
 
-		build_critic() {
+		build_critic(depth) {
 			const model = tf.sequential();
 			
 			
@@ -344,7 +349,7 @@ function actor_critic() {
 				kernelInitializer:'glorotUniform',
 				// inputShape: [9, 12], //oneHot shape
 				// inputShape: [1, 1], //oneHot shape
-				inputShape: [8,5], //oneHot shape
+				inputShape: [8, this.depth], //oneHot shape
 			}));
 
 			model.add(tf.layers.flatten());
@@ -452,7 +457,7 @@ function actor_critic() {
 
 	async function main(offline=false) {
 		
-		const DEPTH = 5
+		const DEPTH = 20
 		environment = new Environment(DEPTH)
 		let episode_done = false;
 		// environment.init();
@@ -463,7 +468,7 @@ function actor_critic() {
 		const AMOUNT_ACTIONS = 8;
 		const STATE_SIZE = 2; // 0 -> 120 / step 10
 	
-		let agent = new A2CAgent(STATE_SIZE, AMOUNT_ACTIONS);
+		let agent = new A2CAgent(STATE_SIZE, AMOUNT_ACTIONS,DEPTH);
 		let reward_plotting = {};
 		let episode_length = 0;
 		/*
@@ -523,7 +528,8 @@ function actor_critic() {
 		  // [12, 23, 54, 56, 100],
 		  // [12, 23, 54, 56, 78]
 		// ]
-		function Gyro(data, timeout = 10000) {
+		var AA = {};
+		AA.gyro = function(data, timeout = 10000) {
 			return new Promise((resolve, reject) => {
 				let timer;
 
@@ -592,7 +598,7 @@ function actor_critic() {
 	
 				Sonic().then(function(data){
 					sonicBefore = data
-				
+					
 					var next_state = environment.step(state,action);
 				
 				
@@ -601,16 +607,17 @@ function actor_critic() {
 					
 					Sonic().then(function(data){
 						sonicAfter = data
-						
-						reward = (sonicAfter - sonicBefore) / 10 
-						console.log("REWARD",sonicBefore,sonicAfter)
-						// reward = 0.5
-						
-						// agent.train_model(state, action, reward, next_state, done);
-						agent.train_model(state_tensor, action_tensor, reward, next_state_tensor, false);
-				
-						// console.log(state,next_state)
-						state = next_state
+						AA.gyro().then(function(gryo){
+							reward = (sonicAfter - sonicBefore) / 10 + 1 - gyro.x / 100 + 1 - gyro.y / 100 + 1 - gyro.z / 100
+							console.log("REWARD",sonicBefore,sonicAfter,gyro)
+							// reward = 0.5
+							
+							// agent.train_model(state, action, reward, next_state, done);
+							agent.train_model(state_tensor, action_tensor, reward, next_state_tensor, false);
+					
+							// console.log(state,next_state)
+							state = next_state
+						})
 					})
 					
 					
@@ -621,7 +628,7 @@ function actor_critic() {
 
 			}	
 		// }
-		},250)
+		},500)
 		
 		// next_state = var state = [
 				  // [11, 23, 34, 45, 96],
