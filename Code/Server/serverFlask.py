@@ -181,7 +181,7 @@ class Server():
         def get_gyro():
             print("Get Gyro")
             x,y,z = self.control.getGyro()
-            return {
+             emit('gyro',{
                 'x':x,
                 'y':y,
                 'z':z
