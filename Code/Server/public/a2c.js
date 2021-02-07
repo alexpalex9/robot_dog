@@ -245,15 +245,16 @@ function Environment(depth) {
 			s = s +1
 		}
 		
-		console.log("step en",new_angle,next_state,action)
+		// console.log("step en",new_angle)
 		_this.servos.setAngles(new_angle)
 		
 		// var done = false
+		console.log("wait")
 		var i = 0
 		while (i<5000){
-			i = i +1 
+			i = i +1
 		}
-		
+		console.log("wait done")
 		// _this.servos.setAngles({
 			// '2':action[0],
 			// '3':action[1],
