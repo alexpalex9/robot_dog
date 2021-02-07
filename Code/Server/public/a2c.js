@@ -610,8 +610,13 @@ function actor_critic() {
 						sonicAfter = data
 						// AA.
 						gyro().then(function(gyro){
-							reward = (sonicAfter - sonicBefore) / 10 + 1 - Math.abs(gyro.x) / 100 + 1 - Math.abs(gyro.y) / 100 + 1 - Math.abs(gyro.z) / 100
-							console.log("REWARD",sonicBefore,sonicAfter,gyro)
+							
+							var rewardSonic = sonicAfter - sonicBefore
+							if (rewardSonic <0){
+								rewardSonic = 0
+							}
+							reward = rewardSonic / 10 + 1 - Math.abs(gyro.x) / 100 + 1 - Math.abs(gyro.y) / 100 + 1 - Math.abs(gyro.z) / 100
+							console.log("REWARD",reward)
 							// reward = 0.5
 							
 							// agent.train_model(state, action, reward, next_state, done);
