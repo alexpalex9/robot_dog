@@ -610,7 +610,7 @@ function actor_critic() {
 						sonicAfter = data
 						// AA.
 						gyro().then(function(gyro){
-							reward = (sonicAfter - sonicBefore) / 10 + 1 - gyro.x / 100 + 1 - gyro.y / 100 + 1 - gyro.z / 100
+							reward = (sonicAfter - sonicBefore) / 10 + 1 - Math.abs(gyro.x) / 100 + 1 - Math.abs(gyro.y) / 100 + 1 - Math.abs(gyro.z) / 100
 							console.log("REWARD",sonicBefore,sonicAfter,gyro)
 							// reward = 0.5
 							
