@@ -79,7 +79,7 @@
 }
 
 
- function math_utils() {
+ // function math_utils() {
 
     function weightedRandomItem(data, prob) {
         /*if(data.length !== prob.length) {
@@ -89,7 +89,9 @@
         let rand = Math.random();
         let threshold = 0;
         for(let i=0; i<prob.length; i++) {
+			
             threshold += prob[i];
+			// console.log("ACT",i,threshold,rand,prob[i])
             if(threshold > rand) {
                 return data[i];
             }
@@ -125,14 +127,14 @@
 
 
 
-    return {
-        weightedRandomItem: weightedRandomItem,
-        randomItem: randomItem,
-        ones: ones,
-        argmax: argmax,
-        combinations: combinations,
-    }
-}
+    // return {
+        // weightedRandomItem: weightedRandomItem,
+        // randomItem: randomItem,
+        // ones: ones,
+        // argmax: argmax,
+        // combinations: combinations,
+    // }
+// }
 
 // module.exports = new Math_utils();
 function Environment(depth,use_gyro) {
@@ -303,7 +305,7 @@ function Environment(depth,use_gyro) {
 	}
 		
 	this.step = async function(state,action,state_scaled){
-		console.log("step, action = ",action)
+		// console.log("step, action = ",action)
 		// console.log("step, state = ",state)
 		// console.log("step, action = "state,action,state_scaled)
 		var l = state[0].length - 1
@@ -334,6 +336,16 @@ function Environment(depth,use_gyro) {
 			}else if (action[parseInt(s)]<0.333){
 				var st = 70
 			}
+			
+			// for (var i in action){
+			// var rnd = Math.random()
+			// if (rnd>0.9){
+				// st = 110
+			// }else if (rnd<0.1){
+				// st = 90
+			// }
+					// }
+					
 			// var st = next_state[s][l] + act
 			
 			// if (st > this.maxAngle){
@@ -357,7 +369,7 @@ function Environment(depth,use_gyro) {
 		}
 		
 		
-		// console.log("new angles",new_angle)
+		console.log("new angles",new_angle)
 		// _this.servos.setAngles(new_angle)
 		await this.SetServosAngles(new_angle)
 		
@@ -385,64 +397,12 @@ function Environment(depth,use_gyro) {
 		var sonic_state = await this.Sonic();
 		// console.log("SONIC",sonic_state - this.initial_distance)
 		return  {
-			// servos_state : statesA,
-			// servo_state_scaled : statesA_scaled,
 			gyro_state : gyro_state,
 			distance_change : sonic_state - this.initial_distance,
 			servos_state : _this.servos.state,
-			// gyro_state_scaled : statesA_scaled,
 			next_state : next_state,
 			next_state_scaled : next_state_scaled
 		}
-		
-		
-		// console.log("check set angle")
-		// var done = false
-		// while (done==false){
-			// var isdone = true;
-			// for (s in _this.servos.values){
-				// if (_this.servos.state[s]!=new_angle[s]){
-					// isdone = false;
-				// }
-				
-			// }
-			// done = isdone;
-			
-		// }
-		
-		
-		// console.log("check set angle done")
-		// _this.servos.setAngles({
-			// '2':action[0],
-			// '3':action[1],
-			// '6':action[2],
-			// '6':action[3],
-			// '9':action[4],
-			// '10':action[5],
-			// '12':action[6],
-			// '13':action[7]
-		// })
-		// wait for angle set on reobot
-		// setTimeout(function(){
-		// var next_state_scaled = Array.from(next_state)
-		// for (var i in next_state_scaled){
-			// for (var j in next_state_scaled[i]){
-				// if (i<8){ // it is a servo
-					// next_state_scaled[i][j] = this.servos_scale_sate(next_state[i][j])
-				// }else{
-					// next_state_scaled[i][j] = next_state[i][j] / 100
-				// }
-			// }
-			
-		// }
-		
-		
-		
-		// return this.Gyro({
-				// next_servo_state : next_state,
-				// next_servo_state_scaled : next_state_scaled
-			// })
-		// },500)
 		
 	}
 
@@ -452,17 +412,19 @@ function actor_critic() {
 	let zeros = (w, h, v=0) => Array.from(new Array(h), _ => Array(w).fill(v));
 	// tf.enableDebugMode()
 	class A2CAgent {
-		constructor(state_size, inputs_size,depth) {
+		constructor(inputs_size,depth,actions_size) {
 			console.log("constructor A2C")
 			this.render = false;
-			this.state_size = state_size;
+			// this.state_size = state_size;
 			this.inputs_size = inputs_size;
 			this.value_size = 1;
 
 			this.discount_factor = 0.99;
 			this.actor_learningr = 0.001;
 			this.critic_learningr = 0.005;
-			this.depth = depth
+			this.depth = depth;
+			this.actions_size = actions_size
+			
 			// console.log("Contructu actor",this.depth,depth)
 			this.actor = this.build_actor();
 			this.critic = this.build_critic();
@@ -477,7 +439,7 @@ function actor_critic() {
 			
 			model.add(tf.layers.dense({
 				// units: 24,
-				units: 1,
+				units: 24,
 				activation: 'relu',
 				kernelInitializer:'glorotUniform',
 				inputShape:[this.inputs_size, this.depth], //oneHotShape
@@ -489,7 +451,7 @@ function actor_critic() {
 			model.add(tf.layers.flatten());
 
 			model.add(tf.layers.dense({
-				units: this.inputs_size,
+				units: this.actions_size,
 				activation:'softmax',
 				kernelInitializer:'glorotUniform',
 			}));
@@ -639,9 +601,10 @@ function actor_critic() {
 		}else{
 			var AMOUNT_INPUTS = 8;
 		}
-		const STATE_SIZE = 2; // 0 -> 120 / step 10
+		const AMOUNT_ACTIONS = 8;
+		// const STATE_SIZE = 3; // 0 -> 120 / step 10
 	
-		let agent = new A2CAgent(STATE_SIZE, AMOUNT_INPUTS,DEPTH);
+		let agent = new A2CAgent(AMOUNT_INPUTS,DEPTH,AMOUNT_ACTIONS);
 		let reward_plotting = {};
 		let episode_length = 0;
 		/*
@@ -713,16 +676,20 @@ function actor_critic() {
 					// state_scaled = Array.from(init.servo_state_scaled)
 					// console.log(state_scaled)
 					// state_scaled.push(init.gyro_state_scaled)
-					console.log(state_scaled)
+					// console.log(state_scaled)
 					
 					const state_tensor = tf.tensor(state_scaled).expandDims(0)
 
 					// var action = agent.get_action(xs,[-5,5]);
 					var action_tensor = agent.actor.predict(state_tensor, {
-							batchSize:1,
+							batchSize:2,
 						});
 					action = action_tensor.dataSync()
 					
+					
+					// console.log(weightedRandomItem([70,90,100], action))
+					// action_rnd = math_utils.weightedRandomItem([0.33,0.66,1], policy_flat);
+					// console.log(action_tensor.flatten().dataSync())
 					// console.log(action)
 					// var dist =JSON.parse(JSON.stringify( _this.sonar.value))
 					
@@ -758,6 +725,7 @@ function actor_critic() {
 									// reward = 1/2 * rewardSonic / 10 + 1/6 - Math.abs(gyro.x) / 100 + 1/6 - Math.abs(gyro.y) / 100 + 1/6 - Math.abs(gyro.z) / 100
 									// reward =  1/3 *  (1- Math.abs(gyro.x) / 100 ) + 1/3 * (1 - Math.abs(gyro.y) / 100 ) + 1/3 * (1- Math.abs(gyro.z) / 100)
 									reward =  distance_change / 10
+									// reward = Math.random()
 									console.log("REWARD",distance_change,reward)
 									// reward = 0.5
 									
