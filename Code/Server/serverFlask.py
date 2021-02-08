@@ -49,7 +49,7 @@ from Thread import *
 from Command import COMMAND as cmd
 
 
-PORT = 5000
+PORT = 5001
 
 class Camera(object):
     thread = None  # background thread that reads frames from camera
@@ -168,11 +168,11 @@ class Server():
             if DEV==False:
                 #print("servo value";self.control.servo.values())
                 emit('state',{
-                    'server':self.control.servo.values
+                    'servos':self.control.servo.values
                 })
             else:
                 emit('state',{
-                    'server':{
+                    'servos':{
                         1 : 45,
                         2 : 10
                     }
@@ -180,12 +180,19 @@ class Server():
         @socketio.on('gyro', namespace='/robot')
         def get_gyro():
             print("Get Gyro")
-            x,y,z = self.control.getGyro()
-            emit('gyro',{
-                'x':x,
-                'y':y,
-                'z':z
-            })
+            if DEV==False:
+                x,y,z = self.control.getGyro()
+                emit('gyro',{
+                    'x':x,
+                    'y':y,
+                    'z':z
+                })
+            else :
+                emit('gyro',{
+                    'x': random.randrange(0, 20),
+                    'y': random.randrange(0, 20),
+                    'z': random.randrange(0, 20)
+                })
             
         @socketio.on('set servos angle', namespace='/robot')
         def set_servos(data):
@@ -195,7 +202,11 @@ class Server():
                     self.control.servo.setServoAngle(int(servo),data[servo])
                 else:
                     pass
-        
+            if DEV==False:
+                emit('servos angle',self.control.servo.values)
+            else:
+                emit('servos angle',data)
+                
         @socketio.on('cmd', namespace='/robot')
         def ws_cmd(allData):
             cmdArray=allData #.split('\n')

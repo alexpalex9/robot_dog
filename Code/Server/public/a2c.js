@@ -135,43 +135,31 @@
 }
 
 // module.exports = new Math_utils();
-function Environment(depth) {
+function Environment(depth,use_gyro) {
 	console.log("init Env",depth)
+	this.use_gyro = use_gyro
 	this.getData = function(){
 		return _this.servos.state
 		
 	}
-	this.init = function () {
-		// let utils = require(__dirname+'/utils.js').algo_utils;
-
-		// states = [];
-
-		// for(let key in boolean_states_attributes) {
-			// if(boolean_states_attributes[`${key}`] === true) {
-				// states.push([true, false]);
-			// }
-		// }
-
-		// for(let key in numeric_states_attributes) {
-			// if(numeric_states_attributes[`${key}`] === true) {
-				// let max = 0;
-				// if(`${key}` === 'ua_count')
-					// max = MAX_UA_USE;
-				// else if(`${key}` === 'ip_count')
-					// max = MAX_IP_USE;
-				// else if(`${key}` === 'domain_count')
-					// max = MAX_DOMAIN_COUNT;
-
-				// states.push(utils.generate_step_array(max, Math.ceil(max/10)));
-			// }
-		// }
-
-		// let cartesian = require('cartesian');
-		// states = cartesian(states);
-		// N_STATES = states.length;
-		// return states;
-		console.log("sey angl")
-		_this.servos.setAngles({
+	this.init = async function () {
+		// Actions : 90 / 110 / 70
+		this.maxAngle = 110
+		this.minAngle = 70
+		this.scale_a = 1 / (this.maxAngle - this.minAngle)
+		this.scale_b = -  this.minAngle * this.scale_a
+	
+		// _this.servos.setAngles({
+			// '2':90,
+			// '3':90,
+			// '5':90,
+			// '6':90,
+			// '9':90,
+			// '10':90,
+			// '12':90,
+			// '13':90,
+		// });
+		var angle = {
 			'2':90,
 			'3':90,
 			'5':90,
@@ -180,8 +168,9 @@ function Environment(depth) {
 			'10':90,
 			'12':90,
 			'13':90,
-		});
-		this.initial_states = {
+		} 
+		await this.SetServosAngles(angle)
+		this.initial_servos_state = {
 			'2':90,
 			'3':90,
 			'5':90,
@@ -195,75 +184,234 @@ function Environment(depth) {
 		
 		
 		var statesA = []
-		for (var s in this.initial_states){
+		var statesA_scaled = []
+		for (var s in this.initial_servos_state){
 			statesA.push([])
+			statesA_scaled.push([])
 			for (var d=0;d<depth;d++){
 				statesA[statesA.length-1].push(90)
+				statesA_scaled[statesA_scaled.length-1].push(this.servos_scale_sate(90))
 			}
 			
 		}
 		
-		// console.log("init statesA",statesA)
-		return statesA
+		
+		var sonic_state = await this.Sonic();
+		this.initial_distance = sonic_state
+		// console.log(gyro)
+		
+		// console.log(statesA)
+		
+		if (this.use_gyro==true){
+			var gyro_state = await this.Gyro();
+			for (var g in gyro_state){
+				statesA.push([])
+				statesA_scaled.push([])
+				for (var d=0;d<depth;d++){
+					statesA[statesA.length-1].push(gyro_state[g])
+					statesA_scaled[statesA_scaled.length-1].push(gyro_state[g]/100)
+				}
+				
+			}
+			
+		}else{
+			var gyro_state = {'x':0,'y':0,'z':0}
+		}
+		console.log(gyro_state,statesA,statesA_scaled)
+		console.log(statesA)
+		return  {
+			gyro_state : gyro_state,
+			state : statesA,
+			state_scaled : statesA_scaled
+		}
 	}
 
-	this.step = function(state,action){
-		console.log(action)
+	this.servos_scale_sate = function(state){
+		// var next_state_scaled = Array.from(state)
+		// for (var i in state){
+			// for (var j in next_state_scaled[i]){
+		return state * this.scale_a + this.scale_b
+				
+			// }
+			
+		// }
+		
+		
+	}
+	
+	this.Sonic = function(timeout = 10000) {
+			return new Promise((resolve, reject) => {
+				let timer;
+				_this.socket.emit('cmd', [_this.COMMAND.CMD_SONIC])
+				function responseHandler(message) {
+					// resolve promise with the value we got
+					resolve(message);
+					clearTimeout(timer);
+				}
+
+				_this.socket.once('sonic', responseHandler); 
+
+				// set timeout so if a response is not received within a 
+				// reasonable amount of time, the promise will reject
+				timer = setTimeout(() => {
+					reject(new Error("timeout waiting for msg"));
+					socket.removeListener('sonic', responseHandler);
+				}, timeout);
+
+			});
+		}
+		
+	this.SetServosAngles = function(data,timeout = 10000) {
+		return new Promise((resolve, reject) => {
+			let timer;
+			_this.socket.emit('set servos angle',data)
+			function responseHandler(message) {
+				resolve(message);
+				clearTimeout(timer);
+			}
+
+			_this.socket.once('servos angle', responseHandler); 
+
+			// set timeout so if a response is not received within a 
+			// reasonable amount of time, the promise will reject
+			timer = setTimeout(() => {
+				reject(new Error("timeout waiting for msg"));
+				socket.removeListener('servos angle', responseHandler);
+			}, timeout);
+
+		});
+	}	
+	this.Gyro = function(timeout = 10000) {
+		return new Promise((resolve, reject) => {
+			let timer;
+			_this.socket.emit('gyro')
+			function responseHandler(message) {
+				resolve(message);
+				clearTimeout(timer);
+			}
+
+			_this.socket.once('gyro', responseHandler); 
+
+			// set timeout so if a response is not received within a 
+			// reasonable amount of time, the promise will reject
+			timer = setTimeout(() => {
+				reject(new Error("timeout waiting for msg"));
+				socket.removeListener('gyro', responseHandler);
+			}, timeout);
+
+		});
+	}
+		
+	this.step = async function(state,action,state_scaled){
+		console.log("step, action = ",action)
+		// console.log("step, state = ",state)
+		// console.log("step, action = "state,action,state_scaled)
 		var l = state[0].length - 1
 		// next_state = Array.from(state);
 		var next_state = [];
+		var next_state_scaled = [];
 		
 		var new_angle = {}
 		// for (var s in state){
 		var s = 0
-		for (var ss in this.initial_states){
+		for (var ss in this.initial_servos_state){
 			
+			
+			
+			// as increment decision
+			// if (action[parseInt(s)]-0.5>0){
+				// act = 5
+			// }
+			// if (action[parseInt(s)]-0.5<0){
+				// act = -5
+			// }
+			// var st = next_state[s][l] + act
+			
+			// as angle decision
+			var st = 90
+			if (action[parseInt(s)]>0.666){
+				st = 110;
+			}else if (action[parseInt(s)]<0.333){
+				var st = 70
+			}
+			// var st = next_state[s][l] + act
+			
+			// if (st > this.maxAngle){
+				// st = this.maxAngle
+			// }
+			// if (st < this.minAngle){
+				// st = this.minAngle
+			// }
 			next_state.push(Array.from(state[s]));
-			
-			// var act = parseFloat(action[parseInt(s)]-0.5 * 5)
-			
-			if (action[parseInt(s)]-0.5>0){
-				act = 5
-			}
-			if (action[parseInt(s)]-0.5<0){
-				act = -5
-			}
-			var st = next_state[s][l] + act
-			
-			
-			if (st > 90 + 20){
-				st =  90 + 20
-			}
-			if (st < 90 - 20){
-				st =  90 - 20
-			}
+			next_state_scaled.push(Array.from(state_scaled[s]));
 			
 			next_state[s] = next_state[s].slice(1)
+			next_state_scaled[s] = next_state_scaled[s].slice(1)
+			
 			next_state[s].push(st)
+			next_state_scaled[s].push(this.servos_scale_sate(st))
+			
 			new_angle[ss] = st
 			
 			s = s +1
 		}
 		
-		console.log("new angles",new_angle)
-		_this.servos.setAngles(new_angle)
 		
-		console.log("check set angle")
-		var done = false
-		while (done==false){
-			var isdone = true;
-			for (s in _this.servos.values){
-				if (_this.servos.values[s]!=new_angle[s]){
-					isdone = false;
-				}
-				
-			}
-			done = isdone;
+		// console.log("new angles",new_angle)
+		// _this.servos.setAngles(new_angle)
+		await this.SetServosAngles(new_angle)
+		
+		if (this.use_gyro==true){
+			var gyro_state = await this.Gyro();
 			
+			
+			for (var ss in gyro_state){
+				// console.log(s,next_state)
+				
+				next_state.push(Array.from(state[s]));
+				next_state_scaled.push(Array.from(state_scaled[s]));
+				
+				next_state[s] = next_state[s].slice(1)
+				next_state_scaled[s] = next_state_scaled[s].slice(1)
+				
+				var st = gyro_state[ss]
+				next_state[s].push(st)
+				next_state_scaled[s].push(st/100)
+				s = s + 1
+			}
+		}else{
+			var gyro_state = {'x':0,'y':0,'z':0}
+		}
+		var sonic_state = await this.Sonic();
+		// console.log("SONIC",sonic_state - this.initial_distance)
+		return  {
+			// servos_state : statesA,
+			// servo_state_scaled : statesA_scaled,
+			gyro_state : gyro_state,
+			distance_change : sonic_state - this.initial_distance,
+			servos_state : _this.servos.state,
+			// gyro_state_scaled : statesA_scaled,
+			next_state : next_state,
+			next_state_scaled : next_state_scaled
 		}
 		
 		
-		console.log("check set angle done")
+		// console.log("check set angle")
+		// var done = false
+		// while (done==false){
+			// var isdone = true;
+			// for (s in _this.servos.values){
+				// if (_this.servos.state[s]!=new_angle[s]){
+					// isdone = false;
+				// }
+				
+			// }
+			// done = isdone;
+			
+		// }
+		
+		
+		// console.log("check set angle done")
 		// _this.servos.setAngles({
 			// '2':action[0],
 			// '3':action[1],
@@ -276,7 +424,24 @@ function Environment(depth) {
 		// })
 		// wait for angle set on reobot
 		// setTimeout(function(){
-			return next_state
+		// var next_state_scaled = Array.from(next_state)
+		// for (var i in next_state_scaled){
+			// for (var j in next_state_scaled[i]){
+				// if (i<8){ // it is a servo
+					// next_state_scaled[i][j] = this.servos_scale_sate(next_state[i][j])
+				// }else{
+					// next_state_scaled[i][j] = next_state[i][j] / 100
+				// }
+			// }
+			
+		// }
+		
+		
+		
+		// return this.Gyro({
+				// next_servo_state : next_state,
+				// next_servo_state_scaled : next_state_scaled
+			// })
 		// },500)
 		
 	}
@@ -287,11 +452,11 @@ function actor_critic() {
 	let zeros = (w, h, v=0) => Array.from(new Array(h), _ => Array(w).fill(v));
 	// tf.enableDebugMode()
 	class A2CAgent {
-		constructor(state_size, action_size,depth) {
+		constructor(state_size, inputs_size,depth) {
 			console.log("constructor A2C")
 			this.render = false;
 			this.state_size = state_size;
-			this.action_size = action_size;
+			this.inputs_size = inputs_size;
 			this.value_size = 1;
 
 			this.discount_factor = 0.99;
@@ -307,7 +472,7 @@ function actor_critic() {
 		
 		build_actor() {
 			
-			// console.log("DEPT actore",this.depth)
+			// console.log("DEPT actore",this.depth,this.inputs_size)
 			const model = tf.sequential();
 			
 			model.add(tf.layers.dense({
@@ -315,7 +480,7 @@ function actor_critic() {
 				units: 1,
 				activation: 'relu',
 				kernelInitializer:'glorotUniform',
-				inputShape:[8, this.depth], //oneHotShape
+				inputShape:[this.inputs_size, this.depth], //oneHotShape
 				// inputShape:[1, 1], //oneHotShape
 				// inputShape:[1, 2], //oneHotShape
 				// inputShape:[5, 5], //oneHotShape
@@ -324,7 +489,7 @@ function actor_critic() {
 			model.add(tf.layers.flatten());
 
 			model.add(tf.layers.dense({
-				units: this.action_size,
+				units: this.inputs_size,
 				activation:'softmax',
 				kernelInitializer:'glorotUniform',
 			}));
@@ -349,7 +514,7 @@ function actor_critic() {
 				kernelInitializer:'glorotUniform',
 				// inputShape: [9, 12], //oneHot shape
 				// inputShape: [1, 1], //oneHot shape
-				inputShape: [8, this.depth], //oneHot shape
+				inputShape: [this.inputs_size, this.depth], //oneHot shape
 			}));
 
 			model.add(tf.layers.flatten());
@@ -399,8 +564,8 @@ function actor_critic() {
 		}
 
 		train_model(state, action, reward, next_state, done) {
-			let target = zeros(8, 1);
-			let advantages = zeros(1, this.action_size);
+			let target = zeros(this.inputs_size, 1);
+			let advantages = zeros(1, this.inputs_size);
 
 			// let oneHotState = tf.oneHot(this.format_state(state), 12);
 			// let oneHotNextState = tf.oneHot(this.format_state(next_state), 12);
@@ -428,7 +593,7 @@ function actor_critic() {
 			// thisAgent.done = false
 			// while( thisAgent.done == false){
 				// console.log(thisAgent.done)
-				this.actor.fit(oneHotState, tf.tensor(advantages).reshape([1,8]), {
+				this.actor.fit(oneHotState, tf.tensor(advantages).reshape([1,this.inputs_size]), {
 					epochs:1,
 				})
 				// .then(function(i){
@@ -455,20 +620,28 @@ function actor_critic() {
 	// const serialiser = require('../utils/serialisation');
 
 
-	async function main(offline=false) {
+	async function main(offline=false,use_gyro=false) {
 		
-		const DEPTH = 20
-		environment = new Environment(DEPTH)
+		const DEPTH = 3
+		environment = new Environment(DEPTH,use_gyro)
 		let episode_done = false;
 		// environment.init();
 
 		// var state = environment.getData();
-		var state = environment.init();
-		// const AMOUNT_ACTIONS = data.actions_index.length;
-		const AMOUNT_ACTIONS = 8;
+		// var inti = await environment.init()
+		var {gyro_state,state,state_scaled} = await environment.init()
+		console.log(state_scaled)
+		// var state = init.state;
+		// var state_scaled = init.state_scaled;
+		// const AMOUNT_INPUTS = data.actions_index.length;
+		if (use_gyro==true){
+			var AMOUNT_INPUTS = 11;
+		}else{
+			var AMOUNT_INPUTS = 8;
+		}
 		const STATE_SIZE = 2; // 0 -> 120 / step 10
 	
-		let agent = new A2CAgent(STATE_SIZE, AMOUNT_ACTIONS,DEPTH);
+		let agent = new A2CAgent(STATE_SIZE, AMOUNT_INPUTS,DEPTH);
 		let reward_plotting = {};
 		let episode_length = 0;
 		/*
@@ -530,109 +703,80 @@ function actor_critic() {
 		// ]
 		// var AA = {};
 		// AA.
-		gyro = function(data, timeout = 10000) {
-			return new Promise((resolve, reject) => {
-				let timer;
-
-				_this.socket.emit('gyro')
-
-				function responseHandler(message) {
-					// resolve promise with the value we got
-					resolve(message);
-					clearTimeout(timer);
-				}
-
-				_this.socket.once('gyro', responseHandler); 
-
-				// set timeout so if a response is not received within a 
-				// reasonable amount of time, the promise will reject
-				timer = setTimeout(() => {
-					reject(new Error("timeout waiting for msg"));
-					socket.removeListener('gyro', responseHandler);
-				}, timeout);
-
-			});
-		}
-
-
-
-		function Sonic(data, timeout = 10000) {
-			return new Promise((resolve, reject) => {
-				let timer;
-
-				_this.socket.emit('cmd', [_this.COMMAND.CMD_SONIC])
-
-				function responseHandler(message) {
-					// resolve promise with the value we got
-					resolve(message);
-					clearTimeout(timer);
-				}
-
-				_this.socket.once('sonic', responseHandler); 
-
-				// set timeout so if a response is not received within a 
-				// reasonable amount of time, the promise will reject
-				timer = setTimeout(() => {
-					reject(new Error("timeout waiting for msg"));
-					socket.removeListener('sonic', responseHandler);
-				}, timeout);
-
-			});
-		}
-
+		
 						
-		setInterval(function(){
+		setInterval(async function(){
 		// while(true){
 			if (_this.a2c.active==true){
-				
-				const state_tensor = tf.tensor(state).expandDims(0)
+					// var init = environment.init()
+					// console.log(init)
+					// state_scaled = Array.from(init.servo_state_scaled)
+					// console.log(state_scaled)
+					// state_scaled.push(init.gyro_state_scaled)
+					console.log(state_scaled)
+					
+					const state_tensor = tf.tensor(state_scaled).expandDims(0)
 
-				// var action = agent.get_action(xs,[-5,5]);
-				var action_tensor = agent.actor.predict(state_tensor, {
-						batchSize:1,
-					});
-				action = action_tensor.dataSync()
-				
-				// console.log(action)
-				// var dist =JSON.parse(JSON.stringify( _this.sonar.value))
-				
-	
-				Sonic().then(function(data){
-					sonicBefore = data
+					// var action = agent.get_action(xs,[-5,5]);
+					var action_tensor = agent.actor.predict(state_tensor, {
+							batchSize:1,
+						});
+					action = action_tensor.dataSync()
 					
-					var next_state = environment.step(state,action);
-				
-				
-				
-					var next_state_tensor = tf.tensor(state).expandDims(0);
+					// console.log(action)
+					// var dist =JSON.parse(JSON.stringify( _this.sonar.value))
 					
-					Sonic().then(function(data){
-						sonicAfter = data
-						// AA.
-						gyro().then(function(gyro){
+		
+					// Sonic().then(function(data){
+						// sonicBefore = data
+						//var distance_change;
+						// var step = await environment.step()
+						// console.log(step)
+						// var {state_scaled, distance_change , gyro_state} = await environment.step()
+						var {gyro_state ,distance_change , servos_state, next_state, next_state_scaled } = await environment.step(state,action,state_scaled)
+						// console.log(step)
+						// .then(function(step){
+							// console.log(gyro_state)
+							// var next_state = step.next_state
+							// var next_state_scaled = step.next_state_scaled
+							// var gyro = step.gyro
+							// TODO : remplace par { next_state,next_state_scaled} = environment.step(state,action,state_scaled)
+						
+						
+						
+							var next_state_tensor = tf.tensor(next_state_scaled).expandDims(0);
 							
-							var rewardSonic = sonicAfter - sonicBefore
-							if (rewardSonic <0){
-								rewardSonic = 0
-							}
-							// reward = 1/2 * rewardSonic / 10 + 1/6 - Math.abs(gyro.x) / 100 + 1/6 - Math.abs(gyro.y) / 100 + 1/6 - Math.abs(gyro.z) / 100
-							reward =  1/3 *  (1- Math.abs(gyro.x) / 100 ) + 1/3 * (1 - Math.abs(gyro.y) / 100 ) + 1/3 * (1- Math.abs(gyro.z) / 100)
-							console.log("REWARD",reward)
-							// reward = 0.5
+							// Sonic().then(function(data){
+								// sonicAfter = data
+								// AA.
+								// gyro().then(function(gyro){
+									
+									// var rewardSonic = sonicAfter - sonicBefore
+									// if (rewardSonic <0){
+										// rewardSonic = 0
+									// }
+									// reward = 1/2 * rewardSonic / 10 + 1/6 - Math.abs(gyro.x) / 100 + 1/6 - Math.abs(gyro.y) / 100 + 1/6 - Math.abs(gyro.z) / 100
+									// reward =  1/3 *  (1- Math.abs(gyro.x) / 100 ) + 1/3 * (1 - Math.abs(gyro.y) / 100 ) + 1/3 * (1- Math.abs(gyro.z) / 100)
+									reward =  distance_change / 10
+									console.log("REWARD",distance_change,reward)
+									// reward = 0.5
+									
+									// agent.train_model(state, action, reward, next_state, done);
+									agent.train_model(state_tensor, action_tensor, reward, next_state_tensor, false);
 							
-							// agent.train_model(state, action, reward, next_state, done);
-							agent.train_model(state_tensor, action_tensor, reward, next_state_tensor, false);
-					
-							// console.log(state,next_state)
-							state = next_state
-						})
-					})
-					
-					
+									// console.log(state,next_state)
+									state = next_state
+									state_scaled = next_state_scaled
+								// })
+							// })
+						// })
+					// })
 					
 					
 					
-				})
+					
+					
+				// })
 
 			}	
 		// }

@@ -365,14 +365,12 @@ var init = function(){
 		_this.sonar.value = data
 	})
 
-	_this.gyro.job = setInterval(function(){
-		// console.log("emit sonic")
-		_this.socket.emit('gyro')
-	},250)	
-	_this.socket.on("gyro",function(data){
-		// console.log("gyro",data)
-		_this.gyro.value = data
-	})
+	// _this.gyro.job = setInterval(function(){
+		// _this.socket.emit('gyro')
+	// },250)	
+	// _this.socket.on("gyro",function(data){
+		// _this.gyro.value = data
+	// })
 	
 	$("#webcam").on("error", function() {
 		console.log("webcam error")
