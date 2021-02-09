@@ -695,10 +695,24 @@ function actor_critic() {
 		var chart = myCharts()
 
 		console.log("servos_walk",servos_walk)
-						
+		
+		var epoch = 0;
+		
+		try {
+			agent.actor = await tf.loadLayersModel('localstorage://actor_model');
+			agent.critic = await tf.loadLayersModel('localstorage://critic_model');
+			agent.actor .summary();
+			agent.critic .summary();
+			console.log("model loaded")
+		} catch(e) {
+			console.log("no model saved, cannot load",e)
+		}	
+
+
 		setInterval(async function(){
 		// while(true){
 			if (_this.a2c.active==true){
+					epoch = epoch + 1 
 					// var init = environment.init()
 					// console.log(init)
 					// state_scaled = Array.from(init.servo_state_scaled)
@@ -792,7 +806,11 @@ function actor_critic() {
 					// })
 					
 					
-					
+					if (epoch % 10 == 0){
+						console.log("saving model")
+						await agent.actor.save('localstorage://actor_model');
+						await agent.critic.save('localstorage://critic_model');
+					}
 					
 					
 				// })
