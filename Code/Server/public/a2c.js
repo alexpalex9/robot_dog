@@ -646,16 +646,16 @@ function actor_critic() {
 		
 		const SERVOS = [
 			{'name':2,'init':0,'used':false},
-			{'name':3,'init':80,'used':true,'min':60,'max':100,'step':20},
+			{'name':3,'init':80,'used':true,'min':60,'max':100,'step':10},
 			{'name':4,'init':85,'used':false},
 			{'name':5,'init':0,'used':false},
-			{'name':6,'init':80,'used':true,'min':60,'max':100,'step':20},
+			{'name':6,'init':80,'used':true,'min':60,'max':100,'step':10},
 			{'name':7,'init':85,'used':false},
 			{'name':8,'init':95,'used':false},
-			{'name':9,'init':80,'used':true,'min':60,'max':100,'step':20},
+			{'name':9,'init':80,'used':true,'min':60,'max':100,'step':10},
 			{'name':10,'init':180,'used':false},
 			{'name':11,'init':95,'used':false},
-			{'name':12,'init':90,'used':true,'min':80,'max':110,'step':20},
+			{'name':12,'init':90,'used':true,'min':80,'max':110,'step':10},
 			{'name':13,'init':180,'used':false},
 			{'name':15,'init':90,'used':false,'label':'head'},
 		]
