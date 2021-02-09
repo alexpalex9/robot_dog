@@ -6,7 +6,7 @@ class Servo:
         #self.angleMin=18
         self.angleMin=0
         #self.angleMax=162
-        self.angleMax=180
+        self.angleMax=18
         self.pwm = Adafruit_PCA9685.PCA9685()   
         self.pwm.set_pwm_freq(50)               # Set the cycle frequency of PWM
         self.values = {}
