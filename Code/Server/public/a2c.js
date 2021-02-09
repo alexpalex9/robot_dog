@@ -2,6 +2,8 @@
 // some code in github https://github.com/naifmeh/smartbotjs/blob/remotecrawlers/utils/math_utils.js
 // tf.js tutorials : https://www.tensorflow.org/js/tutorials
  
+ // pi 4 leg : https://sebastianfoerster86.wordpress.com/2016/11/07/robot-controlled-by-artificial-neural-network/ 
+ 
  
  // https://github.com/naifmeh/smartbotjs/blob/remotecrawlers/algorithm/environment.js
  // actions
@@ -126,7 +128,17 @@
     }
 
 
+function randomChoice(p) {
+    let rnd = p.reduce( (a, b) => a + b ) * Math.random();
+    return p.findIndex( a => (rnd -= a) < 0 );
+}
 
+function randomChoices(p, count) {
+    return Array.from(Array(count), randomChoice.bind(null, p));
+}
+
+let result = randomChoices([0.1, 0, 0.3, 0.6, 0], 3);
+console.log("TESST RANDMOCHPOSES",result);
     // return {
         // weightedRandomItem: weightedRandomItem,
         // randomItem: randomItem,
@@ -144,13 +156,24 @@ function Environment(depth,use_gyro) {
 		return _this.servos.state
 		
 	}
-	this.init = async function () {
+	this.init = async function (servos,servos_actions) {
 		// Actions : 90 / 110 / 70
-		this.maxAngle = 110
-		this.minAngle = 70
+		// this.maxAngle = 110
+		this.maxAngle = servos_actions[servos_actions.length-1]
+		this.minAngle = servos_actions[0]
 		this.scale_a = 1 / (this.maxAngle - this.minAngle)
 		this.scale_b = -  this.minAngle * this.scale_a
 	
+	
+		// var actions_init = {}
+		this.servos_state = {}
+		var initial_servos_state = {}
+		for (var s in servos){
+			initial_servos_state[s] = servos[s]['init']
+			if (servos[s]['used']==true){
+				this.servos_state[servos[s].name] = servos[s]['init']
+			}
+		}
 		// _this.servos.setAngles({
 			// '2':90,
 			// '3':90,
@@ -161,38 +184,39 @@ function Environment(depth,use_gyro) {
 			// '12':90,
 			// '13':90,
 		// });
-		var angle = {
-			'2':90,
-			'3':90,
-			'5':90,
-			'6':90,
-			'9':90,
-			'10':90,
-			'12':90,
-			'13':90,
-		} 
-		await this.SetServosAngles(angle)
-		this.initial_servos_state = {
-			'2':90,
-			'3':90,
-			'5':90,
-			'6':90,
-			'9':90,
-			'9':90,
-			'10':90,
-			'12':90,
-			'13':90,
-		}
+		// var angle = {
+			// '2':90,
+			// '3':90,
+			// '5':90,
+			// '6':90,
+			// '9':90,
+			// '10':90,
+			// '12':90,
+			// '13':90,
+		// } 
+		// console.log("initial_servos_state",initial_servos_state)
+		await this.SetServosAngles(initial_servos_state)
+		// this.initial_servos_state = {
+			// '2':90,
+			// '3':90,
+			// '5':90,
+			// '6':90,
+			// '9':90,
+			// '9':90,
+			// '10':90,
+			// '12':90,
+			// '13':90,
+		// }
 		
-		
+		console.log("INIT",this.servos_state)
 		var statesA = []
 		var statesA_scaled = []
-		for (var s in this.initial_servos_state){
+		for (var s in this.servos_state){
 			statesA.push([])
 			statesA_scaled.push([])
 			for (var d=0;d<depth;d++){
-				statesA[statesA.length-1].push(90)
-				statesA_scaled[statesA_scaled.length-1].push(this.servos_scale_sate(90))
+				statesA[statesA.length-1].push(this.servos_state[s])
+				statesA_scaled[statesA_scaled.length-1].push(this.servos_scale_sate(this.servos_state[s]))
 			}
 			
 		}
@@ -219,14 +243,19 @@ function Environment(depth,use_gyro) {
 		}else{
 			var gyro_state = {'x':0,'y':0,'z':0}
 		}
-		console.log(gyro_state,statesA,statesA_scaled)
-		console.log(statesA)
+		// console.log(gyro_state,statesA,statesA_scaled)
+		console.log("STATES",statesA)
 		return  {
 			gyro_state : gyro_state,
 			state : statesA,
 			state_scaled : statesA_scaled
 		}
+		
+		return servos_walk
 	}
+
+
+
 
 	this.servos_scale_sate = function(state){
 		// var next_state_scaled = Array.from(state)
@@ -306,7 +335,7 @@ function Environment(depth,use_gyro) {
 		
 	this.step = async function(state,action,state_scaled){
 		// console.log("step, action = ",action)
-		// console.log("step, state = ",state)
+		console.log("step, state = ",state)
 		// console.log("step, action = "state,action,state_scaled)
 		var l = state[0].length - 1
 		// next_state = Array.from(state);
@@ -316,7 +345,7 @@ function Environment(depth,use_gyro) {
 		var new_angle = {}
 		// for (var s in state){
 		var s = 0
-		for (var ss in this.initial_servos_state){
+		for (var servo in action){
 			
 			
 			
@@ -330,12 +359,12 @@ function Environment(depth,use_gyro) {
 			// var st = next_state[s][l] + act
 			
 			// as angle decision
-			var st = 90
-			if (action[parseInt(s)]>0.666){
-				st = 110;
-			}else if (action[parseInt(s)]<0.333){
-				var st = 70
-			}
+			// var st = 90
+			// if (action[parseInt(s)]>0.666){
+				// st = 110;
+			// }else if (action[parseInt(s)]<0.333){
+				// var st = 70
+			// }
 			
 			// for (var i in action){
 			// var rnd = Math.random()
@@ -354,30 +383,31 @@ function Environment(depth,use_gyro) {
 			// if (st < this.minAngle){
 				// st = this.minAngle
 			// }
+			
 			next_state.push(Array.from(state[s]));
 			next_state_scaled.push(Array.from(state_scaled[s]));
 			
 			next_state[s] = next_state[s].slice(1)
 			next_state_scaled[s] = next_state_scaled[s].slice(1)
 			
-			next_state[s].push(st)
-			next_state_scaled[s].push(this.servos_scale_sate(st))
+			next_state[s].push(action[servo])
+			next_state_scaled[s].push(this.servos_scale_sate(action[servo]))
 			
-			new_angle[ss] = st
+			// new_angle[servo] = st
 			
 			s = s +1
 		}
 		
 		
-		console.log("new angles",new_angle)
+		console.log("new angles",action,next_state,next_state_scaled)
 		// _this.servos.setAngles(new_angle)
-		await this.SetServosAngles(new_angle)
+		await this.SetServosAngles(action)
 		
 		if (this.use_gyro==true){
 			var gyro_state = await this.Gyro();
 			
 			
-			for (var ss in gyro_state){
+			for (var dim in gyro_state){
 				// console.log(s,next_state)
 				
 				next_state.push(Array.from(state[s]));
@@ -386,7 +416,7 @@ function Environment(depth,use_gyro) {
 				next_state[s] = next_state[s].slice(1)
 				next_state_scaled[s] = next_state_scaled[s].slice(1)
 				
-				var st = gyro_state[ss]
+				var st = gyro_state[dim]
 				next_state[s].push(st)
 				next_state_scaled[s].push(st/100)
 				s = s + 1
@@ -399,6 +429,7 @@ function Environment(depth,use_gyro) {
 		return  {
 			gyro_state : gyro_state,
 			distance_change : sonic_state - this.initial_distance,
+			distance : sonic_state,
 			servos_state : _this.servos.state,
 			next_state : next_state,
 			next_state_scaled : next_state_scaled
@@ -425,7 +456,6 @@ function actor_critic() {
 			this.depth = depth;
 			this.actions_size = actions_size
 			
-			// console.log("Contructu actor",this.depth,depth)
 			this.actor = this.build_actor();
 			this.critic = this.build_critic();
 			
@@ -510,7 +540,8 @@ function actor_critic() {
 		}
 
 		get_action(state, actions) {
-			// const math_utils = require('../utils/math_utils');
+			// this.actions_size * this.servos_size,
+			
 			console.log(this.format_state(state))
 			// let oneHotState = tf.oneHot(this.format_state(state), 12);
 			let oneHotState = tf.oneHot(this.format_state(state), 2);
@@ -523,11 +554,16 @@ function actor_critic() {
 			
 			// return math_utils.weightedRandomItem(actions, policy_flat);
 			return actions;
+			// should return
+			
 		}
 
-		train_model(state, action, reward, next_state, done) {
-			let target = zeros(this.inputs_size, 1);
-			let advantages = zeros(1, this.inputs_size);
+		async train_model(state, action, reward, next_state, done,chart) {
+			// let target = zeros(this.inputs_size, 1);
+			let target = zeros(1,this.value_size);
+			// let advantages = zeros(1, this.inputs_size);
+			// let advantages = zeros(1, this.actions_size);
+			let advantages = zeros(1, this.actions_size);
 
 			// let oneHotState = tf.oneHot(this.format_state(state), 12);
 			// let oneHotNextState = tf.oneHot(this.format_state(next_state), 12);
@@ -550,23 +586,31 @@ function actor_critic() {
 				advantages[action] = [reward +this.discount_factor * (next_value) - value];
 				target[0] = reward + this.discount_factor * next_value;
 			}
-
+			// console.log("TARGET ACTORE=",advantages)
 			// var thisAgent = this;
 			// thisAgent.done = false
 			// while( thisAgent.done == false){
-				// console.log(thisAgent.done)
-				this.actor.fit(oneHotState, tf.tensor(advantages).reshape([1,this.inputs_size]), {
+				// console.log("ok")
+				await this.actor.fit(oneHotState, tf.tensor(advantages).reshape([1,this.actions_size]), {
 					epochs:1,
 				})
 				// .then(function(i){
 					// console.log("fit actore done",i)
-				this.critic.fit(oneHotState, tf.tensor(target), {
+				
+				await this.critic.fit(oneHotState, tf.tensor(target), {
 					epochs:1,
 				}).then(function(h){
-					console.log("Loss after Epoch : " + h.history.loss[0]);
-					console.log("reward after Epoch : " + reward);
+					// this.lossA = h.history.loss
+					// console.log(h)
+					chart.addData({
+							'loss':h.history.loss[0],
+							'reward':reward
+						})
+					// console.log("Loss after Epoch : " + h.history.loss[0]);
+					// console.log("reward after Epoch : " + reward);
 					// thisAgent.done = true
 				})
+				// console.log(t)
 				// });
 			// }
 			
@@ -591,82 +635,64 @@ function actor_critic() {
 
 		// var state = environment.getData();
 		// var inti = await environment.init()
-		var {gyro_state,state,state_scaled} = await environment.init()
-		console.log(state_scaled)
+		
+		// console.log(state_scaled)
 		// var state = init.state;
 		// var state_scaled = init.state_scaled;
 		// const AMOUNT_INPUTS = data.actions_index.length;
-		if (use_gyro==true){
-			var AMOUNT_INPUTS = 11;
-		}else{
-			var AMOUNT_INPUTS = 8;
+		
+		
+
+		
+		const SERVOS = [
+			{'name':2,'init':110,'used':false},
+			{'name':3,'init':90,'used':true},
+			{'name':4,'init':90,'used':false},
+			{'name':5,'init':110,'used':false},
+			{'name':6,'init':90,'used':true},
+			{'name':7,'init':90,'used':false},
+			{'name':8,'init':90,'used':false},
+			{'name':9,'init':90,'used':true},
+			{'name':10,'init':110,'used':false},
+			{'name':11,'init':90,'used':false},
+			{'name':12,'init':90,'used':true},
+			{'name':13,'init':110,'used':false},
+			{'name':15,'init':90,'used':false,'label':'head'},
+		]
+		
+		var actions_index = [70,90,110];
+		
+		var AMOUNT_INPUTS = 0
+		
+		var servos_walk = [];
+		for (var i in SERVOS){
+			if (SERVOS[i].used==true){
+				servos_walk.push(SERVOS[i])
+				AMOUNT_INPUTS = AMOUNT_INPUTS + 1
+			}
 		}
-		const AMOUNT_ACTIONS = 8;
+		
+		if (use_gyro==true){
+			AMOUNT_INPUTS = AMOUNT_INPUTS + 3 ;
+			// var AMOUNT_INPUTS = 11;
+		// }else{
+			// var AMOUNT_INPUTS = 8;
+		}
+		
+		const AMOUNT_ACTIONS = servos_walk.length * actions_index.length;
+		
 		// const STATE_SIZE = 3; // 0 -> 120 / step 10
 	
 		let agent = new A2CAgent(AMOUNT_INPUTS,DEPTH,AMOUNT_ACTIONS);
 		let reward_plotting = {};
 		let episode_length = 0;
-		/*
-		for(let i = 0; i < Object.values(data.websites).length; i++) {
-			episode_done = false;
-			reward_plotting[i] = 0;
-
-			let state = environment.reset(i);
-			
-			
-			while(true) {
-				data = environment.getEnvironmentData();
-				console.log('Episode '+i+' : '+(data.current_step+1)+'/'+(data.length_episode+1));
-
-				let action = agent.get_action(state, data.actions_index);
-				let step_data = await environment.step(action);
-				let next_state = step_data.state,
-					reward = step_data.reward,
-					done = step_data.done;
-				
-				episode_length = step_data.episode_length;
-
-				reward_plotting[i] += reward < 0 ? 1: 0;
-				agent.train_model(state, action, reward, next_state, done);
-
-				if(done) {
-					break;
-				}
-
-				state = next_state;
-			}
-			reward_plotting[i] = (reward_plotting[i]/(episode_length+1))*100;
-			// await serialiser.serialise({
-				// reward_plotting: reward_plotting,
-			// }, 'plot_actor_critic.json');
-			// if(i%10) {
-			// agent.actor.save(__dirname+'/actor_model');
-			// agent.critic.save(__dirname+'/critic_model');
-			// }
-		}
-
-		return Promise.resolve({
-			reward_plotting: reward_plotting,
-		});
-		*/
-		// var action = agent.get_action([0],[-5,5]);
-		// console.log(action)
-		// agent.train_model([0], action, reward, next_state, done);
 		
-		// var state = [
-		  // [11, 23, 34, 45, 96],
-		  // [12, 23, 43, 56, 50],
-		  // [12, 23, 56, 67, 80],
-		  // [13, 34, 56, 45, 70],
-		  // [12, 23, 54, 56, 60],
-		  // [12, 23, 54, 56, 50],
-		  // [12, 23, 54, 56, 100],
-		  // [12, 23, 54, 56, 78]
-		// ]
-		// var AA = {};
-		// AA.
 		
+		var {gyro_state,state,state_scaled} = await environment.init(SERVOS,actions_index)
+		
+		var chart = myCharts()
+
+		console.log("servos_walk",servos_walk)
 						
 		setInterval(async function(){
 		// while(true){
@@ -676,17 +702,35 @@ function actor_critic() {
 					// state_scaled = Array.from(init.servo_state_scaled)
 					// console.log(state_scaled)
 					// state_scaled.push(init.gyro_state_scaled)
-					// console.log(state_scaled)
+					console.log("state_scaled",state_scaled)
 					
 					const state_tensor = tf.tensor(state_scaled).expandDims(0)
-
+					
 					// var action = agent.get_action(xs,[-5,5]);
-					var action_tensor = agent.actor.predict(state_tensor, {
-							batchSize:2,
+					var policy = agent.actor.predict(state_tensor, {
+							batchSize:1,
 						});
-					action = action_tensor.dataSync()
+					// console.log("OK1")
+					var policy_flat  = policy.dataSync()
+					var actions = {}
+					for (var s in servos_walk){
+						servos_walk[s]['policy'] = []
+						for (var a in actions_index){
+							// console.log("s=",s)
+							// console.log("a=",typeof(a))
+							// console.log("action leng=",actions_index.length)
+							// console.log(s * actions_index.length + typeof(a))
+							// console.log(policy_flat[servos_walk.length)
+							servos_walk[s]['policy'].push(policy_flat[(s*actions_index.length)+parseInt(a)]*servos_walk.length)
+						}
+						// servos_walk[s]['action'] = randomChoice(servos_walk[s]['policy');
+						var choice = randomChoice(servos_walk[s]['policy'])
+						console.log("distribution",servos_walk[s].name,choice,actions_index[choice])
+						actions[servos_walk[s].name] = actions_index[randomChoice(servos_walk[s]['policy'])]
+					}
+					// console.log("ACTIONS",servos_walk,actions)
 					
-					
+					// console.log("OK1")
 					// console.log(weightedRandomItem([70,90,100], action))
 					// action_rnd = math_utils.weightedRandomItem([0.33,0.66,1], policy_flat);
 					// console.log(action_tensor.flatten().dataSync())
@@ -700,7 +744,8 @@ function actor_critic() {
 						// var step = await environment.step()
 						// console.log(step)
 						// var {state_scaled, distance_change , gyro_state} = await environment.step()
-						var {gyro_state ,distance_change , servos_state, next_state, next_state_scaled } = await environment.step(state,action,state_scaled)
+						var {gyro_state ,distance_change , distance, servos_state, next_state, next_state_scaled } = await environment.step(state,actions,state_scaled)
+						
 						// console.log(step)
 						// .then(function(step){
 							// console.log(gyro_state)
@@ -730,7 +775,7 @@ function actor_critic() {
 									// reward = 0.5
 									
 									// agent.train_model(state, action, reward, next_state, done);
-									agent.train_model(state_tensor, action_tensor, reward, next_state_tensor, false);
+									await agent.train_model(state_tensor, policy_flat, reward, next_state_tensor, false,chart);
 							
 									// console.log(state,next_state)
 									state = next_state
