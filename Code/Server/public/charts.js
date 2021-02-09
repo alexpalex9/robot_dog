@@ -249,9 +249,9 @@ var myCharts = function(parent){
 
 	_this.addData = function(data){
 		if (_this.reward_loss_chart.config.data.labels.length>200){
-			_this.reward_loss_chart.config.data.labels.slice(1)
+			_this.reward_loss_chart.config.data.labels = _this.reward_loss_chart.config.data.labels.slice(1)
 			for (var c in _this.reward_loss_chart.config.data.datasets){
-				_this.reward_loss_chart.config.data.datasets[c].data.slice(1)
+				_this.reward_loss_chart.config.data.datasets[c].data = _this.reward_loss_chart.config.data.datasets[c].data.slice(1)
 			}
 		}
 		if (_this.reward_loss_chart.config.data.labels.length== 0){
