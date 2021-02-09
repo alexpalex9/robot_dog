@@ -698,15 +698,15 @@ function actor_critic() {
 		
 		var epoch = 0;
 		
-		try {
-			agent.actor = await tf.loadLayersModel('localstorage://actor_model');
-			agent.critic = await tf.loadLayersModel('localstorage://critic_model');
-			agent.actor .summary();
-			agent.critic .summary();
-			console.log("model loaded")
-		} catch(e) {
-			console.log("no model saved, cannot load",e)
-		}	
+		// try {
+			// agent.actor = await tf.loadLayersModel('localstorage://actor_model');
+			// agent.critic = await tf.loadLayersModel('localstorage://critic_model');
+			// agent.actor.summary();
+			// agent.critic.summary();
+			// console.log("model loaded")
+		// } catch(e) {
+			// console.log("no model saved, cannot load",e)
+		// }	
 
 
 		setInterval(async function(){
