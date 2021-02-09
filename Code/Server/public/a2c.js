@@ -159,64 +159,54 @@ function Environment(depth,use_gyro) {
 	this.init = async function (servos,servos_actions) {
 		// Actions : 90 / 110 / 70
 		// this.maxAngle = 110
-		this.maxAngle = servos_actions[servos_actions.length-1]
-		this.minAngle = servos_actions[0]
-		this.scale_a = 1 / (this.maxAngle - this.minAngle)
-		this.scale_b = -  this.minAngle * this.scale_a
+		// this.maxAngle = servos_actions[servos_actions.length-1]
+		// this.minAngle = servos_actions[0]
+		// this.scale_a = 1 / (this.maxAngle - this.minAngle)
+		// this.scale_b = -  this.minAngle * this.scale_a
 	
 	
 		// var actions_init = {}
-		this.servos_state = {}
+		this.servos_actions = servos_actions
+		this.servos = servos
+		this.servos_object = {}
 		var initial_servos_state = {}
+		
 		for (var s in servos){
-			initial_servos_state[s] = servos[s]['init']
+			initial_servos_state[servos[s].name] = servos[s]['init']
 			if (servos[s]['used']==true){
-				this.servos_state[servos[s].name] = servos[s]['init']
+				this.servos_object[servos[s].name] = {}
+				this.servos_object[servos[s].name]['state'] = servos[s]['init']
+				this.servos_object[servos[s].name]['step'] = servos[s]['step']
+				this.servos_object[servos[s].name]['max'] = servos[s]['max']
+				this.servos_object[servos[s].name]['min'] = servos[s]['min']
+				// console.log(this.servos_object,servos[s])
+				this.servos_object[servos[s].name]['scale_a'] = 1 / (servos[s].max - servos[s].min)
+				this.servos_object[servos[s].name]['scale_b'] = - servos[s].min * this.servos_object[servos[s].name]['scale_a']
+				
+				// make closure below?
+				// var _thistemp = this;
+				// this.servos_object[servos[s].name].scale = function(state){
+						// return (function(a,b){
+						// console.log(state,a,b)
+						// return state * a + b
+					// })(_thistemp.servos_object[servos[s].name]['scale_a'],_thistemp.servos_object[servos[s].name]['scale_b'])
+				// }
+				
+				// console.log("TEST TEST TEST",this.servos_object[servos[s].name].scale(90))	
 			}
 		}
-		// _this.servos.setAngles({
-			// '2':90,
-			// '3':90,
-			// '5':90,
-			// '6':90,
-			// '9':90,
-			// '10':90,
-			// '12':90,
-			// '13':90,
-		// });
-		// var angle = {
-			// '2':90,
-			// '3':90,
-			// '5':90,
-			// '6':90,
-			// '9':90,
-			// '10':90,
-			// '12':90,
-			// '13':90,
-		// } 
-		// console.log("initial_servos_state",initial_servos_state)
+	
 		await this.SetServosAngles(initial_servos_state)
-		// this.initial_servos_state = {
-			// '2':90,
-			// '3':90,
-			// '5':90,
-			// '6':90,
-			// '9':90,
-			// '9':90,
-			// '10':90,
-			// '12':90,
-			// '13':90,
-		// }
 		
-		console.log("INIT",this.servos_state)
+		console.log("INIT",this.servos_object)
 		var statesA = []
 		var statesA_scaled = []
-		for (var s in this.servos_state){
+		for (var s in this.servos_object){
 			statesA.push([])
 			statesA_scaled.push([])
 			for (var d=0;d<depth;d++){
-				statesA[statesA.length-1].push(this.servos_state[s])
-				statesA_scaled[statesA_scaled.length-1].push(this.servos_scale_sate(this.servos_state[s]))
+				statesA[statesA.length-1].push(this.servos_object[s]['state'])
+				statesA_scaled[statesA_scaled.length-1].push(this.servos_scale_sate(this.servos_object[s]['state'],s))
 			}
 			
 		}
@@ -244,7 +234,7 @@ function Environment(depth,use_gyro) {
 			var gyro_state = {'x':0,'y':0,'z':0}
 		}
 		// console.log(gyro_state,statesA,statesA_scaled)
-		console.log("STATES",statesA)
+		// console.log("STATES",statesA)
 		return  {
 			gyro_state : gyro_state,
 			state : statesA,
@@ -257,17 +247,9 @@ function Environment(depth,use_gyro) {
 
 
 
-	this.servos_scale_sate = function(state){
-		// var next_state_scaled = Array.from(state)
-		// for (var i in state){
-			// for (var j in next_state_scaled[i]){
-		return state * this.scale_a + this.scale_b
-				
-			// }
-			
-		// }
-		
-		
+	this.servos_scale_sate = function(state,servo){
+		// console.log("servos_scale_sate",state,servo,this.servos_object[servo])
+		return state * this.servos_object[servo].scale_a + this.servos_object[servo].scale_b
 	}
 	
 	this.Sonic = function(timeout = 10000) {
@@ -333,22 +315,40 @@ function Environment(depth,use_gyro) {
 		});
 	}
 		
-	this.step = async function(state,action,state_scaled){
+	this.step = async function(state,action,state_scaled,incremental){
 		// console.log("step, action = ",action)
-		console.log("step, state = ",state)
+		// console.log("step, state = ",state)
 		// console.log("step, action = "state,action,state_scaled)
 		var l = state[0].length - 1
 		// next_state = Array.from(state);
 		var next_state = [];
 		var next_state_scaled = [];
 		
-		var new_angle = {}
+		// var new_angle = {}
 		// for (var s in state){
 		var s = 0
+		var action_angle = {}
+		
 		for (var servo in action){
 			
 			
+			if (incremental){
+				
+				var act_angle = action[servo] *  this.servos_object[servo]['step']  + this.servos_object[servo]['state']
+				// console.log(servo,act_angle)
+				if (act_angle > this.servos_object[servo]['max']){
+					act_angle = this.servos_object[servo]['max']
+				}
+				if (act_angle < this.servos_object[servo]['min']){
+					act_angle = this.servos_object[servo]['min']
+				}
+			}else{
+				var act_angle = action[servo]
+			}
 			
+			// console.log(servo,action[servo],this.servos_object[servo]['state'],act_angle)
+			action_angle[servo] = act_angle
+			this.servos_object[servo]['state'] = act_angle
 			// as increment decision
 			// if (action[parseInt(s)]-0.5>0){
 				// act = 5
@@ -390,8 +390,8 @@ function Environment(depth,use_gyro) {
 			next_state[s] = next_state[s].slice(1)
 			next_state_scaled[s] = next_state_scaled[s].slice(1)
 			
-			next_state[s].push(action[servo])
-			next_state_scaled[s].push(this.servos_scale_sate(action[servo]))
+			next_state[s].push(act_angle)
+			next_state_scaled[s].push(this.servos_scale_sate(act_angle,servo))
 			
 			// new_angle[servo] = st
 			
@@ -399,9 +399,9 @@ function Environment(depth,use_gyro) {
 		}
 		
 		
-		console.log("new angles",action,next_state,next_state_scaled)
+		console.log("new angles",action_angle,next_state,next_state_scaled)
 		// _this.servos.setAngles(new_angle)
-		await this.SetServosAngles(action)
+		await this.SetServosAngles(action_angle)
 		
 		if (this.use_gyro==true){
 			var gyro_state = await this.Gyro();
@@ -646,21 +646,23 @@ function actor_critic() {
 		
 		const SERVOS = [
 			{'name':2,'init':110,'used':false},
-			{'name':3,'init':90,'used':true},
+			{'name':3,'init':90,'used':true,'min':70,'max':110,'step':20},
 			{'name':4,'init':90,'used':false},
 			{'name':5,'init':110,'used':false},
-			{'name':6,'init':90,'used':true},
+			{'name':6,'init':90,'used':true,'min':70,'max':110,'step':20},
 			{'name':7,'init':90,'used':false},
 			{'name':8,'init':90,'used':false},
-			{'name':9,'init':90,'used':true},
+			{'name':9,'init':90,'used':true,'min':70,'max':110,'step':20},
 			{'name':10,'init':110,'used':false},
 			{'name':11,'init':90,'used':false},
-			{'name':12,'init':90,'used':true},
+			{'name':12,'init':90,'used':true,'min':70,'max':110,'step':20},
 			{'name':13,'init':110,'used':false},
 			{'name':15,'init':90,'used':false,'label':'head'},
 		]
 		
-		var actions_index = [70,90,110];
+		// var actions_index = [70,90,110];
+		var actions_index = [-1,0,1];
+		var incremental = true;
 		
 		var AMOUNT_INPUTS = 0
 		
@@ -702,7 +704,7 @@ function actor_critic() {
 					// state_scaled = Array.from(init.servo_state_scaled)
 					// console.log(state_scaled)
 					// state_scaled.push(init.gyro_state_scaled)
-					console.log("state_scaled",state_scaled)
+					// console.log("state_scaled",state_scaled)
 					
 					const state_tensor = tf.tensor(state_scaled).expandDims(0)
 					
@@ -725,7 +727,7 @@ function actor_critic() {
 						}
 						// servos_walk[s]['action'] = randomChoice(servos_walk[s]['policy');
 						var choice = randomChoice(servos_walk[s]['policy'])
-						console.log("distribution",servos_walk[s].name,choice,actions_index[choice])
+						// console.log("distribution",servos_walk[s].name,choice,actions_index[choice])
 						actions[servos_walk[s].name] = actions_index[randomChoice(servos_walk[s]['policy'])]
 					}
 					// console.log("ACTIONS",servos_walk,actions)
@@ -744,7 +746,7 @@ function actor_critic() {
 						// var step = await environment.step()
 						// console.log(step)
 						// var {state_scaled, distance_change , gyro_state} = await environment.step()
-						var {gyro_state ,distance_change , distance, servos_state, next_state, next_state_scaled } = await environment.step(state,actions,state_scaled)
+						var {gyro_state ,distance_change , distance, servos_state, next_state, next_state_scaled } = await environment.step(state,actions,state_scaled,incremental)
 						
 						// console.log(step)
 						// .then(function(step){
@@ -771,7 +773,7 @@ function actor_critic() {
 									// reward =  1/3 *  (1- Math.abs(gyro.x) / 100 ) + 1/3 * (1 - Math.abs(gyro.y) / 100 ) + 1/3 * (1- Math.abs(gyro.z) / 100)
 									reward =  distance_change / 10
 									// reward = Math.random()
-									console.log("REWARD",distance_change,reward)
+									// console.log("REWARD",distance_change,reward)
 									// reward = 0.5
 									
 									// agent.train_model(state, action, reward, next_state, done);

@@ -248,6 +248,12 @@ var myCharts = function(parent){
 	_this.reward_loss_chart  = new Chart(document.getElementById("loss_reward_chart").getContext("2d"),configSet_reward_loss);
 
 	_this.addData = function(data){
+		if (_this.reward_loss_chart.config.data.labels.length>200){
+			_this.reward_loss_chart.config.data.labels.slice(1)
+			for (var c in _this.reward_loss_chart.config.data.datasets){
+				_this.reward_loss_chart.config.data.datasets[c].data.slice(1)
+			}
+		}
 		if (_this.reward_loss_chart.config.data.labels.length== 0){
 			_this.reward_loss_chart.config.data.labels = [0]
 		}else{
