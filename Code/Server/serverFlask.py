@@ -125,11 +125,9 @@ class Server():
         def index():
             return render_template('index.html')
         
-        @app.route('/actor_model')
-        def save_actor_model(data):
-            print(data)
-            return render_template('index.html')
-        
+        @app.route('/learn')
+        def learn():
+            return render_template('learn.html')
         def gen(camera=None):
             while True:
                 if DEV==False:

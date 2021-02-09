@@ -20,44 +20,29 @@
 		<h1 style="text-align:center">
 		<img src='images/dog_client.png' style="height:50px;float:left;"></img> Robot dog Freenove
 		</h1>
-		<div id="videoContainer">
-		<img class="motionDetection" id="webcam" src="stream.mjpg" ></img>
-		<canvas id="face_overlay"  style="position:absolute;left:0;top:0" ></canvas>
-		<canvas id="motion_overlay" style="position:absolute;left:0;top:0"></canvas>
 		
-		</div>
 		<div id="commandContainer">
-			<a id="face_detection_button" class="button disabled">Face</a>
-			<a id="motion_detection_button" class="button disabled">Motion</a>
-			<a id="sonar_button" class="button">Sonar</a>
 			<a id="train_button" class="button">Train</a>
 		</div>
-		
-		
-		<div id="JoystickContainer" style="clear:both;">
-			
-			<div class="joystick left">
-				<h2>ATTITUDE</h2>
-				<div id="joyAttitude" style="width:120px;height:120px"></div>
-			</div>
-			<div class="joystick center">
-				<h2>HEAD</h2>
-				<div id="joyHead" style="width:120px;height:120px"></div>
-			</div>
-			<div class="joystick right">
-				<h2>MOVEMENT</h2>
-				<div id="joyMove" style="width:120px;height:120px"></div>
-			</div>
-		</div>
+
+	</div>
+	<div id="charts_container" style="width:100%;height:250px">
+		<canvas id="loss_reward_chart" style="height:250px;width:65%;display:inline-block" ></canvas>
+		<canvas id="servos_chart" style="height:250px;width:20%;display:inline-block" ></canvas>
 	</div>
 	</body>
 	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.8.2/dist/tf.js"></script>
+	<script type="text/javascript" src="Chart.bundle.min.js"></script>
+	<script type="text/javascript" src="charts.js"></script>
 	<script src="joy.min.js"></script>
-	<script src="face-api.js"></script>
+	<!-- <script src="face-api.js"></script> -->
 	<script src="motion.js"></script>
 	<script src="face.js"></script>
+	
+	
 	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.0/socket.io.min.js"></script>
 	<script src="main.js"></script>
-	
+	<script src="a2c.js"></script>
+ 
 </html>
