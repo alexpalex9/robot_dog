@@ -399,7 +399,7 @@ function Environment(depth,use_gyro) {
 		}
 		
 		
-		console.log("new angles",action_angle,next_state,next_state_scaled)
+		// console.log("new angles",action_angle,next_state,next_state_scaled)
 		// _this.servos.setAngles(new_angle)
 		await this.SetServosAngles(action_angle)
 		
@@ -583,7 +583,7 @@ function actor_critic() {
 				advantages[action] = [reward - value];
 				target[0] = reward;
 			} else {
-				advantages[action] = [reward +this.discount_factor * (next_value) - value];
+				advantages[action] = [reward + this.discount_factor * (next_value) - value];
 				target[0] = reward + this.discount_factor * next_value;
 			}
 			// console.log("TARGET ACTORE=",advantages)
@@ -772,9 +772,10 @@ function actor_critic() {
 									// reward = 1/2 * rewardSonic / 10 + 1/6 - Math.abs(gyro.x) / 100 + 1/6 - Math.abs(gyro.y) / 100 + 1/6 - Math.abs(gyro.z) / 100
 									// reward =  1/3 *  (1- Math.abs(gyro.x) / 100 ) + 1/3 * (1 - Math.abs(gyro.y) / 100 ) + 1/3 * (1- Math.abs(gyro.z) / 100)
 									reward =  - distance_change / 100
-									if (reward<0){
-										reward = 0
-									}
+									// console.log(distance_change,distance,reward)
+									// if (reward < 0){
+										// reward = 0
+									// }
 									// reward = Math.random()
 									// console.log("REWARD",distance_change,reward)
 									// reward = 0.5
