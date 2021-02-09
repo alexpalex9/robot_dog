@@ -645,18 +645,18 @@ function actor_critic() {
 
 		
 		const SERVOS = [
-			{'name':2,'init':110,'used':false},
+			{'name':2,'init':50,'used':false},
 			{'name':3,'init':90,'used':true,'min':70,'max':110,'step':20},
 			{'name':4,'init':90,'used':false},
-			{'name':5,'init':110,'used':false},
+			{'name':5,'init':50,'used':false},
 			{'name':6,'init':90,'used':true,'min':70,'max':110,'step':20},
 			{'name':7,'init':90,'used':false},
 			{'name':8,'init':90,'used':false},
 			{'name':9,'init':90,'used':true,'min':70,'max':110,'step':20},
-			{'name':10,'init':110,'used':false},
+			{'name':10,'init':130,'used':false},
 			{'name':11,'init':90,'used':false},
 			{'name':12,'init':90,'used':true,'min':70,'max':110,'step':20},
-			{'name':13,'init':110,'used':false},
+			{'name':13,'init':130,'used':false},
 			{'name':15,'init':90,'used':false,'label':'head'},
 		]
 		
