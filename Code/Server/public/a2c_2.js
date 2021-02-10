@@ -837,8 +837,11 @@ function actor_critic() {
 						// await agent.actor.save('localstorage://actor_model');
 						// await agent.critic.save('localstorage://critic_model');
 					// }
-					
-					
+					console.log("WRITE MODEL")
+					await agent.critic.save(
+											tf.io.http(
+												window.location.origin + '/mymodels',
+												 {requestInit:{ method: 'POST',headers : {'prefix':'critic_' }}}));
 				// })
 
 			}	
