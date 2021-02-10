@@ -816,7 +816,7 @@ function actor_critic() {
 									// }
 									// reward = 1/2 * rewardSonic / 10 + 1/6 - Math.abs(gyro.x) / 100 + 1/6 - Math.abs(gyro.y) / 100 + 1/6 - Math.abs(gyro.z) / 100
 									// reward =  1/3 *  (1- Math.abs(gyro.x) / 100 ) + 1/3 * (1 - Math.abs(gyro.y) / 100 ) + 1/3 * (1- Math.abs(gyro.z) / 100)
-									reward =  - distance_change / 100
+									reward = 1/ ( - distance_change / 100)
 									// reward = epoch /100
 									// console.log(distance_change,distance,reward)
 									// if (reward < 0){
