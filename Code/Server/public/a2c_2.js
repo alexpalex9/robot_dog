@@ -792,7 +792,7 @@ function actor_critic() {
 									// reward = 1/ ( - distance_change / 100)
 									reward = - distance_change / 100
 									
-									reward = (epoch * ((Math.random() * 5) - 2) ) / 100
+									// reward = (epoch * ((Math.random() * 5) - 2) ) / 100
 
 									if (epoch % 200 == 0){
 										await agent.train_model(state_scaled, policy_flat, reward, next_state_scaled, true,chart);
