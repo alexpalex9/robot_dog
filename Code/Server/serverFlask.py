@@ -6,6 +6,8 @@ from flask import Flask, render_template, Response, flash, request, redirect, ur
 from flask_socketio import SocketIO, send, emit
 from werkzeug.utils import secure_filename
 import os
+import logging
+logging.getLogger('flask_socketio').setLevel(logging.ERROR)
 
 UPLOAD_FOLDER = os.path.dirname(os.path.realpath(__file__)) + '/public/mymodels/'
 #print(UPLOAD_FOLDER)
