@@ -138,7 +138,7 @@ function randomChoices(p, count) {
 }
 
 let result = randomChoices([0.1, 0, 0.3, 0.6, 0], 3);
-console.log("TESST RANDMOCHPOSES",result);
+// console.log("TESST RANDMOCHPOSES",result);
     // return {
         // weightedRandomItem: weightedRandomItem,
         // randomItem: randomItem,
@@ -150,7 +150,7 @@ console.log("TESST RANDMOCHPOSES",result);
 
 // module.exports = new Math_utils();
 function Environment(depth,use_gyro) {
-	console.log("init Env",depth)
+	// console.log("init Env",depth)
 	this.use_gyro = use_gyro
 	this.getData = function(){
 		return _this.servos.state
@@ -204,7 +204,7 @@ function Environment(depth,use_gyro) {
 	
 		await this.SetServosAngles(initial_servos_state)
 		
-		console.log("INIT",this.servos_object)
+		// console.log("INIT",this.servos_object)
 		var statesA = []
 		var statesA_scaled = []
 		for (var s in this.servos_object){
@@ -407,8 +407,9 @@ function Environment(depth,use_gyro) {
 		
 		// console.log("new angles",action_angle,next_state,next_state_scaled)
 		// _this.servos.setAngles(new_angle)
+		console.log("set servo Angles")
 		await this.SetServosAngles(action_angle)
-		
+		console.log("servo Angles setted")
 		if (this.use_gyro==true){
 			var gyro_state = await this.Gyro();
 			
@@ -552,7 +553,7 @@ function actor_critic() {
 		get_action(state, actions) {
 			// this.actions_size * this.servos_size,
 			
-			console.log(this.format_state(state))
+			// console.log(this.format_state(state))
 			// let oneHotState = tf.oneHot(this.format_state(state), 12);
 			let oneHotState = tf.oneHot(this.format_state(state), 2);
 			
@@ -574,7 +575,7 @@ function actor_critic() {
 			// let advantages = zeros(1, this.inputs_size);
 			// let advantages = zeros(1, this.actions_size);
 			var advantages = zeros(1, this.actions_size);
-			console.log("init advantages",advantages)
+			// console.log("init advantages",advantages)
 			// let oneHotState = tf.oneHot(this.format_state(state), 12);
 			// let oneHotNextState = tf.oneHot(this.format_state(next_state), 12);
 			var oneHotState = tf.oneHot(state,3).reshape([1,12,2])
@@ -723,7 +724,7 @@ function actor_critic() {
 		
 		var chart = myCharts()
 
-		console.log("servos_walk",servos_walk)
+		// console.log("servos_walk",servos_walk)
 		
 		var epoch = 0;
 		var batch = 0;
@@ -842,7 +843,7 @@ function actor_critic() {
 
 			}	
 		// }
-		},500)
+		},1000)
 
 	}
 

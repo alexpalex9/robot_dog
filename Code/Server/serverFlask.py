@@ -226,6 +226,7 @@ class Server():
             if DEV==False:
                 emit('servos angle',self.control.servo.values)
             else:
+                time.sleep(0.5)
                 emit('servos angle',data)
                 
         @socketio.on('cmd', namespace='/robot')
@@ -286,7 +287,7 @@ class Server():
                     self.control.order=data
                     self.control.timeout=time.time()
            
-        socketio.run(app, "0.0.0.0", port=PORT,debug=True)        
+        socketio.run(app, "0.0.0.0", port=PORT,debug=False)        
         
 if __name__ == '__main__':
     server = Server()
