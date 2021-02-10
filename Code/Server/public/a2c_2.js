@@ -447,14 +447,15 @@ function actor_critic() {
 			console.log("constructor A2C")
 			this.render = false;
 			// this.state_size = state_size;
-			this.inputs_size = inputs_size;
+			this.inputs_size = inputs_size; // 4
 			this.value_size = 1;
 
 			this.discount_factor = 0.99;
 			this.actor_learningr = 0.001;
 			this.critic_learningr = 0.005;
-			this.depth = depth;
-			this.actions_size = actions_size
+			this.depth = depth; // 2
+			this.actions_size = actions_size // 12
+			this.actions_item_length = 3
 			
 			this.actor = this.build_actor();
 			this.critic = this.build_critic();
@@ -472,14 +473,12 @@ function actor_critic() {
 				units: 24,
 				activation: 'relu',
 				kernelInitializer:'glorotUniform',
-				inputShape:[this.inputs_size, this.depth], //oneHotShape
-				// inputShape:[1, 1], //oneHotShape
-				// inputShape:[1, 2], //oneHotShape
-				// inputShape:[5, 5], //oneHotShape
+				// inputShape:[this.inputs_size, this.depth], //oneHotShape
+				inputShape:[12,2], //oneHotShape
 			}));
 			model.add(tf.layers.flatten());
 			// addd by me
-			model.add(tf.layers.dense({units: 24, activation: 'relu'}));
+			// model.add(tf.layers.dense({units: 24, activation: 'relu'}));
 			// model.add(tf.layers.flatten());
 
 			model.add(tf.layers.dense({
@@ -508,13 +507,16 @@ function actor_critic() {
 				kernelInitializer:'glorotUniform',
 				// inputShape: [9, 12], //oneHot shape
 				// inputShape: [1, 1], //oneHot shape
-				inputShape: [this.inputs_size, this.depth], //oneHot shape
+				// inputShape: [3,12], //oneHot shape
+				// inputShape: [this.inputs_size * 3, this.depth], //oneHot shape
+				inputShape: [12,2], //oneHot shape
 			}));
 
 			model.add(tf.layers.flatten());
 
 			model.add(tf.layers.dense({
 				units: this.value_size,
+				// units: 4,
 				activation:'linear',
 				kernelInitializer:'glorotUniform',
 			}));
@@ -560,45 +562,58 @@ function actor_critic() {
 			
 		}
 
-		async train_model(state, action, reward, next_state, done,chart) {
+		async train_model(state, action, reward, next_state, done, chart) {
 			// let target = zeros(this.inputs_size, 1);
 			let target = zeros(1,this.value_size);
 			// let advantages = zeros(1, this.inputs_size);
 			// let advantages = zeros(1, this.actions_size);
-			let advantages = zeros(1, this.actions_size);
+			var advantages = zeros(1, this.actions_size);
 			console.log("init advantages",advantages)
 			// let oneHotState = tf.oneHot(this.format_state(state), 12);
 			// let oneHotNextState = tf.oneHot(this.format_state(next_state), 12);
-			// oneHotState = oneHotState.reshape([1, 9, 12])
+			var oneHotState = tf.oneHot(state,3).reshape([1,12,2])
 			// oneHotState = oneHotState.reshape([1, 8, 5])
-			// oneHotNextState = oneHotNextState.reshape([1, 9, 12])
+			var oneHotNextState = tf.oneHot(next_state,3).reshape([1,12,2])
 			// oneHotNextState = oneHotNextState.reshape([1, 8, 5])
-			var oneHotState = state
-			var oneHotNextState = next_state
+			// var oneHotState = state
+			// console.log("TRAIN, oneHotState  1",state_tensor)
+			// var oneHotNextState = next_state
 			let value = this.critic.predict(oneHotState).flatten().dataSync();
 			// console.log(value.data())
-			// console.log(value.dataSync())
+			console.log("CRITIC predict",value)
 			// let next_value = this.critic.predict(oneHotNextState).flatten().get(0);
 			let next_value = this.critic.predict(oneHotNextState).flatten().dataSync();
 			// console.log(action) //Pb nbr d'actions dans advantages
-			if(done) {
-				advantages[action] = [reward - value];
-				target[0] = reward;
-			} else {
-				advantages[action] = [reward + this.discount_factor * (next_value) - value];
+			// if(done) {
+				// advantages[action] = [reward - value];
+				// target[0] = reward;
+			// } else {
+				// console.log("action",action)
+				// console.log("ADV CALC",[reward + this.discount_factor * (next_value) - value])
+				// advantages[action] = [reward + (1 - done)  * this.discount_factor * (next_value) - value];
 				// trying to do my advantages
 				
 				target[0] = reward + this.discount_factor * next_value;
+				// for (var i =0;i< 4 ;i++){ 
+					
+					// target[0][i] = reward + this.discount_factor * next_value[i];
+				// }
+				var advantages = []
+				for (var i =0;i<this.actions_size;i++){
+					advantages.push(reward + (1 - done) * this.discount_factor * (next_value) - value)
+					// advantages.push(reward + (1 - done) * this.discount_factor * (next_value[Math.floor(i/4)]) - value[Math.floor(i/4)])
+				}
+				// console.log("advantages",advantages)
+				// console.log("advantages",tf.tensor(advantages).dataSync())
+				// console.log("target",tf.tensor(target).dataSync())
 				
-				console.log("advantages",advantages,reward,value,tf.tensor(advantages).dataSync())
-				console.log("target",target)
-				
-			}
+			// }
 			// console.log("TARGET ACTORE=",advantages)
 			// var thisAgent = this;
 			// thisAgent.done = false
 			// while( thisAgent.done == false){
 				// console.log("ok")
+				// await this.actor.fit(oneHotState, tf.tensor(advantages).reshape([1,this.actions_size]), {epochs:1,})
 				// await this.actor.fit(oneHotState, tf.tensor(advantages).reshape([1,this.actions_size]), {epochs:1,})
 				await this.actor.fit(oneHotState, tf.tensor(advantages).reshape([1,this.actions_size]), {epochs:1,})
 				// .then(function(i){
@@ -635,7 +650,7 @@ function actor_critic() {
 
 	async function main(offline=false,use_gyro=false) {
 		
-		const DEPTH = 3
+		const DEPTH = 2
 		environment = new Environment(DEPTH,use_gyro)
 		let episode_done = false;
 		// environment.init();
@@ -727,12 +742,20 @@ function actor_critic() {
 					// state_scaled.push(init.gyro_state_scaled)
 					// console.log("state_scaled",state_scaled)
 					
-					const state_tensor = tf.tensor(state_scaled).expandDims(0)
+					// const state_tensor = tf.tensor(state_scaled).expandDims(0)
 					
+					var  state_tensor = tf.oneHot(state_scaled, actions_index.length);
+					// console.log("ON HOT STATE",oneHotState.dataSync())
+					// console.log("TENSOR",state_tensor.dataSync())
+					// console.log("TENSOR reshape",state_tensor.dataSync())
 					// var action = agent.get_action(xs,[-5,5]);
-					var policy = agent.actor.predict(state_tensor, {
-							batchSize:1,
-						});
+					// var policy = agent.actor.predict(state_tensor, {batchSize:1	});
+					
+					var policy = agent.actor.predict(state_tensor.reshape([1,12,2]), {batchSize:1});
+					console.log("POLICY",policy.dataSync())
+					// let policy = this.actor.predict(oneHotState.reshape([1,9,12]), {
+						// batchSize:1,
+					// });
 					// console.log("OK1")
 					var policy_flat  = policy.dataSync()
 					var actions = {}
@@ -779,7 +802,8 @@ function actor_critic() {
 						
 						
 						
-							var next_state_tensor = tf.tensor(next_state_scaled).expandDims(0);
+							// var next_state_tensor = tf.tensor(next_state_scaled).expandDims(0);
+							// var next_state_tensor = tf.oneHot(next_state_scaled);
 							
 							// Sonic().then(function(data){
 								// sonicAfter = data
@@ -793,6 +817,7 @@ function actor_critic() {
 									// reward = 1/2 * rewardSonic / 10 + 1/6 - Math.abs(gyro.x) / 100 + 1/6 - Math.abs(gyro.y) / 100 + 1/6 - Math.abs(gyro.z) / 100
 									// reward =  1/3 *  (1- Math.abs(gyro.x) / 100 ) + 1/3 * (1 - Math.abs(gyro.y) / 100 ) + 1/3 * (1- Math.abs(gyro.z) / 100)
 									reward =  - distance_change / 100
+									// reward = epoch /100
 									// console.log(distance_change,distance,reward)
 									// if (reward < 0){
 										// reward = 0
@@ -802,7 +827,11 @@ function actor_critic() {
 									// reward = 0.5
 									
 									// agent.train_model(state, action, reward, next_state, done);
-									await agent.train_model(state_tensor, policy_flat, reward, next_state_tensor, false,chart);
+									if (epoch % 100 == 0){
+										await agent.train_model(state_scaled, policy_flat, reward, next_state_scaled, true,chart);
+									}else{
+										await agent.train_model(state_scaled, policy_flat, reward, next_state_scaled, false,chart);
+									}
 							
 									// console.log(state,next_state)
 									state = next_state
@@ -813,11 +842,11 @@ function actor_critic() {
 					// })
 					
 					
-					if (epoch % 10 == 0){
-						console.log("saving model")
-						await agent.actor.save('localstorage://actor_model');
-						await agent.critic.save('localstorage://critic_model');
-					}
+					// if (epoch % 10 == 0){
+						// console.log("saving model")
+						// await agent.actor.save('localstorage://actor_model');
+						// await agent.critic.save('localstorage://critic_model');
+					// }
 					
 					
 				// })
