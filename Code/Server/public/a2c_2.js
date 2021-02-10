@@ -156,6 +156,12 @@ function Environment(depth,use_gyro) {
 		return _this.servos.state
 		
 	}
+	
+	this.reset = async function(){
+		var sonic_state = await this.Sonic();
+		this.initial_distance = sonic_state
+		console.log("Reset done, new initial distance is",this.initial_distance)
+	}
 	this.init = async function (servos,servos_actions) {
 		// Actions : 90 / 110 / 70
 		// this.maxAngle = 110
@@ -719,6 +725,7 @@ function actor_critic() {
 		console.log("servos_walk",servos_walk)
 		
 		var epoch = 0;
+		var batch = 0;
 		
 		// try {
 			// agent.actor = await tf.loadLayersModel('localstorage://actor_model');
@@ -733,8 +740,13 @@ function actor_critic() {
 
 		setInterval(async function(){
 		// while(true){
+			if (_this.a2c.reset==true){
+				await environment.reset()	
+				_this.a2c.reset = false;
+			}
 			if (_this.a2c.active==true){
 					epoch = epoch + 1 
+					batch = batch + 1 
 					// var init = environment.init()
 					// console.log(init)
 					// state_scaled = Array.from(init.servo_state_scaled)
@@ -816,7 +828,8 @@ function actor_critic() {
 									// }
 									// reward = 1/2 * rewardSonic / 10 + 1/6 - Math.abs(gyro.x) / 100 + 1/6 - Math.abs(gyro.y) / 100 + 1/6 - Math.abs(gyro.z) / 100
 									// reward =  1/3 *  (1- Math.abs(gyro.x) / 100 ) + 1/3 * (1 - Math.abs(gyro.y) / 100 ) + 1/3 * (1- Math.abs(gyro.z) / 100)
-									reward = 1/ ( - distance_change / 100)
+									// reward = 1/ ( - distance_change / 100)
+									reward = - distance_change / 100
 									// reward = epoch /100
 									// console.log(distance_change,distance,reward)
 									// if (reward < 0){
@@ -827,10 +840,13 @@ function actor_critic() {
 									// reward = 0.5
 									
 									// agent.train_model(state, action, reward, next_state, done);
-									if (epoch % 100 == 0){
+									if (epoch % 200 == 0){
 										await agent.train_model(state_scaled, policy_flat, reward, next_state_scaled, true,chart);
+										await environment.reset()
 									}else{
-										await agent.train_model(state_scaled, policy_flat, reward, next_state_scaled, false,chart);
+										// if (batch % 20 == 0){
+											await agent.train_model(state_scaled, policy_flat, reward, next_state_scaled, false,chart);
+										// }
 									}
 							
 									// console.log(state,next_state)

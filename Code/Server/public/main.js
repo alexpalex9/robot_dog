@@ -349,7 +349,15 @@ var init = function(){
 		}
 		
 	})
-	
+	$("#reset_button").on('click',function(){
+		// var $this = this
+		// console.log($(this).hasClass('active'))
+		_this.a2c.active = false
+		_this.a2c.reset = true
+		$("#train_button").removeClass("active")
+		
+		
+	})	
 	$("#sonar_button").on('click',function(){
 		// var $this = this
 		console.log($(this).hasClass('active'))
