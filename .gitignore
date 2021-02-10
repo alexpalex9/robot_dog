@@ -1,4 +1,5 @@
 Code/Client/__pycache__/
 Code/Server/__pycache__/
 Code/Client/Face/
-Code/Server/public/mymodels/
+Code/Server/public/mymodels/*.json
+Code/Server/public/mymodels/*.bin
