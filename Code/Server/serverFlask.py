@@ -2,9 +2,14 @@
 
 import sys
 print(sys.argv)
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, Response, flash, request, redirect, url_for
 from flask_socketio import SocketIO, send, emit
+from werkzeug.utils import secure_filename
+import os
 
+UPLOAD_FOLDER = os.path.dirname(os.path.realpath(__file__)) + '\\public\\mymodels\\'
+print(UPLOAD_FOLDER)
+ALLOWED_EXTENSIONS = {'bin','json'}
 
 import io
 import time
@@ -102,7 +107,7 @@ class Camera(object):
                 if time.time() - cls.last_access > 10:
                     break
         cls.thread = None
-
+    
 class Server():
     def __init__(self):
         self.tcp_flag=False
@@ -120,11 +125,29 @@ class Server():
                     static_url_path='',
                     static_folder='public',
                     template_folder='view')
-        socketio = SocketIO(app)            
+        
+        app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+        
+        SECRET_KEY = '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'
+        app.config['SECRET_KEY'] = SECRET_KEY
+        
+        socketio = SocketIO(app)
         @app.route('/')
         def index():
             return render_template('index.html')
         
+        def allowed_file(filename):
+            return '.' in filename and \
+                   filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+        
+        @app.route('/mymodels', methods=['GET', 'POST'])
+        def upload_file():
+            #print("REQUEST",request.files)
+            print("REQUEST",request.headers)
+            for f in request.files:
+                request.files[f].save(os.path.join(app.config['UPLOAD_FOLDER'], request.headers['Prefix'] + f))
+            return "done"
+    
         @app.route('/learn')
         def learn():
             return render_template('learn.html')

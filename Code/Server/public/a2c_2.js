@@ -774,11 +774,7 @@ function actor_critic() {
 					for (var s in servos_walk){
 						servos_walk[s]['policy'] = []
 						for (var a in actions_index){
-							// console.log("s=",s)
-							// console.log("a=",typeof(a))
-							// console.log("action leng=",actions_index.length)
-							// console.log(s * actions_index.length + typeof(a))
-							// console.log(policy_flat[servos_walk.length)
+
 							servos_walk[s]['policy'].push(policy_flat[(s*actions_index.length)+parseInt(a)]*servos_walk.length)
 						}
 						// servos_walk[s]['action'] = randomChoice(servos_walk[s]['policy');
@@ -786,63 +782,32 @@ function actor_critic() {
 						// console.log("distribution",servos_walk[s].name,choice,actions_index[choice])
 						actions[servos_walk[s].name] = actions_index[randomChoice(servos_walk[s]['policy'])]
 					}
-					// console.log("ACTIONS",servos_walk,actions)
-					
-					// console.log("OK1")
-					// console.log(weightedRandomItem([70,90,100], action))
-					// action_rnd = math_utils.weightedRandomItem([0.33,0.66,1], policy_flat);
-					// console.log(action_tensor.flatten().dataSync())
-					// console.log(action)
-					// var dist =JSON.parse(JSON.stringify( _this.sonar.value))
-					
-		
-					// Sonic().then(function(data){
-						// sonicBefore = data
-						//var distance_change;
-						// var step = await environment.step()
-						// console.log(step)
-						// var {state_scaled, distance_change , gyro_state} = await environment.step()
+
 						var {gyro_state ,distance_change , distance, servos_state, next_state, next_state_scaled } = await environment.step(state,actions,state_scaled,incremental)
 						
-						// console.log(step)
-						// .then(function(step){
-							// console.log(gyro_state)
-							// var next_state = step.next_state
-							// var next_state_scaled = step.next_state_scaled
-							// var gyro = step.gyro
-							// TODO : remplace par { next_state,next_state_scaled} = environment.step(state,action,state_scaled)
-						
-						
-						
-							// var next_state_tensor = tf.tensor(next_state_scaled).expandDims(0);
-							// var next_state_tensor = tf.oneHot(next_state_scaled);
-							
-							// Sonic().then(function(data){
-								// sonicAfter = data
-								// AA.
-								// gyro().then(function(gyro){
-									
-									// var rewardSonic = sonicAfter - sonicBefore
-									// if (rewardSonic <0){
-										// rewardSonic = 0
+
 									// }
 									// reward = 1/2 * rewardSonic / 10 + 1/6 - Math.abs(gyro.x) / 100 + 1/6 - Math.abs(gyro.y) / 100 + 1/6 - Math.abs(gyro.z) / 100
 									// reward =  1/3 *  (1- Math.abs(gyro.x) / 100 ) + 1/3 * (1 - Math.abs(gyro.y) / 100 ) + 1/3 * (1- Math.abs(gyro.z) / 100)
 									// reward = 1/ ( - distance_change / 100)
 									reward = - distance_change / 100
-									// reward = epoch /100
-									// console.log(distance_change,distance,reward)
-									// if (reward < 0){
-										// reward = 0
-									// }
-									// reward = Math.random()
-									// console.log("REWARD",distance_change,reward)
-									// reward = 0.5
 									
-									// agent.train_model(state, action, reward, next_state, done);
-									if (epoch % 200 == 0){
+									reward = (epoch * ((Math.random() * 5) - 2) ) / 100
+
+									if (epoch % 2 == 0){
 										await agent.train_model(state_scaled, policy_flat, reward, next_state_scaled, true,chart);
 										await environment.reset()
+										// agent.actor.save(window.location.origin + '/mymodels')
+										// agent.critic.save(window.location.origin + '/mymodels')
+										await agent.actor.save(
+											tf.io.http(
+												window.location.origin + '/mymodels',
+												 {requestInit:{ method: 'POST',headers : {'prefix':'actor_' }}}));
+												 
+										await agent.critic.save(
+											tf.io.http(
+												window.location.origin + '/mymodels',
+												 {requestInit:{ method: 'POST',headers : {'prefix':'critic_' }}}));
 									}else{
 										// if (batch % 20 == 0){
 											await agent.train_model(state_scaled, policy_flat, reward, next_state_scaled, false,chart);
@@ -856,7 +821,14 @@ function actor_critic() {
 							// })
 						// })
 					// })
-					
+
+					// agent.actor.save(
+						// tf.io.browserHTTPRequest(
+						// tf.io.http(
+							// window.location.origin + '/mymodels',
+							 // {requestInit:{ method: 'POST',headers : {'class':'_actor'  } } }));
+							
+			
 					
 					// if (epoch % 10 == 0){
 						// console.log("saving model")
@@ -870,43 +842,7 @@ function actor_critic() {
 			}	
 		// }
 		},500)
-		
-		// next_state = var state = [
-				  // [11, 23, 34, 45, 96],
-				  // [12, 23, 43, 56, 23],
-				  // [12, 23, 56, 67, 56],
-				  // [13, 34, 56, 45, 67],
-				  // [12, 23, 54, 56, 78],
-				  // [12, 23, 54, 56, 78],
-				  // [12, 23, 54, 56, 78],
-				  // [12, 23, 54, 56, 78]
-				// ]
-		// const xs = tf.tensor(state).expandDims(0)
-		// this.actor.fit(xs, tf.tensor(advantages).reshape([1,2047]), {
-				// epochs:1,
-			// });
 
-
-		// var value = critic.actor.predict(xs, {
-				// batchSize:1,
-			// }).flatten().get(0)
-			
-			
-			// this.critic.fit(oneHotState, tf.tensor(target), {
-				// epochs:1,
-			// });
-			
-			
-			
-		// https://towardsdatascience.com/how-to-train-a-neural-network-on-chrome-using-tensorflow-js-76dcd1725032
-		// var action = agent.actor.predict(tf.tensor2d([10,10,10], [1,3]));
-		// var action = agent.actor.predict(tf.tensor2d([1,2,3,4,5,6,7,8,9,10,11,12], [12, 1]));
-		
-		// agent.actor.save('localstorage://actor_model');
-		// agent.critic.save('localstorage://critic_model');
-		
-		// const model = await tf.loadLayersModel('localstorage://actor_model');
-		// console.log(model)
 	}
 
 
