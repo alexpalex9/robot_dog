@@ -7,7 +7,7 @@ from flask_socketio import SocketIO, send, emit
 from werkzeug.utils import secure_filename
 import os
 
-UPLOAD_FOLDER = os.path.dirname(os.path.realpath(__file__)) + '\\public\\mymodels'
+UPLOAD_FOLDER = os.path.dirname(os.path.realpath(__file__)) + '/public/mymodels/'
 #print(UPLOAD_FOLDER)
 ALLOWED_EXTENSIONS = {'bin','json'}
 
@@ -145,8 +145,9 @@ class Server():
             #print("REQUEST",request.files)
             print("REQUEST",request.headers)
             for f in request.files:
-                print(os.path.join(app.config['UPLOAD_FOLDER'], request.headers['Prefix'] + f))
-                request.files[f].save(os.path.join(app.config['UPLOAD_FOLDER'], request.headers['Prefix'] + f))
+                #print(os.path.join(app.config['UPLOAD_FOLDER'], request.headers['Prefix'] + f))
+                #request.files[f].save(os.path.join(app.config['UPLOAD_FOLDER'], request.headers['Prefix'] + f))
+                request.files[f].save(app.config['UPLOAD_FOLDER'] +  request.headers['Prefix'] + f)
             return "done"
     
         @app.route('/learn')
