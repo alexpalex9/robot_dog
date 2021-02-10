@@ -226,9 +226,9 @@ class Server():
                 else:
                     pass
             if DEV==False:
+                time.sleep(0.5)
                 emit('servos angle',self.control.servo.values)
             else:
-                time.sleep(0.5)
                 emit('servos angle',data)
                 
         @socketio.on('cmd', namespace='/robot')
