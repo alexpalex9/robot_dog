@@ -691,6 +691,7 @@ function actor_critic() {
 		// var actions_index = [70,90,110];
 		var actions_index = [-1,0,1];
 		var incremental = true;
+		var incremental = false;
 		
 		var AMOUNT_INPUTS = 0
 		
