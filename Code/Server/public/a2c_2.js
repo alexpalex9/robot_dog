@@ -484,7 +484,7 @@ function actor_critic() {
 			}));
 			model.add(tf.layers.flatten());
 			// addd by me
-			// model.add(tf.layers.dense({units: 24, activation: 'relu'}));
+			model.add(tf.layers.dense({units: 24, activation: 'relu'}));
 			// model.add(tf.layers.flatten());
 
 			model.add(tf.layers.dense({
@@ -691,7 +691,7 @@ function actor_critic() {
 		// var actions_index = [70,90,110];
 		var actions_index = [-1,0,1];
 		var incremental = true;
-		var incremental = false;
+		// var incremental = false;
 		
 		var AMOUNT_INPUTS = 0
 		
