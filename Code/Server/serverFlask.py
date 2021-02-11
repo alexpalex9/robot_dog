@@ -4,7 +4,7 @@ import sys
 print(sys.argv)
 from flask import Flask, render_template, Response, flash, request, redirect, url_for
 from flask_socketio import SocketIO, send, emit
-from werkzeug.utils import secure_filename
+#from werkzeug.utils import secure_filename
 import os
 #import logging
 #logging.getLogger('socketio').setLevel(logging.ERROR)
