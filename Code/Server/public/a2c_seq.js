@@ -334,7 +334,7 @@ function Environment(depth,use_gyro) {
 		// var new_angle = {}
 		// for (var s in state){
 		var s = 0
-		// var action_angle = {}
+		var action_angle = {}
 		
 		
 			
@@ -354,8 +354,8 @@ function Environment(depth,use_gyro) {
 			// }
 			
 			// console.log(servo,action[servo],this.servos_object[servo]['state'],act_angle)
-			// action_angle[servo] = act_angle
-			this.servos_object[action.servo]['state'] = action.action[action.servo]
+			action_angle[action.servo] =  action.angle
+			this.servos_object[action.servo]['state'] = action.angle
 			// as increment decision
 			// if (action[parseInt(s)]-0.5>0){
 				// act = 5
@@ -398,8 +398,8 @@ function Environment(depth,use_gyro) {
 			next_state_scaled[s] = next_state_scaled[s].slice(1)
 			
 			if (servo==action.servo){
-				next_state[s].push(this.servos_object[action.servo]['state'] )
-				next_state_scaled[s].push(this.servos_scale_sate(action.servo,this.servos_object[action.servo]['state'] ))
+				next_state[s].push(action.angle)
+				next_state_scaled[s].push(this.servos_scale_sate(action.servo,action.angle))
 			}else{
 				next_state[s].push(next_state[s][next_state[s].length-1])
 				next_state_scaled[s].push(next_state_scaled[s][next_state[s].length-1])
@@ -414,8 +414,8 @@ function Environment(depth,use_gyro) {
 		
 		// console.log("new angles",action_angle,next_state,next_state_scaled)
 		// _this.servos.setAngles(new_angle)
-		console.log("set servo Angles")
-		await this.SetServosAngles(action.action)
+		console.log("set servo Angles",action_angle)
+		await this.SetServosAngles(action_angle)
 		console.log("servo Angles setted")
 		if (this.use_gyro==true){
 			var gyro_state = await this.Gyro();
@@ -621,7 +621,7 @@ function actor_critic() {
 					// advantages.push(reward + (1 - done) * this.discount_factor * (next_value[Math.floor(i/4)]) - value[Math.floor(i/4)])
 				// }
 				advantages[action.index] = [reward + (1 - done) * this.discount_factor * (next_value) - value];
-				console.log("advantages",advantages)
+				console.log("advantages",action,advantages)
 				// console.log("advantages",tf.tensor(advantages).dataSync())
 				// console.log("target",tf.tensor(target).dataSync())
 				
@@ -710,7 +710,7 @@ function actor_critic() {
 				servos_walk.push(SERVOS[i])
 				AMOUNT_INPUTS = AMOUNT_INPUTS + 1
 				for (var act in SERVOS[i].actions){
-					actions_index.push({'servo':SERVOS[i].name,'action':{SERVOS[i].name:SERVOS[i].actions[act]},'index':actions_index.length})
+					actions_index.push({'servo':SERVOS[i].name,'angle':SERVOS[i].actions[act],'index':actions_index.length})
 				}
 			}
 		}
@@ -787,7 +787,7 @@ function actor_critic() {
 					// reward = (epoch * ((Math.random() * 5) - 2) ) / 100
 
 					if (epoch % 200 == 0){
-						await agent.train_model(state_scaled, policy_flat, reward, next_state_scaled, true,chart);
+						await agent.train_model(state_scaled, action, reward, next_state_scaled, true,chart);
 						await environment.reset()
 						// agent.actor.save(window.location.origin + '/mymodels')
 						// agent.critic.save(window.location.origin + '/mymodels')
@@ -802,7 +802,7 @@ function actor_critic() {
 								 {requestInit:{ method: 'POST',headers : {'prefix':'critic_' }}}));
 					}else{
 						// if (batch % 20 == 0){
-						await agent.train_model(state_scaled, policy_flat, reward, next_state_scaled, false,chart);
+						await agent.train_model(state_scaled, action, reward, next_state_scaled, false,chart);
 						// }
 					}
 			
