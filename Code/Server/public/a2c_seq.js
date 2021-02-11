@@ -182,12 +182,14 @@ function Environment(depth,use_gyro) {
 			if (servos[s]['used']==true){
 				this.servos_object[servos[s].name] = {}
 				this.servos_object[servos[s].name]['state'] = servos[s]['init']
-				this.servos_object[servos[s].name]['step'] = servos[s]['step']
-				this.servos_object[servos[s].name]['max'] = servos[s]['max']
-				this.servos_object[servos[s].name]['min'] = servos[s]['min']
+				// this.servos_object[servos[s].name]['step'] = servos[s]['step']
+				// this.servos_object[servos[s].name]['max'] = servos[s]['max']
+				// this.servos_object[servos[s].name]['min'] = servos[s]['min']
 				// console.log(this.servos_object,servos[s])
-				this.servos_object[servos[s].name]['scale_a'] = 1 / (servos[s].max - servos[s].min)
-				this.servos_object[servos[s].name]['scale_b'] = - servos[s].min * this.servos_object[servos[s].name]['scale_a']
+				// this.servos_object[servos[s].name]['scale_a'] = 1 / (servos[s].max - servos[s].min)
+				this.servos_object[servos[s].name]['scale_a'] = 1 / (servos[s].actions[servos[s].actions.length-1] - servos[s].actions[0])
+				// this.servos_object[servos[s].name]['scale_b'] = - servos[s].min * this.servos_object[servos[s].name]['scale_a']
+				this.servos_object[servos[s].name]['scale_b'] = - servos[s].actions[0] * this.servos_object[servos[s].name]['scale_a']
 				
 				// make closure below?
 				// var _thistemp = this;
@@ -212,7 +214,7 @@ function Environment(depth,use_gyro) {
 			statesA_scaled.push([])
 			for (var d=0;d<depth;d++){
 				statesA[statesA.length-1].push(this.servos_object[s]['state'])
-				statesA_scaled[statesA_scaled.length-1].push(this.servos_scale_sate(this.servos_object[s]['state'],s))
+				statesA_scaled[statesA_scaled.length-1].push(this.servos_scale_sate(s,this.servos_object[s]['state']))
 			}
 			
 		}
@@ -247,14 +249,13 @@ function Environment(depth,use_gyro) {
 			state_scaled : statesA_scaled
 		}
 		
-		return servos_walk
 	}
 
 
 
 
-	this.servos_scale_sate = function(state,servo){
-		// console.log("servos_scale_sate",state,servo,this.servos_object[servo])
+	this.servos_scale_sate = function(servo,state){
+		// console.log("servos_scale_sate",state,servo,this.servos_object)
 		return state * this.servos_object[servo].scale_a + this.servos_object[servo].scale_b
 	}
 	
@@ -335,26 +336,26 @@ function Environment(depth,use_gyro) {
 		var s = 0
 		var action_angle = {}
 		
-		for (var servo in action){
+		
 			
 			
-			if (incremental){
+			// if (incremental){
 				
-				var act_angle = action[servo] *  this.servos_object[servo]['step']  + this.servos_object[servo]['state']
+				// var act_angle = action[servo] *  this.servos_object[servo]['step']  + this.servos_object[servo]['state']
 				// console.log(servo,act_angle)
-				if (act_angle > this.servos_object[servo]['max']){
-					act_angle = this.servos_object[servo]['max']
-				}
-				if (act_angle < this.servos_object[servo]['min']){
-					act_angle = this.servos_object[servo]['min']
-				}
-			}else{
-				var act_angle = action[servo]
-			}
+				// if (act_angle > this.servos_object[servo]['max']){
+					// act_angle = this.servos_object[servo]['max']
+				// }
+				// if (act_angle < this.servos_object[servo]['min']){
+					// act_angle = this.servos_object[servo]['min']
+				// }
+			// }else{
+				// var act_angle = action[servo]
+			// }
 			
 			// console.log(servo,action[servo],this.servos_object[servo]['state'],act_angle)
-			action_angle[servo] = act_angle
-			this.servos_object[servo]['state'] = act_angle
+			// action_angle[servo] = act_angle
+			this.servos_object[action.servo]['state'] = action.angle
 			// as increment decision
 			// if (action[parseInt(s)]-0.5>0){
 				// act = 5
@@ -389,15 +390,21 @@ function Environment(depth,use_gyro) {
 			// if (st < this.minAngle){
 				// st = this.minAngle
 			// }
-			
+		for (var servo in this.servos_object){
 			next_state.push(Array.from(state[s]));
 			next_state_scaled.push(Array.from(state_scaled[s]));
 			
 			next_state[s] = next_state[s].slice(1)
 			next_state_scaled[s] = next_state_scaled[s].slice(1)
 			
-			next_state[s].push(act_angle)
-			next_state_scaled[s].push(this.servos_scale_sate(act_angle,servo))
+			if (servo==action.servo){
+				next_state[s].push(action.angle)
+				next_state_scaled[s].push(this.servos_scale_sate(action.servo,action.angle))
+			}else{
+				next_state[s].push(next_state[s][next_state[s].length-1])
+				next_state_scaled[s].push(next_state_scaled[s][next_state[s].length-1])
+				
+			}
 			
 			// new_angle[servo] = st
 			
@@ -573,8 +580,8 @@ function actor_critic() {
 			// let target = zeros(this.inputs_size, 1);
 			let target = zeros(1,this.value_size);
 			// let advantages = zeros(1, this.inputs_size);
-			// let advantages = zeros(1, this.actions_size);
-			var advantages = zeros(1, this.actions_size);
+			let advantages = zeros(1, this.actions_size);
+			// var advantages = zeros(1, this.actions_size);
 			// console.log("init advantages",advantages)
 			// let oneHotState = tf.oneHot(this.format_state(state), 12);
 			// let oneHotNextState = tf.oneHot(this.format_state(next_state), 12);
@@ -592,14 +599,14 @@ function actor_critic() {
 			let next_value = this.critic.predict(oneHotNextState).flatten().dataSync();
 			// console.log(action) //Pb nbr d'actions dans advantages
 			// if(done) {
-				// advantages[action] = [reward - value];
+				
 				// target[0] = reward;
 			// } else {
 				// console.log("action",action)
 				// console.log("ADV CALC",[reward + this.discount_factor * (next_value) - value])
-				console.log("ACTION FOR REWARD",action)
-				advantages[action] = [reward + (1 - done)  * this.discount_factor * (next_value) - value];
-				console.log("advantages",advantages)
+				// console.log("ACTION FOR REWARD",action)
+				// advantages[action] = [reward + (1 - done)  * this.discount_factor * (next_value) - value];
+				// console.log("advantages",advantages)
 				// trying to do my advantages
 				
 				target[0] = reward + this.discount_factor * next_value;
@@ -607,12 +614,14 @@ function actor_critic() {
 					
 					// target[0][i] = reward + this.discount_factor * next_value[i];
 				// }
-				var advantages = []
-				for (var i =0;i<this.actions_size;i++){
-					advantages.push(reward + (1 - done) * this.discount_factor * (next_value) - value)
+				// var advantages = []
+				// for (var i =0;i<this.actions_size;i++){
+					// advantages.push(reward + (1 - done) * this.discount_factor * (next_value) - value)
+					// advantages.push(reward + (1 - done) * this.discount_factor * (next_value) - value)
 					// advantages.push(reward + (1 - done) * this.discount_factor * (next_value[Math.floor(i/4)]) - value[Math.floor(i/4)])
-				}
-				// console.log("advantages",advantages)
+				// }
+				advantages[action.index] = [reward + (1 - done) * this.discount_factor * (next_value) - value];
+				console.log("advantages",advantages)
 				// console.log("advantages",tf.tensor(advantages).dataSync())
 				// console.log("target",tf.tensor(target).dataSync())
 				
@@ -677,34 +686,40 @@ function actor_critic() {
 		
 		const SERVOS = [
 			{'name':2,'init':0,'used':false},
-			{'name':3,'init':80,'used':true,'min':70,'max':90,'step':10},
+			{'name':3,'init':80,'used':true,'min':70,'max':90,'step':10,'actions':[70,80,90]},
 			{'name':4,'init':85,'used':false},
 			{'name':5,'init':0,'used':false},
-			{'name':6,'init':100,'used':true,'min':90,'max':110,'step':10},
+			{'name':6,'init':100,'used':true,'min':90,'max':110,'step':10,'actions':[90,100,110]},
 			{'name':7,'init':85,'used':false},
 			{'name':8,'init':95,'used':false},
-			{'name':9,'init':80,'used':true,'min':70,'max':90,'step':10},
+			{'name':9,'init':80,'used':true,'min':70,'max':90,'step':10,'actions':[70,80,90]},
 			{'name':10,'init':180,'used':false},
 			{'name':11,'init':95,'used':false},
-			{'name':12,'init':90,'used':true,'min':80,'max':100,'step':10},
+			{'name':12,'init':90,'used':true,'min':80,'max':100,'step':10,'actions':[80,90,100]},
 			{'name':13,'init':180,'used':false},
 			{'name':15,'init':90,'used':false,'label':'head'},
 		]
 		
-		// var actions_index = [70,90,110];
-		var actions_index = [-1,0,1];
-		var incremental = true;
-		// var incremental = false;
+		
 		
 		var AMOUNT_INPUTS = 0
-		
+		var actions_index = []
 		var servos_walk = [];
 		for (var i in SERVOS){
 			if (SERVOS[i].used==true){
 				servos_walk.push(SERVOS[i])
 				AMOUNT_INPUTS = AMOUNT_INPUTS + 1
+				for (var act in SERVOS[i].actions){
+					actions_index.push({'servo':SERVOS[i].name,'angle':SERVOS[i].actions[act],'index':actions_index.length})
+				}
 			}
 		}
+		
+		// var actions_index = [70,90,110];
+		// var actions_index = [-1,0,1];
+		var incremental = false;
+		// var incremental = false;
+		
 		
 		if (use_gyro==true){
 			AMOUNT_INPUTS = AMOUNT_INPUTS + 3 ;
@@ -713,7 +728,7 @@ function actor_critic() {
 			// var AMOUNT_INPUTS = 8;
 		}
 		
-		const AMOUNT_ACTIONS = servos_walk.length * actions_index.length;
+		const AMOUNT_ACTIONS = actions_index.length // servos_walk.length * actions_index.length;
 		
 		// const STATE_SIZE = 3; // 0 -> 120 / step 10
 	
@@ -741,6 +756,8 @@ function actor_critic() {
 			// console.log("no model saved, cannot load",e)
 		// }	
 
+		console.log("actions_index",actions_index)
+		console.log("state",state)
 
 		setInterval(async function(){
 		// while(true){
@@ -751,101 +768,48 @@ function actor_critic() {
 			if (_this.a2c.active==true){
 					epoch = epoch + 1 
 					batch = batch + 1 
-					// var init = environment.init()
-					// console.log(init)
-					// state_scaled = Array.from(init.servo_state_scaled)
-					// console.log(state_scaled)
-					// state_scaled.push(init.gyro_state_scaled)
-					// console.log("state_scaled",state_scaled)
-					
-					// const state_tensor = tf.tensor(state_scaled).expandDims(0)
-					
-					var  state_tensor = tf.oneHot(state_scaled, actions_index.length);
-					// console.log("ON HOT STATE",oneHotState.dataSync())
-					// console.log("TENSOR",state_tensor.dataSync())
-					// console.log("TENSOR reshape",state_tensor.dataSync())
-					// var action = agent.get_action(xs,[-5,5]);
-					// var policy = agent.actor.predict(state_tensor, {batchSize:1	});
+					var  state_tensor = tf.oneHot(state_scaled, actions_index.length / servos_walk.length );
 					
 					var policy = agent.actor.predict(state_tensor.reshape([1,12,2]), {batchSize:1});
-					console.log("POLICY",policy.dataSync())
-					// let policy = this.actor.predict(oneHotState.reshape([1,9,12]), {
-						// batchSize:1,
-					// });
-					// console.log("OK1")
 					var policy_flat  = policy.dataSync()
-					var actions = {}
-					for (var s in servos_walk){
-						servos_walk[s]['policy'] = []
-						for (var a in actions_index){
-
-							servos_walk[s]['policy'].push(policy_flat[(s*actions_index.length)+parseInt(a)]*servos_walk.length)
-						}
-						// servos_walk[s]['action'] = randomChoice(servos_walk[s]['policy');
-						var choice = randomChoice(servos_walk[s]['policy'])
-						// console.log("distribution",servos_walk[s].name,choice,actions_index[choice])
-						actions[servos_walk[s].name] = actions_index[randomChoice(servos_walk[s]['policy'])]
-					}
-
-						var {gyro_state ,distance_change , distance, servos_state, next_state, next_state_scaled } = await environment.step(state,actions,state_scaled,incremental)
+					console.log("POLICY",policy_flat)
+					var action =  actions_index[randomChoice(policy_flat)]
+					console.log("ACTION = ",action)
+					var {gyro_state ,distance_change , distance, servos_state, next_state, next_state_scaled } = await environment.step(state,action,state_scaled,incremental)
 						
 
-									// }
-									// reward = 1/2 * rewardSonic / 10 + 1/6 - Math.abs(gyro.x) / 100 + 1/6 - Math.abs(gyro.y) / 100 + 1/6 - Math.abs(gyro.z) / 100
-									// reward =  1/3 *  (1- Math.abs(gyro.x) / 100 ) + 1/3 * (1 - Math.abs(gyro.y) / 100 ) + 1/3 * (1- Math.abs(gyro.z) / 100)
-									// reward = 1/ ( - distance_change / 100)
-									reward = - distance_change / 100
-									
-									// reward = (epoch * ((Math.random() * 5) - 2) ) / 100
-
-									if (epoch % 200 == 0){
-										await agent.train_model(state_scaled, policy_flat, reward, next_state_scaled, true,chart);
-										await environment.reset()
-										// agent.actor.save(window.location.origin + '/mymodels')
-										// agent.critic.save(window.location.origin + '/mymodels')
-										await agent.actor.save(
-											tf.io.http(
-												window.location.origin + '/mymodels',
-												 {requestInit:{ method: 'POST',headers : {'prefix':'actor_' }}}));
-												 
-										await agent.critic.save(
-											tf.io.http(
-												window.location.origin + '/mymodels',
-												 {requestInit:{ method: 'POST',headers : {'prefix':'critic_' }}}));
-									}else{
-										// if (batch % 20 == 0){
-											await agent.train_model(state_scaled, policy_flat, reward, next_state_scaled, false,chart);
-										// }
-									}
-							
-									// console.log(state,next_state)
-									state = next_state
-									state_scaled = next_state_scaled
-								// })
-							// })
-						// })
-					// })
-
-					// agent.actor.save(
-						// tf.io.browserHTTPRequest(
-						// tf.io.http(
-							// window.location.origin + '/mymodels',
-							 // {requestInit:{ method: 'POST',headers : {'class':'_actor'  } } }));
-							
-			
-					
-					// if (epoch % 10 == 0){
-						// console.log("saving model")
-						// await agent.actor.save('localstorage://actor_model');
-						// await agent.critic.save('localstorage://critic_model');
 					// }
-					// console.log("WRITE MODEL")
-					// await agent.critic.save(
-											// tf.io.http(
-												// window.location.origin + '/mymodels',
-												 // {requestInit:{ method: 'POST',headers : {'prefix':'critic_' }}}));
-				// })
+					// reward = 1/2 * rewardSonic / 10 + 1/6 - Math.abs(gyro.x) / 100 + 1/6 - Math.abs(gyro.y) / 100 + 1/6 - Math.abs(gyro.z) / 100
+					// reward =  1/3 *  (1- Math.abs(gyro.x) / 100 ) + 1/3 * (1 - Math.abs(gyro.y) / 100 ) + 1/3 * (1- Math.abs(gyro.z) / 100)
+					// reward = 1/ ( - distance_change / 100)
+					reward = - distance_change / 100
+					
+					reward = (epoch * ((Math.random() * 5) - 2) ) / 100
 
+					if (epoch % 200 == 0){
+						await agent.train_model(state_scaled, policy_flat, reward, next_state_scaled, true,chart);
+						await environment.reset()
+						// agent.actor.save(window.location.origin + '/mymodels')
+						// agent.critic.save(window.location.origin + '/mymodels')
+						await agent.actor.save(
+							tf.io.http(
+								window.location.origin + '/mymodels',
+								 {requestInit:{ method: 'POST',headers : {'prefix':'actor_' }}}));
+								 
+						await agent.critic.save(
+							tf.io.http(
+								window.location.origin + '/mymodels',
+								 {requestInit:{ method: 'POST',headers : {'prefix':'critic_' }}}));
+					}else{
+						// if (batch % 20 == 0){
+						await agent.train_model(state_scaled, policy_flat, reward, next_state_scaled, false,chart);
+						// }
+					}
+			
+					// console.log(state,next_state)
+					state = next_state
+					state_scaled = next_state_scaled
+		
 			}	
 		// }
 		},1000)
