@@ -560,7 +560,7 @@ function actor_critic() {
 
    
 	async function init(load=false,use_gyro=false){
-		const DEPTH = 3
+		const DEPTH = 4
 				
 		this.environment = new Environment(DEPTH,use_gyro)
 		
