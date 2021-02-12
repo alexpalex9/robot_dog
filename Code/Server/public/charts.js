@@ -155,7 +155,7 @@ var myCharts = function(parent){
 		type:'line',
 		yAxisID:"right"
 	}
-	loss_template = {
+	loss_critic_template = {
 		data : [],
 		borderWidth : 1,
 		borderColor: 'rgba(221, 151, 149, 1)',
@@ -168,11 +168,27 @@ var myCharts = function(parent){
 		pointBackgroundColor : 'rgba(221, 151, 149, 1)',
 		fill: false,
 		spanGaps: true,
-		label: "loss",
+		label: "loss_critic",
 		yAxisID:"left",
 		type:'line'
 	}
-
+	loss_actor_template = {
+		data : [],
+		borderWidth : 1,
+		borderColor: 'rgba(149, 151, 221, 1)',
+		pointBorderWidth : 0,
+		pointRadius: 0,
+		lineTension : 0,
+		pointHitRadius: 5,
+		// type:'line',
+		pointBorderColor : 'rgba(149, 151, 221, 1)',
+		pointBackgroundColor : 'rgba(149, 151, 221, 1)',
+		fill: false,
+		spanGaps: true,
+		label: "loss_actor",
+		yAxisID:"left",
+		type:'line'
+	}
 	inventory_template = {
 		data : [],
 		borderWidth : 3,
@@ -238,7 +254,7 @@ var myCharts = function(parent){
 		data : {
 			labels: [],
 			datasets : [
-				JSON.parse(JSON.stringify(loss_template)),
+				JSON.parse(JSON.stringify(loss_critic_template)),
 				JSON.parse(JSON.stringify(reward_template))
 			]
 		},
@@ -249,7 +265,8 @@ var myCharts = function(parent){
 		data : {
 			labels: [],
 			datasets : [
-				JSON.parse(JSON.stringify(loss_template)),
+				JSON.parse(JSON.stringify(loss_critic_template)),
+				JSON.parse(JSON.stringify(loss_actor_template)),
 				JSON.parse(JSON.stringify(distance_template))
 			]
 		},

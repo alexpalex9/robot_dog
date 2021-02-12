@@ -376,6 +376,7 @@ function actor_critic() {
 			this.actor = this.build_actor();
 			this.critic = this.build_critic();
 			this.critic_loss_episode = [];
+			this.actor_loss_episode = [];
 			
 
 		}
@@ -532,10 +533,13 @@ function actor_critic() {
 				// console.log("ok")
 				// await this.actor.fit(oneHotState, tf.tensor(advantages).reshape([1,this.actions_size]), {epochs:1,})
 				// await this.actor.fit(oneHotState, tf.tensor(advantages).reshape([1,this.actions_size]), {epochs:1,})
-				await this.actor.fit(oneHotState, tf.tensor(advantages).reshape([1,this.actions_size]), {epochs:1,})
-				// .then(function(i){
-					// console.log("fit actore done",i)
 				var _this_agent = this;
+				await this.actor.fit(oneHotState, tf.tensor(advantages).reshape([1,this.actions_size]), {epochs:1,}).then(function(h){
+					_this_agent.actor_loss_episode.push(h.history.loss[0])
+				})
+					// .then(function(i){
+					// console.log("fit actore done",i)
+				
 				await this.critic.fit(oneHotState, tf.tensor(target), {
 					epochs:1,
 				}).then(function(h){
@@ -543,7 +547,7 @@ function actor_critic() {
 					// console.log(h)
 						_this_agent.critic_loss_episode.push(h.history.loss[0])
 						chart.addData('reward_loss_chart_periods',{
-								'loss':h.history.loss[0],
+								'loss_critic':h.history.loss[0],
 								'reward':reward
 							})
 					// console.log("Loss after Epoch : " + h.history.loss[0]);
@@ -648,9 +652,11 @@ function actor_critic() {
 			// console.log("--> training job",this_ac.reset)
 			
 		// while(true){
+			var reseted = false;
 			if (_this_ac.reset==true){
 				await _this_ac.environment.reset()	
 				_this_ac.reset = false;
+				reseted = true;
 				log("environement reseted")
 			}
 			
@@ -687,7 +693,7 @@ function actor_critic() {
 					
 					// reward = (epoch * ((Math.random() * 5) - 2) ) / 100
 
-					if (_this_ac.period % 200 == 0 || distance<5 || distance>70){
+					if (_this_ac.period % 200 == 0 || distance<5 || distance>70 || reseted==true){
 						
 						await _this_ac.agent.train_model(_this_ac.state_scaled, action, reward, next_state_scaled, true,_this_ac.chart);
 						await _this_ac.environment.reset()
@@ -717,12 +723,21 @@ function actor_critic() {
 							log(' episode ended at periods ' + _this_ac.period + ' - training paused since too far from wall : ' + distance + 'cm')
 							_this_ac.period = 0
 							//$('#log').prepend('<div>' + now + ': episode ended since too far from wall :' + distance + ' cm</div>') 
+						}else if(reseted==true){
+							log('episode ended since reset')
+							_this_ac.period = 0
+							reseted = false;
 						}else{
 							log('episode ended after 200 periods')
 							_this_ac.period = 0
+							
 						}
 						
-						_this_ac.chart.addData('reward_loss_chart_episods',{distance:distance_change,loss:_this_ac.agent.critic_loss_episode.reduce((a, b) => a + b, 0)/_this_ac.agent.critic_loss_episode.length})
+						_this_ac.chart.addData('reward_loss_chart_episods',{
+							distance:distance_change,
+							loss_critic:_this_ac.agent.critic_loss_episode.reduce((a, b) => a + b, 0)/_this_ac.agent.critic_loss_episode.length,
+							loss_actor:_this_ac.agent.actor_loss_episode.reduce((a, b) => a + b, 0)/_this_ac.agent.actor_loss_episode.length
+						})
 						
 						
 					}else{
@@ -734,7 +749,7 @@ function actor_critic() {
 					// console.log(state,next_state)
 					_this_ac.state = next_state
 					_this_ac.state_scaled = next_state_scaled
-					console.log("_this_ac.critic_loss_episode.",_this_ac.critic_loss_episode)
+					// console.log("_this_ac.critic_loss_episode.",_this_ac.critic_loss_episode)
 				// console.log("RELAUNCH AGAIN TRAIN")
 				await this.train(_this_ac)
 			}
