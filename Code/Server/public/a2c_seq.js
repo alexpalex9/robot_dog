@@ -678,7 +678,7 @@ function actor_critic() {
 					
 					// reward = (epoch * ((Math.random() * 5) - 2) ) / 100
 
-					if (_this_ac.period % 20 == 0 || distance<5 || distance>70){
+					if (_this_ac.period % 200 == 0 || distance<5 || distance>70){
 						
 						await _this_ac.agent.train_model(_this_ac.state_scaled, action, reward, next_state_scaled, true,_this_ac.chart);
 						await _this_ac.environment.reset()
@@ -709,7 +709,8 @@ function actor_critic() {
 							_this_ac.period = 0
 							//$('#log').prepend('<div>' + now + ': episode ended since too far from wall :' + distance + ' cm</div>') 
 						}else{
-							log('episode ended after 200 epoch') 	
+							log('episode ended after 200 epoch')
+							_this_ac.period = 0
 						}
 						
 						_this_ac.chart.addData('reward_loss_chart_episods',{distance:distance_change})
