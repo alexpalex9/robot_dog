@@ -748,11 +748,11 @@ function actor_critic() {
 		// clearInterval(this.trainingJob)
 	// }
 	async function stop_training() {
-		log("model stopped")
+		log("training stopped")
 		this.chart.cleanData('reward_loss_chart_periods')
 		this.chart.cleanData('reward_loss_chart_episods')
 		this.init()
-		this.active = false
+		// this.active = false
 		
 		// clearInterval(this.trainingJob)
 	}
@@ -769,7 +769,7 @@ function actor_critic() {
 	return {
 		init : init,
 		train: train,
-		// stop_training : stop_training,
+		stop_training : stop_training,
 		test:test
 		
 	}
@@ -800,10 +800,10 @@ $(function(){
 	$("#train_button").on('click',function(){
 		// console.log($(this).hasClass("active"))
 		if($(this).hasClass("active")){
-			console.log("PAUSE TRAINING")
+			// console.log("PAUSE TRAINING")
 			$(this).removeClass("active")
-			// sars.pause_training()
-			sars.active = false
+			sars.pause_training()
+			// sars.active = false
 		}else{
 			console.log("TRAIN BUTTON",sars)
 			$(this).addClass("active")
