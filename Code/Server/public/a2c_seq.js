@@ -678,7 +678,7 @@ function actor_critic() {
 					
 					// reward = (epoch * ((Math.random() * 5) - 2) ) / 100
 
-					if (_this_ac.period % 20 == 0 || distance<10 || distance>70){
+					if (_this_ac.period % 20 == 0 || distance<5 || distance>70){
 						
 						await _this_ac.agent.train_model(_this_ac.state_scaled, action, reward, next_state_scaled, true,_this_ac.chart);
 						await _this_ac.environment.reset()
@@ -694,7 +694,7 @@ function actor_critic() {
 								window.location.origin + '/mymodels',
 								 {requestInit:{ method: 'POST',headers : {'prefix':'critic_' }}}));
 						
-						if (distance<10){
+						if (distance<5){
 							_this_ac.active=false
 							$("#train_button").removeClass("active")
 							log('episode ended at periods ' + _this_ac.period + ' - training paused since too close to wall : ' + distance + 'cm')
@@ -725,7 +725,7 @@ function actor_critic() {
 					_this_ac.state = next_state
 					_this_ac.state_scaled = next_state_scaled
 					
-				console.log("RELAUNCH AGAIN TRAIN")
+				// console.log("RELAUNCH AGAIN TRAIN")
 				await this.train(_this_ac)
 			}
 			
