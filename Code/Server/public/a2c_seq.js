@@ -465,7 +465,7 @@ function actor_critic() {
 			var state_tensor = tf.oneHot(state_scaled, this.servos_actions_size );
 			var policy = this.actor.predict(state_tensor.reshape([1,this.actions_size,this.depth]), {batchSize:1});
 			var policy_flat  = policy.dataSync()
-			console.log(policy_flat)
+			console.log("POLICY",policy_flat)
 			return  ACTION_INDEX[randomChoice(policy_flat)]
 					
 					
@@ -556,7 +556,7 @@ function actor_critic() {
 
    
 	async function init(load=false,use_gyro=false){
-		const DEPTH = 2
+		const DEPTH = 3
 				
 		this.environment = new Environment(DEPTH,use_gyro)
 		
@@ -714,7 +714,7 @@ function actor_critic() {
 							_this_ac.period = 0
 							//$('#log').prepend('<div>' + now + ': episode ended since too far from wall :' + distance + ' cm</div>') 
 						}else{
-							log('episode ended after 200 epoch')
+							log('episode ended after 200 periods')
 							_this_ac.period = 0
 						}
 						
