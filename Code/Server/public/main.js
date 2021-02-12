@@ -336,28 +336,8 @@ var init = function(){
 		}
 		}
 	})
-	$("#train_button").on('click',function(){
-		// var $this = this
-		// console.log($(this).hasClass('active'))
-		if($(this).hasClass("active")){
-			$(this).removeClass("active")
-			_this.a2c.active = false
 
-		}else{
-			$(this).addClass("active")
-			_this.a2c.active = true
-		}
-		
-	})
-	$("#reset_button").on('click',function(){
-		// var $this = this
-		// console.log($(this).hasClass('active'))
-		_this.a2c.active = false
-		_this.a2c.reset = true
-		$("#train_button").removeClass("active")
-		
-		
-	})	
+
 	$("#sonar_button").on('click',function(){
 		// var $this = this
 		console.log($(this).hasClass('active'))
@@ -403,6 +383,10 @@ var init = function(){
 		});
 	})
 	// $("#webcam").attr('src','stream.mjpg')
+	
+	
+	
+	
 }
 
 $(init())

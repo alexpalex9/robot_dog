@@ -57,7 +57,7 @@ from Thread import *
 from Command import COMMAND as cmd
 
 
-PORT = 5001
+PORT = 5002
 
 class Camera(object):
     thread = None  # background thread that reads frames from camera
@@ -150,6 +150,7 @@ class Server():
             for f in request.files:
                 #print(os.path.join(app.config['UPLOAD_FOLDER'], request.headers['Prefix'] + f))
                 #request.files[f].save(os.path.join(app.config['UPLOAD_FOLDER'], request.headers['Prefix'] + f))
+                # https://github.com/fabianlee/python-flask-upload-files/blob/master/flask_upload_files.py
                 request.files[f].save(app.config['UPLOAD_FOLDER'] +  request.headers['Prefix'] + f)
             return "done"
     
@@ -272,7 +273,7 @@ class Server():
                     if DEV==False:
                         sonic = self.sonic.getDistance()
                     else:
-                        sonic = random.randrange(0, 20)
+                        sonic = random.randrange(8, 90)
                     emit('sonic',sonic)
                 elif cmd.CMD_POWER in data:
                     self.measuring_voltage(self.connection1)

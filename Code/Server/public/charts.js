@@ -233,7 +233,7 @@ var myCharts = function(parent){
 	
 	
 	
-	var configSet_reward_loss = {
+	var configSet_reward_loss_periods = {
 		type: 'bar',
 		data : {
 			labels: [],
@@ -244,32 +244,49 @@ var myCharts = function(parent){
 		},
 		options: JSON.parse(JSON.stringify(reward_loss_options))
 	}
-	
-	_this.reward_loss_chart  = new Chart(document.getElementById("loss_reward_chart").getContext("2d"),configSet_reward_loss);
+	var configSet_reward_loss_episods = {
+		type: 'line',
+		data : {
+			labels: [],
+			datasets : [
+				JSON.parse(JSON.stringify(distance_template))
+			]
+		},
+		options: JSON.parse(JSON.stringify(reward_loss_options))
+	}	
+	_this.reward_loss_chart_episods  = new Chart(document.getElementById("loss_reward_chart_episodes").getContext("2d"),configSet_reward_loss_episods);
+	_this.reward_loss_chart_periods = new Chart(document.getElementById("loss_reward_chart_periods").getContext("2d"),configSet_reward_loss_periods);
 
-	_this.addData = function(data){
-		if (_this.reward_loss_chart.config.data.labels.length>200){
-			_this.reward_loss_chart.config.data.labels = _this.reward_loss_chart.config.data.labels.slice(1)
-			for (var c in _this.reward_loss_chart.config.data.datasets){
-				_this.reward_loss_chart.config.data.datasets[c].data = _this.reward_loss_chart.config.data.datasets[c].data.slice(1)
+	_this.cleanData = function(chart_name){
+		_this[chart_name].config.data.labels = []
+		for (var c in _this[chart_name].config.data.datasets){
+			_this[chart_name].config.data.datasets[c].data = []
+		}
+		_this[chart_name].update()
+	}
+	_this.addData = function(chart_name,data){
+		if (_this[chart_name].config.data.labels.length>200){
+			_this[chart_name].config.data.labels = _this[chart_name].config.data.labels.slice(1)
+			for (var c in _this[chart_name].config.data.datasets){
+				_this[chart_name].config.data.datasets[c].data = _this[chart_name].config.data.datasets[c].data.slice(1)
 			}
 		}
-		if (_this.reward_loss_chart.config.data.labels.length== 0){
-			_this.reward_loss_chart.config.data.labels = [0]
+		if (_this[chart_name].config.data.labels.length== 0){
+			_this[chart_name].config.data.labels = [0]
 		}else{
-			_this.reward_loss_chart.config.data.labels.push(_this.reward_loss_chart.config.data.labels[_this.reward_loss_chart.config.data.labels.length-1]+1)
+			_this[chart_name].config.data.labels.push(_this[chart_name].config.data.labels[_this[chart_name].config.data.labels.length-1]+1)
 		}
 		for (var d in data){
-			for (var c in _this.reward_loss_chart.config.data.datasets){
-				if (_this.reward_loss_chart.config.data.datasets[c].label==d){
-					_this.reward_loss_chart.config.data.datasets[c].data.push(data[d])
+			for (var c in _this[chart_name].config.data.datasets){
+				if (_this[chart_name].config.data.datasets[c].label==d){
+					_this[chart_name].config.data.datasets[c].data.push(data[d])
 				}
 			}
 
 		}
 			
 			// _this.chartEpisodes1.config.data.datasets[1].data.push(data.loss);
-			_this.reward_loss_chart.update()
+			_this[chart_name].update()
 
 	}
 	return _this
