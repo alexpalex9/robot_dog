@@ -249,6 +249,7 @@ var myCharts = function(parent){
 		data : {
 			labels: [],
 			datasets : [
+				JSON.parse(JSON.stringify(loss_template)),
 				JSON.parse(JSON.stringify(distance_template))
 			]
 		},

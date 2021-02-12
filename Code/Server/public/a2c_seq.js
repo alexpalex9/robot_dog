@@ -70,6 +70,7 @@ function Environment(depth,use_gyro) {
 		var sonic_state = await this.Sonic();
 		this.initial_distance = sonic_state
 		console.log("Reset done, new initial distance is",this.initial_distance)
+		$("#reset_button").removeClass('active')
 	}
 	this.init = async function () {
 		
@@ -352,7 +353,8 @@ function Environment(depth,use_gyro) {
 
 function actor_critic() {
 	
-	var _this_ac = this;
+	// var _this_ac = this;
+	// _this_ac.critic_loss_episode = [];
 	// const tf = require('@tensorflow/tfjs-node-gpu');
 	let zeros = (w, h, v=0) => Array.from(new Array(h), _ => Array(w).fill(v));
 	// tf.enableDebugMode()
@@ -373,6 +375,7 @@ function actor_critic() {
 			
 			this.actor = this.build_actor();
 			this.critic = this.build_critic();
+			this.critic_loss_episode = [];
 			
 
 		}
@@ -532,12 +535,13 @@ function actor_critic() {
 				await this.actor.fit(oneHotState, tf.tensor(advantages).reshape([1,this.actions_size]), {epochs:1,})
 				// .then(function(i){
 					// console.log("fit actore done",i)
-				
+				var _this_agent = this;
 				await this.critic.fit(oneHotState, tf.tensor(target), {
 					epochs:1,
 				}).then(function(h){
 					// this.lossA = h.history.loss
 					// console.log(h)
+						_this_agent.critic_loss_episode.push(h.history.loss[0])
 						chart.addData('reward_loss_chart_periods',{
 								'loss':h.history.loss[0],
 								'reward':reward
@@ -581,7 +585,6 @@ function actor_critic() {
 		this.reset = false
 		this.waspaused = false
 		this.started = false
-		
 		
 		if (load==true){
 			try {
@@ -648,6 +651,7 @@ function actor_critic() {
 			if (_this_ac.reset==true){
 				await _this_ac.environment.reset()	
 				_this_ac.reset = false;
+				log("environement reseted")
 			}
 			
 			if (_this_ac.active!=true){
@@ -700,14 +704,14 @@ function actor_critic() {
 								 {requestInit:{ method: 'POST',headers : {'prefix':'critic_' }}}));
 						
 						if (distance<5){
-							_this_ac.active=false
+							_this_ac.active = false
 							$("#train_button").removeClass("active")
 							log('episode ended at periods ' + _this_ac.period + ' - training paused since too close to wall : ' + distance + 'cm')
 							_this_ac.period = 0
 							//$('#log').prepend('<div>' + now + ': episode ended since too close to wall :' + distance + ' cm</div>') 
 							//$('#log').prepend('<div>' + now + ': episode ended since too close to wall :' + distance + ' cm</div>') 
 						}else if(distance>70){
-							_this_ac.active=false
+							_this_ac.active = false
 							// waspaused = true
 							$("#train_button").removeClass("active")
 							log(' episode ended at periods ' + _this_ac.period + ' - training paused since too far from wall : ' + distance + 'cm')
@@ -718,7 +722,7 @@ function actor_critic() {
 							_this_ac.period = 0
 						}
 						
-						_this_ac.chart.addData('reward_loss_chart_episods',{distance:distance_change})
+						_this_ac.chart.addData('reward_loss_chart_episods',{distance:distance_change,loss:_this_ac.agent.critic_loss_episode.reduce((a, b) => a + b, 0)/_this_ac.agent.critic_loss_episode.length})
 						
 						
 					}else{
@@ -730,7 +734,7 @@ function actor_critic() {
 					// console.log(state,next_state)
 					_this_ac.state = next_state
 					_this_ac.state_scaled = next_state_scaled
-					
+					console.log("_this_ac.critic_loss_episode.",_this_ac.critic_loss_episode)
 				// console.log("RELAUNCH AGAIN TRAIN")
 				await this.train(_this_ac)
 			}
@@ -752,7 +756,8 @@ function actor_critic() {
 		
 		this.reset = true
 		this.active = false
-		log("training paused and reset")
+		$("#reset_button").addClass('active')
+		log("training paused")
 		
 	}	
 	async function pause_training() {
