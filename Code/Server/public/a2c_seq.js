@@ -579,7 +579,8 @@ function actor_critic() {
 		
 		this.active = false
 		this.reset = false
-		this.waspaused = true
+		this.waspaused = false
+		this.started = false
 		
 		
 		if (load==true){
@@ -606,8 +607,12 @@ function actor_critic() {
 		if (!_this_ac){
 			_this_ac = this;
 		}
-		if (_this_ac.waspaused==true){
+		if (_this_ac.started==false){
 			log("training started")
+			_this_ac.started = true;
+		}
+		if (_this_ac.waspaused==true){
+			log("training resumed")
 			_this_ac.waspaused = false;
 		}
 		console.log("TRAIN FUNCT",_this_ac.active)
@@ -742,11 +747,19 @@ function actor_critic() {
 		$('#log').prepend('<div>' + now + ': ' + text + '</div>') 	
 		
 	}
-	// async function pause_training() {
-		// this.active = false
+	async function reset_training() {
+		// console.log("PAUSE TRAINING")
 		
-		// clearInterval(this.trainingJob)
-	// }
+		this.reset = true
+		this.active = false
+		log("training paused and reset")
+		
+	}	
+	async function pause_training() {
+		console.log("PAUSE TRAINING")
+		log("training paused")
+		this.active = false
+	}
 	async function stop_training() {
 		log("training stopped")
 		this.chart.cleanData('reward_loss_chart_periods')
@@ -770,6 +783,8 @@ function actor_critic() {
 		init : init,
 		train: train,
 		stop_training : stop_training,
+		pause_training : pause_training,
+		reset_training : reset_training,
 		test:test
 		
 	}
@@ -817,10 +832,11 @@ $(function(){
 	$("#reset_button").on('click',function(){
 		// var $this = this
 		if (!$(this).hasClass('disabled')){
-			console.log("CLICK RESET")
-			sars.active = false
+			// console.log("CLICK RESET")
+			// sars.active = false
+			sars.reset_training()
 			$("#train_button").removeClass("active")
-			sars.reset = true
+			// sars.reset = true
 		}
 	})	
 	$("#stop_button").on('click',function(){

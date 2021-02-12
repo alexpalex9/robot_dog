@@ -273,7 +273,7 @@ class Server():
                     if DEV==False:
                         sonic = self.sonic.getDistance()
                     else:
-                        sonic = random.randrange(8, 90)
+                        sonic = random.randrange(8, 72)
                     emit('sonic',sonic)
                 elif cmd.CMD_POWER in data:
                     self.measuring_voltage(self.connection1)
