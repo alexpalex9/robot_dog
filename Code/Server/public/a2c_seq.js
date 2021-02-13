@@ -708,10 +708,9 @@ function actor_critic() {
 					
 					// reward = (epoch * ((Math.random() * 5) - 2) ) / 100
 
-					if (_this_ac.period % 200 == 0 || distance<5 || distance>70 || reseted==true){
+					if (_this_ac.period % 200 == 0 || distance<5 || distance>50 || reseted==true){
 						
-						await _this_ac.agent.train_model(_this_ac.state_scaled, action, reward, next_state_scaled, true,_this_ac.chart);
-						await _this_ac.environment.reset()
+						
 						// agent.actor.save(window.location.origin + '/mymodels')
 						// agent.critic.save(window.location.origin + '/mymodels')
 						await _this_ac.agent.actor.save(
@@ -731,7 +730,7 @@ function actor_critic() {
 							_this_ac.period = 0
 							//$('#log').prepend('<div>' + now + ': episode ended since too close to wall :' + distance + ' cm</div>') 
 							//$('#log').prepend('<div>' + now + ': episode ended since too close to wall :' + distance + ' cm</div>') 
-						}else if(distance>70){
+						}else if(distance>50){
 							_this_ac.active = false
 							// waspaused = true
 							$("#train_button").removeClass("active")
@@ -739,11 +738,16 @@ function actor_critic() {
 							_this_ac.period = 0
 							//$('#log').prepend('<div>' + now + ': episode ended since too far from wall :' + distance + ' cm</div>') 
 						}else if(reseted==true){
+							
+							// await _this_ac.agent.train_model(_this_ac.state_scaled, action, reward, next_state_scaled, true,_this_ac.chart);
+							// await _this_ac.environment.reset()
 							log('episode ended since reset')
 							_this_ac.period = 0
 							reseted = false;
 						}else{
 							log('episode ended after 200 periods')
+							await _this_ac.agent.train_model(_this_ac.state_scaled, action, reward, next_state_scaled, true,_this_ac.chart);
+							await _this_ac.environment.reset()
 							_this_ac.period = 0
 							
 						}
