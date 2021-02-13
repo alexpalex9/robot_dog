@@ -113,7 +113,8 @@ function Environment(depth,use_gyro) {
 			}
 			
 		}
-		
+		// console.log("STATES  INIT",statesA)
+		// console.log("STATES SCALED INIT",statesA_scaled)
 		
 		var sonic_state = await this.Sonic();
 		this.initial_distance = sonic_state
@@ -138,7 +139,7 @@ function Environment(depth,use_gyro) {
 			var gyro_state = {'x':0,'y':0,'z':0}
 		}
 		// console.log(gyro_state,statesA,statesA_scaled)
-		// console.log("STATES",statesA)
+		
 		return  {
 			gyro_state : gyro_state,
 			state : statesA,
@@ -221,7 +222,7 @@ function Environment(depth,use_gyro) {
 	this.step = async function(state,action,state_scaled,incremental){
 		// console.log("step, action = ",action)
 		// console.log("step, state = ",state)
-		// console.log("step, action = "state,action,state_scaled)
+		// console.log("step, action = ",state,action,state_scaled)
 		var l = state[0].length - 1
 		// next_state = Array.from(state);
 		var next_state = [];
@@ -289,16 +290,25 @@ function Environment(depth,use_gyro) {
 		for (var servo in this.servos_object){
 			next_state.push(Array.from(state[s]));
 			next_state_scaled.push(Array.from(state_scaled[s]));
-			
+			// console.log("servo",next_state,next_state_scaled)
 			next_state[s] = next_state[s].slice(1)
 			next_state_scaled[s] = next_state_scaled[s].slice(1)
 			
 			if (servo==action.servo){
 				next_state[s].push(action.angle)
+				// console.log("pushing next state",servo,s,action.angle,this.servos_scale_sate(action.servo,action.angle))
 				next_state_scaled[s].push(this.servos_scale_sate(action.servo,action.angle))
 			}else{
-				next_state[s].push(next_state[s][next_state[s].length-1])
-				next_state_scaled[s].push(next_state_scaled[s][next_state[s].length-1])
+				
+				// console.log("no action, pushing at i=",next_state[s].length-1,next_state[s])
+				var last_item = next_state[s][next_state[s].length-1]
+				var last_item_scaled = next_state_scaled[s][next_state_scaled[s].length-1]
+				// next_state[s].push(next_state[s][next_state[s].length-1])
+				next_state[s].push(last_item)
+				 
+				// console.log("pushing result",next_state[s].length-1,next_state[s])
+				// next_state_scaled[s].push(next_state_scaled[s][next_state_scaled[s].length-1])
+				next_state_scaled[s].push(last_item_scaled)
 				
 			}
 			
@@ -536,7 +546,7 @@ function actor_critic() {
 					// advantages[i] = next_value;
 				// }
 				advantages[action.index] = [reward + (1 - done) * this.discount_factor * (next_value) - value];
-				// console.log("advantages",action,advantages)
+				console.log("advantages",action,advantages)
 				// console.log("advantages",tf.tensor(advantages).dataSync())
 				// console.log("target",tf.tensor(target).dataSync())
 				
@@ -593,7 +603,8 @@ function actor_critic() {
 		this.ACTION_INDEX = ACTION_INDEX
 		this.chart = myCharts()
 
-		console.log("servos_walk",SERVO_WALK)
+		// console.log("servos_walk",SERVO_WALK)
+		// console.log("init state_scaled",state_scaled)
 		
 		this.epoch = 0;
 		//var period = 0;
@@ -697,11 +708,14 @@ function actor_critic() {
 					// var policy = agent.actor.predict(state_tensor.reshape([1,ACTION_INDEX.length,DEPTH]), {batchSize:1});
 					// var policy_flat  = policy.dataSync()
 					// var action =  ACTION_INDEX[randomChoice(policy_flat)]
+					// console.log("state scaled BEFORE ACTION",_this_ac.state_scaled)
 					
 					action = _this_ac.agent.get_action(_this_ac.state_scaled,_this_ac.ACTION_INDEX)
 					var {gyro_state ,distance_change , distance, servos_state, next_state, next_state_scaled } = await _this_ac.environment.step(_this_ac.state,action,_this_ac.state_scaled,false)
 						
-
+					// console.log("state scaled",_this_ac.state_scaled)
+					// console.log("newt state scaled",next_state_scaled)
+					
 					// }
 					// reward = 1/2 * rewardSonic / 10 + 1/6 - Math.abs(gyro.x) / 100 + 1/6 - Math.abs(gyro.y) / 100 + 1/6 - Math.abs(gyro.z) / 100
 					// reward =  1/3 *  (1- Math.abs(gyro.x) / 100 ) + 1/3 * (1 - Math.abs(gyro.y) / 100 ) + 1/3 * (1- Math.abs(gyro.z) / 100)
