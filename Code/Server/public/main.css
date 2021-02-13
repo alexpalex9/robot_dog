@@ -75,3 +75,19 @@ background: #3C3C3C;
 	top:0;
 	left:0;
 }
+
+
+.knob_title{
+	display:inline-block;
+	width:100%;
+	text-align:center;
+	font-size:15pt;
+}
+
+.knobs_container{
+	margin-top:10px;margin-bottom:10px;text-align:center
+}
+.knob_container{
+	display:inline-block;
+	text-align:center;
+}

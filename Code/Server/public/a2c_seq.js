@@ -181,14 +181,21 @@ function Environment(depth,use_gyro) {
 	this.SetServosAngles = function(data,timeout = 10000) {
 		return new Promise((resolve, reject) => {
 			let timer;
-			_this.socket.emit('set servos angle',data)
+			_this.socket.emit('set servos angle await',data)
 			function responseHandler(message) {
 				resolve(message);
+				
+				for (var s in message){
+					$("#servo_" + s).attr("data-isTriggering","yes");
+					$("#servo_" + s).val(message[s]).trigger('change');
+					$("#servo_" + s).attr("data-isTriggering","no");	
+					
+				}
 				clearTimeout(timer);
 			}
 
-			_this.socket.once('servos angle', responseHandler); 
-
+			_this.socket.once('servos angle await', responseHandler); 
+			
 			// set timeout so if a response is not received within a 
 			// reasonable amount of time, the promise will reject
 			timer = setTimeout(() => {
@@ -346,6 +353,7 @@ function Environment(depth,use_gyro) {
 		}
 		
 		var sonic_state = await this.Sonic();
+		// var distance_change	 = sonic_state - this.initial_distance
 		var distance_change	 = sonic_state - this.last_distance
 		this.last_distance = sonic_state
 		// console.log("last distance =",this.last_distance)

@@ -220,7 +220,21 @@ class Server():
                     'y': random.randrange(0, 20),
                     'z': random.randrange(0, 20)
                 })
-            
+
+        @socketio.on('set servos angle await', namespace='/robot')
+        def set_servos_await(data):
+            print('set servos angle',data)
+            for servo in data:
+                if DEV==False:
+                    self.control.servo.setServoAngle(int(servo),data[servo])
+                else:
+                    pass
+            if DEV==False:
+                time.sleep(0.25)
+                emit('servos angle await',self.control.servo.values)
+            else:
+                emit('servos angle await',data)
+                
         @socketio.on('set servos angle', namespace='/robot')
         def set_servos(data):
             print('set servos angle',data)
