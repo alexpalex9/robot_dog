@@ -354,8 +354,8 @@ function Environment(depth,use_gyro) {
 		}
 		
 		var sonic_state = await this.Sonic();
-		// var distance_change	 = sonic_state - this.initial_distance
-		var distance_change	 = sonic_state - this.last_distance
+		var distance_change	 = (sonic_state - this.initial_distance)/100
+		// var distance_change	 = (sonic_state - this.last_distance)/10
 		this.last_distance = sonic_state
 		// console.log("last distance =",this.last_distance)
 		// console.log("new distance =",sonic_state)
@@ -733,7 +733,7 @@ function actor_critic() {
 					// reward = 1/2 * rewardSonic / 10 + 1/6 - Math.abs(gyro.x) / 100 + 1/6 - Math.abs(gyro.y) / 100 + 1/6 - Math.abs(gyro.z) / 100
 					// reward =  1/3 *  (1- Math.abs(gyro.x) / 100 ) + 1/3 * (1 - Math.abs(gyro.y) / 100 ) + 1/3 * (1- Math.abs(gyro.z) / 100)
 					// reward = 1/ ( - distance_change / 100)
-					reward = - distance_change / 10
+					reward = - distance_change
 					
 					// reward = (epoch * ((Math.random() * 5) - 2) ) / 100
 
@@ -756,7 +756,7 @@ function actor_critic() {
 							_this_ac.active = false
 							$("#train_button").removeClass("active")
 							log('episode ended at periods ' + _this_ac.period + ' - training paused since too close to wall : ' + distance + 'cm')
-							_this_ac.period = 0
+							// _this_ac.period = 0
 							//$('#log').prepend('<div>' + now + ': episode ended since too close to wall :' + distance + ' cm</div>') 
 							//$('#log').prepend('<div>' + now + ': episode ended since too close to wall :' + distance + ' cm</div>') 
 						}else if(distance>50){
@@ -776,6 +776,11 @@ function actor_critic() {
 						}else{
 							log('episode ended after 100 periods')
 							await _this_ac.agent.train_model(_this_ac.state_scaled, action, reward, next_state_scaled, true,_this_ac.chart);
+								_this_ac.chart.addData('reward_loss_chart_episods',{
+								distance:distance_change,
+								loss_critic:_this_ac.agent.critic_loss_episode.reduce((a, b) => a + b, 0)/_this_ac.agent.critic_loss_episode.length,
+								loss_actor:_this_ac.agent.actor_loss_episode.reduce((a, b) => a + b, 0)/_this_ac.agent.actor_loss_episode.length
+							})
 							// await _this_ac.environment.reset()
 							// var initenv await this.environment.init()
 							// next_state_scaled = initenv.state_scaled
@@ -786,11 +791,7 @@ function actor_critic() {
 						next_state = initenv.state
 						next_state_scaled = initenv.state_scaled
 						_this_ac.period = 0
-						_this_ac.chart.addData('reward_loss_chart_episods',{
-							distance:distance_change,
-							loss_critic:_this_ac.agent.critic_loss_episode.reduce((a, b) => a + b, 0)/_this_ac.agent.critic_loss_episode.length,
-							loss_actor:_this_ac.agent.actor_loss_episode.reduce((a, b) => a + b, 0)/_this_ac.agent.actor_loss_episode.length
-						})
+						
 						
 						
 					}else{
