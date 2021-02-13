@@ -117,6 +117,7 @@ function Environment(depth,use_gyro) {
 		
 		var sonic_state = await this.Sonic();
 		this.initial_distance = sonic_state
+		this.last_distance = sonic_state
 		// console.log(gyro)
 		
 		// console.log(statesA)
@@ -337,12 +338,15 @@ function Environment(depth,use_gyro) {
 		// console.log("SONIC",sonic_state - this.initial_distance)
 		return  {
 			gyro_state : gyro_state,
-			distance_change : sonic_state - this.initial_distance,
+			// distance_change : sonic_state - this.initial_distance,
+			distance_change : sonic_state - this.last_distance,
 			distance : sonic_state,
 			servos_state : _this.servos.state,
 			next_state : next_state,
 			next_state_scaled : next_state_scaled
 		}
+		
+		this.last_distance = sonic_state
 		
 	}
 
