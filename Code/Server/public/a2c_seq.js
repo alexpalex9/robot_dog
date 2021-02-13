@@ -477,12 +477,16 @@ function actor_critic() {
 		}
 
 		async train_model(state, action, reward, next_state, done, chart) {
+			
+			// https://adventuresinmachinelearning.com/reinforcement-learning-tensorflow/a2c/
+			
 			// let target = zeros(this.inputs_size, 1);
 			let target = zeros(1,this.value_size);
 			// let advantages = zeros(1, this.inputs_size);
 			let advantages = zeros(1, this.actions_size);
 			// var advantages = zeros(1, this.actions_size);
-			// console.log("init advantages",advantages)
+			console.log("init advantages",advantages)
+			console.log("init states",advantages)
 			// let oneHotState = tf.oneHot(this.format_state(state), 12);
 			// let oneHotNextState = tf.oneHot(this.format_state(next_state), 12);
 			var oneHotState = tf.oneHot(state,this.servos_actions_size).reshape([1,this.actions_size,this.depth])
@@ -519,6 +523,9 @@ function actor_critic() {
 					// advantages.push(reward + (1 - done) * this.discount_factor * (next_value) - value)
 					// advantages.push(reward + (1 - done) * this.discount_factor * (next_value) - value)
 					// advantages.push(reward + (1 - done) * this.discount_factor * (next_value[Math.floor(i/4)]) - value[Math.floor(i/4)])
+				// }
+				// for (var i in advantages){
+					// advantages[i] = next_value;
 				// }
 				advantages[action.index] = [reward + (1 - done) * this.discount_factor * (next_value) - value];
 				// console.log("advantages",action,advantages)
