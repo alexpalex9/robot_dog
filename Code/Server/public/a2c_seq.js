@@ -709,18 +709,18 @@ function actor_critic() {
 					// var policy_flat  = policy.dataSync()
 					// var action =  ACTION_INDEX[randomChoice(policy_flat)]
 					// console.log("state scaled BEFORE ACTION",_this_ac.state_scaled)
-					
+					console.log("state scaled",_this_ac.state_scaled)
 					action = _this_ac.agent.get_action(_this_ac.state_scaled,_this_ac.ACTION_INDEX)
 					var {gyro_state ,distance_change , distance, servos_state, next_state, next_state_scaled } = await _this_ac.environment.step(_this_ac.state,action,_this_ac.state_scaled,false)
 						
-					// console.log("state scaled",_this_ac.state_scaled)
+					
 					// console.log("newt state scaled",next_state_scaled)
 					
 					// }
 					// reward = 1/2 * rewardSonic / 10 + 1/6 - Math.abs(gyro.x) / 100 + 1/6 - Math.abs(gyro.y) / 100 + 1/6 - Math.abs(gyro.z) / 100
 					// reward =  1/3 *  (1- Math.abs(gyro.x) / 100 ) + 1/3 * (1 - Math.abs(gyro.y) / 100 ) + 1/3 * (1- Math.abs(gyro.z) / 100)
 					// reward = 1/ ( - distance_change / 100)
-					reward = - distance_change / 100
+					reward = - distance_change / 10
 					
 					// reward = (epoch * ((Math.random() * 5) - 2) ) / 100
 
