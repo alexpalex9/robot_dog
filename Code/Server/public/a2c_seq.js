@@ -51,8 +51,30 @@ function Environment(depth,use_gyro) {
 			}
 		}
 	}
+
+	this.servos_object = {}
+	this.initial_servos_state = {}
 	
-	
+	for (var s in this.SERVOS){
+		this.initial_servos_state[this.SERVOS[s].name] = this.SERVOS[s]['init']
+		if (this.SERVOS[s]['used']==true){
+			this.servos_object[this.SERVOS[s].name] = {}
+			this.servos_object[this.SERVOS[s].name]['state'] = this.SERVOS[s]['init']
+			this.servos_object[this.SERVOS[s].name]['scale_a'] = 1 / (this.SERVOS[s].actions[this.SERVOS[s].actions.length-1] - this.SERVOS[s].actions[0])
+			this.servos_object[this.SERVOS[s].name]['scale_b'] = - this.SERVOS[s].actions[0] * this.servos_object[this.SERVOS[s].name]['scale_a']
+			
+			// make closure below?
+			// var _thistemp = this;
+			// this.servos_object[servos[s].name].scale = function(state){
+					// return (function(a,b){
+					// console.log(state,a,b)
+					// return state * a + b
+				// })(_thistemp.servos_object[servos[s].name]['scale_a'],_thistemp.servos_object[servos[s].name]['scale_b'])
+			// }
+			
+			// console.log("TEST TEST TEST",this.servos_object[servos[s].name].scale(90))	
+		}
+	}	
 	if (use_gyro==true){
 		this.AMOUNT_INPUTS = this.AMOUNT_INPUTS + 3 ;
 	}
@@ -66,38 +88,16 @@ function Environment(depth,use_gyro) {
 		}
 	}
 	
-	this.reset = async function(){
-		var sonic_state = await this.Sonic();
-		this.initial_distance = sonic_state
-		console.log("Reset done, new initial distance is",this.initial_distance)
-		$("#reset_button").removeClass('active')
-	}
+	// this.reset = async function(){
+		// var sonic_state = await this.Sonic();
+		// this.initial_distance = sonic_state
+		// console.log("Reset done, new initial distance is",this.initial_distance)
+		// $("#reset_button").removeClass('active')
+	// }
 	this.init = async function () {
 		
 		// this.servos_actions = servos_actions
-		this.servos_object = {}
-		this.initial_servos_state = {}
-		
-		for (var s in this.SERVOS){
-			this.initial_servos_state[this.SERVOS[s].name] = this.SERVOS[s]['init']
-			if (this.SERVOS[s]['used']==true){
-				this.servos_object[this.SERVOS[s].name] = {}
-				this.servos_object[this.SERVOS[s].name]['state'] = this.SERVOS[s]['init']
-				this.servos_object[this.SERVOS[s].name]['scale_a'] = 1 / (this.SERVOS[s].actions[this.SERVOS[s].actions.length-1] - this.SERVOS[s].actions[0])
-				this.servos_object[this.SERVOS[s].name]['scale_b'] = - this.SERVOS[s].actions[0] * this.servos_object[this.SERVOS[s].name]['scale_a']
-				
-				// make closure below?
-				// var _thistemp = this;
-				// this.servos_object[servos[s].name].scale = function(state){
-						// return (function(a,b){
-						// console.log(state,a,b)
-						// return state * a + b
-					// })(_thistemp.servos_object[servos[s].name]['scale_a'],_thistemp.servos_object[servos[s].name]['scale_b'])
-				// }
-				
-				// console.log("TEST TEST TEST",this.servos_object[servos[s].name].scale(90))	
-			}
-		}
+
 	
 		await this.SetServosAngles(this.initial_servos_state)
 		
@@ -139,7 +139,7 @@ function Environment(depth,use_gyro) {
 			var gyro_state = {'x':0,'y':0,'z':0}
 		}
 		// console.log(gyro_state,statesA,statesA_scaled)
-		
+		$("#reset_button").removeClass('active')
 		return  {
 			gyro_state : gyro_state,
 			state : statesA,
@@ -689,7 +689,11 @@ function actor_critic() {
 		// while(true){
 			var reseted = false;
 			if (_this_ac.reset==true){
-				await _this_ac.environment.reset()
+				// await _this_ac.environment.reset()
+				var initenv = await this.environment.init()
+				state_scaled = initenv.state_scaled
+				// _this_ac.period = 0
+							
 				_this_ac.reset = false;
 				reseted = true;
 				log("environement reseted")
@@ -774,11 +778,14 @@ function actor_critic() {
 							await _this_ac.agent.train_model(_this_ac.state_scaled, action, reward, next_state_scaled, true,_this_ac.chart);
 							// await _this_ac.environment.reset()
 							// var initenv await this.environment.init()
-							next_state_scaled = initenv.state_scaled
-							_this_ac.period = 0
+							// next_state_scaled = initenv.state_scaled
+							// _this_ac.period = 0
 							
 						}
-						
+						var initenv = await this.environment.init()
+						next_state = initenv.state
+						next_state_scaled = initenv.state_scaled
+						_this_ac.period = 0
 						_this_ac.chart.addData('reward_loss_chart_episods',{
 							distance:distance_change,
 							loss_critic:_this_ac.agent.critic_loss_episode.reduce((a, b) => a + b, 0)/_this_ac.agent.critic_loss_episode.length,
@@ -816,9 +823,12 @@ function actor_critic() {
 		// console.log("PAUSE TRAINING")
 		
 		this.reset = true
+		if (this.active!=false){
+			log("training paused")	
+		}
 		this.active = false
 		$("#reset_button").addClass('active')
-		log("training paused")
+		
 		
 	}	
 	async function pause_training() {
