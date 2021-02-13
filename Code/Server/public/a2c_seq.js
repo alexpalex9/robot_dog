@@ -355,7 +355,7 @@ function Environment(depth,use_gyro) {
 		
 		var sonic_state = await this.Sonic();
 		// var distance_change	 = (sonic_state - this.initial_distance)/100
-		var distance_change	 = sonic_state / 100
+		var distance_change	 = (sonic_state + 50 )/ 100
 		// var distance_change	 = (sonic_state - this.last_distance)/10
 		this.last_distance = sonic_state
 		// console.log("last distance =",this.last_distance)
