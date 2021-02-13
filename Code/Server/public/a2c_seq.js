@@ -157,26 +157,26 @@ function Environment(depth,use_gyro) {
 	}
 	
 	this.Sonic = function(timeout = 10000) {
-			return new Promise((resolve, reject) => {
-				let timer;
-				_this.socket.emit('cmd', [_this.COMMAND.CMD_SONIC])
-				function responseHandler(message) {
-					// resolve promise with the value we got
-					resolve(message);
-					clearTimeout(timer);
-				}
+		return new Promise((resolve, reject) => {
+			let timer;
+			_this.socket.emit('cmd', [_this.COMMAND.CMD_SONIC])
+			function responseHandler(message) {
+				// resolve promise with the value we got
+				resolve(message);
+				clearTimeout(timer);
+			}
 
-				_this.socket.once('sonic', responseHandler); 
+			_this.socket.once('sonic', responseHandler); 
 
-				// set timeout so if a response is not received within a 
-				// reasonable amount of time, the promise will reject
-				timer = setTimeout(() => {
-					reject(new Error("timeout waiting for msg"));
-					socket.removeListener('sonic', responseHandler);
-				}, timeout);
+			// set timeout so if a response is not received within a 
+			// reasonable amount of time, the promise will reject
+			timer = setTimeout(() => {
+				reject(new Error("timeout waiting for msg"));
+				socket.removeListener('sonic', responseHandler);
+			}, timeout);
 
-			});
-		}
+		});
+	}
 		
 	this.SetServosAngles = function(data,timeout = 10000) {
 		return new Promise((resolve, reject) => {
