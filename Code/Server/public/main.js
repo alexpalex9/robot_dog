@@ -253,30 +253,8 @@ var init = function(){
 		},250)
 	}
 	
-	setInterval(function(){
-		_this.socket.emit('get state')
-	},250);
-	_this.socket.on("state",function(data){
-		_this.servos.state = data
-		for (var s in data){
-			$("#servo_" + s).attr("data-isTriggering","yes");
-			$("#servo_" + s).val(data[s]).trigger('change');
-			$("#servo_" + s).attr("data-isTriggering","no");	
-		}
-					
-		// console.log("state",data)
-	});
-	
-	_this.servos.setAngle = function(servo,angle){
-		data = {}
-		data[servo] = angle
-		$("#servo_"+ servo).val(angle).trigger('change');
-		
-		_this.socket.emit('set servos angle', data)
-	};
-	_this.servos.setAngles = function(data){
-		_this.socket.emit('set servos angle', data)
-	};
+
+
 	/*
     async function face_detection(){
       console.log("detection")
@@ -348,17 +326,20 @@ var init = function(){
 
 	$("#sonar_button").on('click',function(){
 		// var $this = this
-		console.log($(this).hasClass('active'))
-		if($(this).hasClass("active")){
-			$(this).removeClass("active")
-			clearInterval(_this.sonar.job)
-			$("#sonar_button").html("Sonic")
-		}else{
-			$(this).addClass("active")
-			_this.sonar.job = setInterval(function(){
-				// console.log("emit sonic")
-				_this.socket.emit('cmd', [_this.COMMAND.CMD_SONIC])
-			},_this.sonar.pollingFrequency)	
+		// console.log($(this).hasClass('active'))
+		
+		if(!$(this).hasClass("disabled")){
+			if($(this).hasClass("active")){
+				$(this).removeClass("active")
+				clearInterval(_this.sonar.job)
+				$("#sonar_button").html("Sonic")
+			}else{
+				$(this).addClass("active")
+				_this.sonar.job = setInterval(function(){
+					// console.log("emit sonic")
+					_this.socket.emit('cmd', [_this.COMMAND.CMD_SONIC])
+				},_this.sonar.pollingFrequency)	
+			}
 		}
 		
 	})
@@ -391,34 +372,59 @@ var init = function(){
 		});
 	})
 	// $("#webcam").attr('src','stream.mjpg')
-	
-		var knobOptions = {		
-			change: function (value) {
-				// $('.mm-page.mm-slideout').addClass('nopan')
-			},
-			release: function (value) {
-				console.log("release")
-				if ("yes"!=$(this.$[0]).attr('data-isTriggering')){
-					console.log("release knob")
-					var cmd ={}
-					cmd[$(this.$[0]).attr('data-servo')] = value
-					_this.socket.emit("set servos angle",cmd);
-				};
-				$(this.$[0]).attr('data-v',value);
-				$(this.$[0]).attr('data-isTriggering',"no");
-			},
-			cancel: function(){},
-			draw: function () {},
-			format : function(v){
-				return v+'°'
-			}
+		// setInterval(function(){
+		// _this.socket.emit('get state')
+	// },250);
+	_this.socket.on("servos angle",function(data){
+		// console.log("receive servos anlge",data)
+		_this.servos.state = data
+		for (var s in data){
+			// console.log("loop",$("#servo_" + s.toString()).length)
+			$("#servo_" + s).attr("data-isTriggering","yes");
+			$("#servo_" + s).val(data[s]).trigger('change');
+			$("#servo_" + s).attr("data-isTriggering","no");
 		}
-		// knob:function(){	
-		$(".knob").knob(knobOptions);
-		// },
-		// $("#servo_3").attr("data-isTriggering","yes");
-		// $("#servo_3").val(45).trigger('change');
-		// $("#servo_3").attr("data-isTriggering","no");
+					
+		// console.log("state",data)
+	});
+	// _this.servos.setAngle = function(servo,angle){
+		// data = {}
+		// data[servo] = angle
+		// $("#servo_"+ servo).val(angle).trigger('change');
+		
+		// _this.socket.emit('set servos angle', data)
+	// };
+	_this.servos.setAngles = function(data){
+		_this.socket.emit('set servos angle', data)
+	};
+	var knobOptions = {		
+		change: function (value) {
+			// $('.mm-page.mm-slideout').addClass('nopan')
+		},
+		release: function (value) {
+			// console.log("release, isTriggering?",$(this.$[0]).attr('data-isTriggering'))
+			if ("yes"!=$(this.$[0]).attr('data-isTriggering')){
+				// console.log("release knob")
+				var cmd ={}
+				cmd[$(this.$[0]).attr('data-servo')] = value
+				// _this.socket.emit("set servos angle",cmd);
+				_this.servos.setAngles(cmd)
+			};
+			$(this.$[0]).attr('data-v',value);
+			$(this.$[0]).attr('data-isTriggering',"no");
+		},
+		cancel: function(){},
+		draw: function () {},
+		format : function(v){
+			return v+'°'
+		}
+	}
+	// knob:function(){	
+	$(".knob").knob(knobOptions);
+	// },
+	// $("#servo_3").attr("data-isTriggering","yes");
+	// $("#servo_3").val(45).trigger('change');
+	// $("#servo_3").attr("data-isTriggering","no");
 }
 
 $(init())

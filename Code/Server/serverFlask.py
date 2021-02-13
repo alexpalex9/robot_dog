@@ -209,32 +209,19 @@ class Server():
             print("Get Gyro")
             if DEV==False:
                 x,y,z = self.control.getGyro()
-                emit('gyro',{
-                    'x':x,
-                    'y':y,
-                    'z':z
-                })
-            else :
-                emit('gyro',{
-                    'x': random.randrange(0, 20),
-                    'y': random.randrange(0, 20),
-                    'z': random.randrange(0, 20)
-                })
-
-        @socketio.on('set servos angle await', namespace='/robot')
-        def set_servos_await(data):
-            print('set servos angle',data)
-            for servo in data:
-                if DEV==False:
-                    self.control.servo.setServoAngle(int(servo),data[servo])
-                else:
-                    pass
-            if DEV==False:
-                time.sleep(0.25)
-                emit('servos angle await',self.control.servo.values)
             else:
-                emit('servos angle await',data)
-                
+                x,y,z = random.randrange(0, 20),random.randrange(0, 20),random.randrange(0, 20)
+            emit('gyro',{
+                'x':x,
+                'y':y,
+                'z':z
+            })
+            emit('gyro await',{
+                'x':x,
+                'y':y,
+                'z':z
+            })
+
         @socketio.on('set servos angle', namespace='/robot')
         def set_servos(data):
             print('set servos angle',data)
@@ -246,8 +233,10 @@ class Server():
             if DEV==False:
                 time.sleep(0.25)
                 emit('servos angle',self.control.servo.values)
+                emit('servos angle await',self.control.servo.values)
             else:
                 emit('servos angle',data)
+                emit('servos angle await',data)
                 
         @socketio.on('cmd', namespace='/robot')
         def ws_cmd(allData):
@@ -289,6 +278,7 @@ class Server():
                     else:
                         sonic = random.randrange(8, 52)
                     emit('sonic',sonic)
+                    emit('sonic await',sonic)
                 elif cmd.CMD_POWER in data:
                     self.measuring_voltage(self.connection1)
                 elif cmd.CMD_WORKING_TIME in data: 

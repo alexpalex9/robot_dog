@@ -76,10 +76,10 @@ function Environment(depth,use_gyro) {
 		
 		// this.servos_actions = servos_actions
 		this.servos_object = {}
-		var initial_servos_state = {}
+		this.initial_servos_state = {}
 		
 		for (var s in this.SERVOS){
-			initial_servos_state[this.SERVOS[s].name] = this.SERVOS[s]['init']
+			this.initial_servos_state[this.SERVOS[s].name] = this.SERVOS[s]['init']
 			if (this.SERVOS[s]['used']==true){
 				this.servos_object[this.SERVOS[s].name] = {}
 				this.servos_object[this.SERVOS[s].name]['state'] = this.SERVOS[s]['init']
@@ -99,7 +99,7 @@ function Environment(depth,use_gyro) {
 			}
 		}
 	
-		await this.SetServosAngles(initial_servos_state)
+		await this.SetServosAngles(this.initial_servos_state)
 		
 		// console.log("INIT",this.servos_object)
 		var statesA = []
@@ -172,7 +172,7 @@ function Environment(depth,use_gyro) {
 			// reasonable amount of time, the promise will reject
 			timer = setTimeout(() => {
 				reject(new Error("timeout waiting for msg"));
-				socket.removeListener('sonic', responseHandler);
+				socket.removeListener('sonic await', responseHandler);
 			}, timeout);
 
 		});
@@ -181,16 +181,17 @@ function Environment(depth,use_gyro) {
 	this.SetServosAngles = function(data,timeout = 10000) {
 		return new Promise((resolve, reject) => {
 			let timer;
-			_this.socket.emit('set servos angle await',data)
+			_this.socket.emit('set servos angle',data)
 			function responseHandler(message) {
+				console.log("SERVOS ANGLE SET")
 				resolve(message);
 				
-				for (var s in message){
-					$("#servo_" + s).attr("data-isTriggering","yes");
-					$("#servo_" + s).val(message[s]).trigger('change');
-					$("#servo_" + s).attr("data-isTriggering","no");	
+				// for (var s in message){
+					// $("#servo_" + s).attr("data-isTriggering","yes");
+					// $("#servo_" + s).val(message[s]).trigger('change');
+					// $("#servo_" + s).attr("data-isTriggering","no");	
 					
-				}
+				// }
 				clearTimeout(timer);
 			}
 
@@ -220,7 +221,7 @@ function Environment(depth,use_gyro) {
 			// reasonable amount of time, the promise will reject
 			timer = setTimeout(() => {
 				reject(new Error("timeout waiting for msg"));
-				socket.removeListener('gyro', responseHandler);
+				socket.removeListener('gyro await', responseHandler);
 			}, timeout);
 
 		});
@@ -732,7 +733,7 @@ function actor_critic() {
 					
 					// reward = (epoch * ((Math.random() * 5) - 2) ) / 100
 
-					if (_this_ac.period % 200 == 0 || distance<5 || distance>50 || reseted==true){
+					if (_this_ac.period % 100 == 0 || distance<5 || distance>50 || reseted==true){
 						
 						
 						// agent.actor.save(window.location.origin + '/mymodels')
@@ -769,9 +770,11 @@ function actor_critic() {
 							// _this_ac.period = 0
 							// reseted = false;
 						}else{
-							log('episode ended after 200 periods')
+							log('episode ended after 100 periods')
 							await _this_ac.agent.train_model(_this_ac.state_scaled, action, reward, next_state_scaled, true,_this_ac.chart);
-							await _this_ac.environment.reset()
+							// await _this_ac.environment.reset()
+							// var initenv await this.environment.init()
+							next_state_scaled = initenv.state_scaled
 							_this_ac.period = 0
 							
 						}
@@ -888,6 +891,7 @@ $(function(){
 			sars.active = true
 			sars.train()
 			$("#reset_button").removeClass('disabled')
+			$("#sonar_button").addClass('disabled')
 			
 		}
 		
