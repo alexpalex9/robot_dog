@@ -334,19 +334,23 @@ function Environment(depth,use_gyro) {
 		}else{
 			var gyro_state = {'x':0,'y':0,'z':0}
 		}
+		
 		var sonic_state = await this.Sonic();
+		var distance_change	 = sonic_state - this.last_distance
+		this.last_distance = sonic_state
+		// console.log("last distance =",this.last_distance)
+		// console.log("new distance =",sonic_state)
 		// console.log("SONIC",sonic_state - this.initial_distance)
 		return  {
 			gyro_state : gyro_state,
 			// distance_change : sonic_state - this.initial_distance,
-			distance_change : sonic_state - this.last_distance,
+			distance_change : distance_change,
 			distance : sonic_state,
 			servos_state : _this.servos.state,
 			next_state : next_state,
 			next_state_scaled : next_state_scaled
 		}
 		
-		this.last_distance = sonic_state
 		
 	}
 
@@ -489,8 +493,8 @@ function actor_critic() {
 			// let advantages = zeros(1, this.inputs_size);
 			let advantages = zeros(1, this.actions_size);
 			// var advantages = zeros(1, this.actions_size);
-			console.log("init advantages",advantages)
-			console.log("init states",advantages)
+			// console.log("init advantages",advantages)
+			// console.log("init states",advantages)
 			// let oneHotState = tf.oneHot(this.format_state(state), 12);
 			// let oneHotNextState = tf.oneHot(this.format_state(next_state), 12);
 			var oneHotState = tf.oneHot(state,this.servos_actions_size).reshape([1,this.actions_size,this.depth])
@@ -633,7 +637,7 @@ function actor_critic() {
 			log("training resumed")
 			_this_ac.waspaused = false;
 		}
-		console.log("TRAIN FUNCT",_this_ac.active)
+		// console.log("TRAIN FUNCT",_this_ac.active)
 		// const DEPTH = 2
 				
 		// environment = new Environment(DEPTH,use_gyro)
