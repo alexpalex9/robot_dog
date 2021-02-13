@@ -669,10 +669,12 @@ function actor_critic() {
 		// while(true){
 			var reseted = false;
 			if (_this_ac.reset==true){
-				await _this_ac.environment.reset()	
+				await _this_ac.environment.reset()
 				_this_ac.reset = false;
 				reseted = true;
 				log("environement reseted")
+				log('episode ended since reset')
+				_this_ac.period = 0
 			}
 			
 			if (_this_ac.active!=true){
@@ -741,9 +743,9 @@ function actor_critic() {
 							
 							// await _this_ac.agent.train_model(_this_ac.state_scaled, action, reward, next_state_scaled, true,_this_ac.chart);
 							// await _this_ac.environment.reset()
-							log('episode ended since reset')
-							_this_ac.period = 0
-							reseted = false;
+							// log('episode ended since reset')
+							// _this_ac.period = 0
+							// reseted = false;
 						}else{
 							log('episode ended after 200 periods')
 							await _this_ac.agent.train_model(_this_ac.state_scaled, action, reward, next_state_scaled, true,_this_ac.chart);
@@ -870,7 +872,7 @@ $(function(){
 	})
 	$("#reset_button").on('click',function(){
 		// var $this = this
-		if (!$(this).hasClass('disabled')){
+		if (!$(this).hasClass('disabled') && !$(this).hasClass('active')){
 			// console.log("CLICK RESET")
 			// sars.active = false
 			sars.reset_training()
