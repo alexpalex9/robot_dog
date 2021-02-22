@@ -168,11 +168,11 @@ var myCharts = function(parent){
 		pointBackgroundColor : 'rgba(221, 151, 149, 1)',
 		fill: false,
 		spanGaps: true,
-		label: "loss_critic",
+		label: "loss_value",
 		yAxisID:"left",
 		type:'line'
 	}
-	loss_actor_template = {
+	loss_total_template = {
 		data : [],
 		borderWidth : 1,
 		borderColor: 'rgba(149, 151, 221, 1)',
@@ -185,7 +185,7 @@ var myCharts = function(parent){
 		pointBackgroundColor : 'rgba(149, 151, 221, 1)',
 		fill: false,
 		spanGaps: true,
-		label: "loss_actor",
+		label: "loss_total",
 		yAxisID:"left",
 		type:'line'
 	}
@@ -255,6 +255,7 @@ var myCharts = function(parent){
 			labels: [],
 			datasets : [
 				JSON.parse(JSON.stringify(loss_critic_template)),
+				JSON.parse(JSON.stringify(loss_total_template)),
 				JSON.parse(JSON.stringify(reward_template))
 			]
 		},
@@ -266,7 +267,7 @@ var myCharts = function(parent){
 			labels: [],
 			datasets : [
 				JSON.parse(JSON.stringify(loss_critic_template)),
-				JSON.parse(JSON.stringify(loss_actor_template)),
+				// JSON.parse(JSON.stringify(loss_actor_template)),
 				JSON.parse(JSON.stringify(distance_template))
 			]
 		},

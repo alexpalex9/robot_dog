@@ -7,6 +7,8 @@
  
  // https://github.com/naifmeh/smartbotjs/blob/remotecrawlers/algorithm/environment.js
 
+// TODO
+// reward par batch de 4?
 
 function randomChoice(p) {
     let rnd = p.reduce( (a, b) => a + b ) * Math.random();
@@ -497,6 +499,7 @@ function actor_critic() {
 			var state_tensor = tf.oneHot(state_scaled, this.servos_actions_size );
 			var policy = this.actor.predict(state_tensor.reshape([1,this.actions_size,this.depth]), {batchSize:1});
 			var policy_flat  = policy.dataSync()
+			console.log("STATE",state_scaled)
 			console.log("POLICY",policy_flat)
 			return  ACTION_INDEX[randomChoice(policy_flat)]
 					
@@ -688,7 +691,9 @@ function actor_critic() {
 			// console.log("--> training job",this_ac.reset)
 			
 		// while(true){
-			var reseted = false;
+			console.log("train")
+		var reseted = false;
+		
 			if (_this_ac.reset==true){
 				// await _this_ac.environment.reset()
 				var initenv = await this.environment.init()
@@ -796,8 +801,14 @@ function actor_critic() {
 						
 						
 					}else{
-						
-						await _this_ac.agent.train_model(_this_ac.state_scaled, action, reward, next_state_scaled, false, _this_ac.chart);
+						if (_this_ac.last_distance==undefined){
+							_this_ac.last_distance = distance
+						}
+						if (_this_ac.period % 4 == 0 && _this_ac.period>0){
+							reward = (distance - _this_ac.last_distance)/10
+							await _this_ac.agent.train_model(_this_ac.state_scaled, action, reward, next_state_scaled, false, _this_ac.chart);
+							_this_ac.last_distance = distance
+						}
 						
 					}
 			
@@ -887,9 +898,9 @@ $(function(){
 	console.log("INIT LEARN")
 	let sars = new actor_critic();
 	sars.init();
-	console.log()
+	// console.log()
 	// sars.active = false
-	
+	$("#train_button").removeClass('disabled')
 	$("#train_button").on('click',function(){
 		// console.log($(this).hasClass("active"))
 		if($(this).hasClass("active")){
