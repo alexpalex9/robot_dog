@@ -295,7 +295,12 @@ class Environment
 		
 		this.statesA = next_stateA
 		this.statesA_scaled = next_stateA_scaled
-		this.reward = (- (this.sonic_state  - this.last_distance) / 5) - 0.5
+		var improvement = this.last_distance - this.sonic_state
+		if (improvement>0){
+			this.reward = improvement
+		}else{
+			this.reward = 0
+		}
 		
 		this.last_distance = this.sonic_state
 	}

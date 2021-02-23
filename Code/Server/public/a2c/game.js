@@ -528,6 +528,7 @@ class PlayGame{
 		
 		if (stop_training){
 			this.log("episode ended since out of boundaries : " + this.m_reinforcementEnvironment.sonic_state  + 'cm')
+			this.pause_training()
 			this.active = false
 		}else{
 			this.log("episode ended after enough steps")
@@ -660,7 +661,7 @@ class PlayGame{
 		$("#train_button").removeClass("active")
 		
 		// console.log("PAUSE TRAINING")
-		await this.m_reinforcementEnvironment.init()
+		
 		// console.log("RESET",this.m_dogInfo,window.reinforcement_info)
 		
 		
@@ -672,7 +673,7 @@ class PlayGame{
 			loss_total:VectorUtils.mean(window.reinforcement_model.loss.total),
 			reward:VectorUtils.sum(this.m_dogInfo.episodeRewards)
 		})
-		
+		await this.m_reinforcementEnvironment.init()
 		this.m_dogInfo.reset(true)
 		window.reinforcement_info.episode++;
 		window.reinforcement_model.loss = {
@@ -692,21 +693,39 @@ class PlayGame{
 		// console.log("PAUSE TRAINING")
 		this.log("training resumed")
 		this.active = true
+		$("#reset_button").removeClass('disabled')
+		$("#sonar_button").addClass('disabled')
+		$("#stop_button").removeClass('disabled')
 		this.training()
 	}
 	async pause_training() {
 		console.log("PAUSE TRAINING")
 		this.log("training paused")
+		$("#train_button").removeClass('active')
 		this.active = false
 	}
 	async stop_training() {
 		this.log("training stopped")
+		$("#train_button").removeClass('active')
+		$("#reset_button").addClass('disabled')
+		$("#stop_button").addClass('disabled')
+		this.active = false
+		this.started = false
 		// this.chart.cleanData('reward_loss_chart_periods')
 		// this.chart.cleanData('reward_loss_chart_episods')
-		this.reset_training(true)
+		// this.reset_training(true)
 		this.chart.cleanData('reward_loss_chart_periods')
 		this.chart.cleanData('reward_loss_chart_episods')
-		this.init()
+		let game = new PlayGame();
+		game.create({
+			mode : "RL_TRAIN"
+			
+		}).then(function(){
+			// game.handleReinforcementLearning()
+			$("#train_button").removeClass('disabled')
+			$("#stop_button").removeClass('disabled')
+		})
+		
 		
 	}
 	log(text){
@@ -741,7 +760,7 @@ let g_settings = {
 	// mode :"RL_TRAIN",
 	agent:{
 		algorithm : "A2C", // REINFORCE REINFORCE_BASELINE A2C
-		nSteps : 1,
+		nSteps : 4,
 		depth : 4,
 		oneHotShape : 3  // class of action
 	},
@@ -805,20 +824,19 @@ $(function(){
 		// console.log($(this).hasClass("active"))
 		if($(this).hasClass("active")){
 			// console.log("PAUSE TRAINING")
-			$(this).removeClass("active")
+			// $(this).removeClass("active")
 			game.pause_training()
 			// game.handleReinforcementLearning()
 			// game.active = false
 		}else{
 			// console.log("TRAIN BUTTON",sars)
-			$(this).addClass("active")
+			// $(this).addClass("active")
 			// sars.active = true
 			// sars.train()
 			// game.active = true
 			// game.training()
 			game.resume_training()
-			$("#reset_button").removeClass('disabled')
-			$("#sonar_button").addClass('disabled')
+			
 			
 		}
 		
@@ -834,9 +852,10 @@ $(function(){
 		}
 	})	
 	$("#stop_button").on('click',function(){
-		game.stop_training()
-		$("#train_button").removeClass('active')
-		$("#reset_button").addClass('disabled')
+		if (!(this).hasClass('disabled')){
+			game.stop_training()
+
+		}
 		
 	})	
 	
