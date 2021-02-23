@@ -637,6 +637,25 @@ class PlayGame{
 	}
 	
 	async reset_training(pause) {
+		
+		if (pause==true){
+		
+			
+		
+			// this.reset = true
+			if (this.active!=false){
+				this.log("training paused")	
+			}
+			this.active = false
+			$("#reset_button").addClass('active')
+		// }else{
+			
+		
+			// this.active = true;
+			// this.training()
+		}
+		$("#train_button").removeClass("active")
+		
 		// console.log("PAUSE TRAINING")
 		await this.m_reinforcementEnvironment.init()
 		// console.log("RESET",this.m_dogInfo,window.reinforcement_info)
@@ -662,22 +681,7 @@ class PlayGame{
 		}
 		
 		this.log("training reseted")
-		if (pause==true){
 		
-			
-		
-			// this.reset = true
-			if (this.active!=false){
-				this.log("training paused")	
-			}
-			this.active = false
-			$("#reset_button").addClass('active')
-		// }else{
-			
-		
-			// this.active = true;
-			// this.training()
-		}
 		
 		
 	}	
@@ -822,7 +826,7 @@ $(function(){
 			// console.log("CLICK RESET")
 			// sars.active = false
 			game.reset_training()
-			$("#train_button").removeClass("active")
+			// $("#train_button").removeClass("active")
 			// sars.reset = true
 		}
 	})	

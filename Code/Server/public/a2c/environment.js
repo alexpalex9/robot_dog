@@ -295,7 +295,7 @@ class Environment
 		
 		this.statesA = next_stateA
 		this.statesA_scaled = next_stateA_scaled
-		this.reward = (- (this.sonic_state  - this.last_distance) / 10) - 0.5
+		this.reward = (- (this.sonic_state  - this.last_distance) / 5) - 0.5
 		
 		this.last_distance = this.sonic_state
 	}
