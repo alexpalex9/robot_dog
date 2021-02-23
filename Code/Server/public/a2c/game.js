@@ -436,7 +436,7 @@ class PlayGame{
                 // We only restart the game
                 // this.m_waitRestart = true;
 				
-                this.onTrainingOver(this.m_reinforcementEnvironment.isDone());
+                await this.onTrainingOver(this.m_reinforcementEnvironment.isDone());
             }
             else
             {
@@ -476,7 +476,7 @@ class PlayGame{
         // this.scene.start('Title');
     // }
 
-    onTrainingOver(stop_training)
+    async onTrainingOver(stop_training)
     {
         // Display histogram with chosen actions
         // tfvis.render.histogram(this.m_actionSurface, this.m_dogInfo.episodeActions, {});
@@ -531,7 +531,7 @@ class PlayGame{
 		}else{
 			this.log("episode ended after enough steps")
 		}
-		this.reset_training(stop_training)
+		await this.reset_training(stop_training)
 		
 		// reset
         // this.scene.restart({ mode : this.m_mode});
@@ -561,7 +561,7 @@ class PlayGame{
 		// console.log("LOSS",window.reinforcement_model.loss,this.m_dogInfo)
 	
 		this.chart.addData('reward_loss_chart_periods',{
-			'label':this.m_dogInfo.globalStep,
+			'label':this.m_dogInfo.episodeUpdateSteps,
 			'loss_value': window.reinforcement_model.loss.total[window.reinforcement_model.loss.total.length-1],
 			'loss_total': window.reinforcement_model.loss.value[window.reinforcement_model.loss.value.length-1],
 			'reward':episodeRewardsSum
@@ -640,7 +640,7 @@ class PlayGame{
 		// console.log("PAUSE TRAINING")
 		await this.m_reinforcementEnvironment.init()
 		// console.log("RESET",this.m_dogInfo,window.reinforcement_info)
-		this.m_dogInfo.reset(true)
+		
 		
 		this.chart.cleanData("reward_loss_chart_periods")
 		
@@ -650,6 +650,8 @@ class PlayGame{
 			loss_total:VectorUtils.mean(window.reinforcement_model.loss.total),
 			reward:VectorUtils.sum(this.m_dogInfo.episodeRewards)
 		})
+		
+		this.m_dogInfo.reset(true)
 		window.reinforcement_info.episode++;
 		window.reinforcement_model.loss = {
 			policy : [],
@@ -744,7 +746,7 @@ let g_settings = {
 		miniBatchSize : 1
 	},
 	reinforcement:{
-		maxSteps : 200,
+		maxSteps : 50,
 		miniBatchSize : 1,
 		// epochsPerEpisode : 1,
 		// layers : 3,
