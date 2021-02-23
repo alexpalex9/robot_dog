@@ -515,6 +515,7 @@ class PolicyBasedAgent
                 // console.log("train after actions " + episodesInfo.episodeActions);   
 
             // train value model
+			console.log("TRAINING inputs :",states.dataSync(),actions.dataSync(),advantages.dataSync())
             if (this.hasValueModel())
             {
                 let discountedRewards = tf.tensor1d(episodesInfo.discountedEpisodeRewards);
@@ -563,13 +564,13 @@ class PolicyBasedAgent
             for (let start = 0; start < datasetSize; start += miniBatchSize)
             {
                 // build the minibatch
-				console.log("states",states)
+				// console.log("states",states)
 				// console.log("miniBatchSize",states)
-				console.log("actions",actions)
-				console.log("discountedRewards",discountedRewards)
+				// console.log("actions",actions)
+				// console.log("discountedRewards",discountedRewards)
 				
                 let end = (start + miniBatchSize < datasetSize) ?  miniBatchSize  : (datasetSize - start);
-				console.log("start end",start,end)
+				// console.log("start end",start,end)
                 const statesSlice = states.slice(start, end);
                 const actionsSlice = actions.slice(start, end);
                 const discountedRewardsSlice = discountedRewards.slice(start, end);

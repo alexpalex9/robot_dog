@@ -701,14 +701,14 @@ class PlayGame{
 			this.log("training started")
 		}
 		this.active = true
-		$("#training_button").addClass('active')
+		$("#train_button").addClass('active')
 		$("#reset_button").removeClass('disabled')
 		$("#sonar_button").addClass('disabled')
 		$("#stop_button").removeClass('disabled')
 		this.training()
 	}
 	async pause_training() {
-		console.log("PAUSE TRAINING")
+		// console.log("PAUSE TRAINING")
 		this.log("training paused")
 		$("#train_button").removeClass('active')
 		this.active = false
@@ -769,7 +769,7 @@ let g_settings = {
 	// mode :"RL_TRAIN",
 	agent:{
 		algorithm : "A2C", // REINFORCE REINFORCE_BASELINE A2C
-		nSteps : 4,
+		nSteps : 1,
 		depth : 4,
 		oneHotShape : 3  // class of action
 	},
@@ -792,8 +792,8 @@ let g_settings = {
 		// gammaDiscountRate : 0.95,
 		gammaDiscountRate : 0.99,
 
-		normalizeAdvantage : true,
-		// normalizeAdvantage : false,
+		// normalizeAdvantage : true,
+		normalizeAdvantage : false,
 
 		// slotCount : 10
 	}
@@ -858,7 +858,7 @@ $(function(){
 		if (!$(this).hasClass('disabled') && !$(this).hasClass('active')){
 			// console.log("CLICK RESET")
 			// sars.active = false
-			game.reset_training()
+			game.reset_training(true)
 			// $("#train_button").removeClass("active")
 			// sars.reset = true
 		}
