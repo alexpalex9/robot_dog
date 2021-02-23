@@ -692,8 +692,13 @@ class PlayGame{
 	}	
 	async resume_training() {
 		// console.log("PAUSE TRAINING")
-		this.log("training resumed")
+		if (this.started==true){			
+			this.log("training started")
+		}else{
+				this.log("training resumed")
+		}
 		this.active = true
+		$("#training_button").addClass('active')
 		$("#reset_button").removeClass('disabled')
 		$("#sonar_button").addClass('disabled')
 		$("#stop_button").removeClass('disabled')
