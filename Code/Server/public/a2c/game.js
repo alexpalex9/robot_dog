@@ -530,12 +530,13 @@ class PlayGame{
 		
 		if (stop_training){
 			this.log("episode ended since out of boundaries : " + this.m_reinforcementEnvironment.sonic_state  + 'cm')
-			this.pause_training()
-			this.active = false
+			// this.pause_training()
+			// this.active = false
+			await this.reset_training(true)
 		}else{
 			this.log("episode ended after enough steps")
 			
-			await this.reset_training(stop_training)
+			await this.reset_training(false)
 		}
 	
 		
@@ -661,7 +662,8 @@ class PlayGame{
 			// this.active = true;
 			// this.training()
 		}
-		$("#train_button").removeClass("active")
+		$("#train_button").addClass('disabled')
+		// $("#train_button").removeClass("active")
 		
 		// console.log("PAUSE TRAINING")
 		
@@ -687,7 +689,7 @@ class PlayGame{
 			total:[]
 			
 		}
-		
+		$("#train_button").removeClass('disabled')
 		this.log("training reseted")
 		
 		
@@ -770,7 +772,7 @@ let g_settings = {
 	agent:{
 		algorithm : "A2C", // REINFORCE REINFORCE_BASELINE A2C
 		nSteps : 1,
-		depth : 4,
+		depth : 3,
 		oneHotShape : 3  // class of action
 	},
 	valuemodel:{
@@ -833,23 +835,25 @@ $(function(){
 	// sars.active = false
 	
 	$("#train_button").on('click',function(){
-		// console.log($(this).hasClass("active"))
-		if($(this).hasClass("active")){
-			// console.log("PAUSE TRAINING")
-			// $(this).removeClass("active")
-			game.pause_training()
-			// game.handleReinforcementLearning()
-			// game.active = false
-		}else{
-			// console.log("TRAIN BUTTON",sars)
-			// $(this).addClass("active")
-			// sars.active = true
-			// sars.train()
-			// game.active = true
-			// game.training()
-			game.resume_training()
-			
-			
+		if (!$(this).hasClass('disabled')){
+			// console.log($(this).hasClass("active"))
+			if($(this).hasClass("active")){
+				// console.log("PAUSE TRAINING")
+				// $(this).removeClass("active")
+				game.pause_training()
+				// game.handleReinforcementLearning()
+				// game.active = false
+			}else{
+				// console.log("TRAIN BUTTON",sars)
+				// $(this).addClass("active")
+				// sars.active = true
+				// sars.train()
+				// game.active = true
+				// game.training()
+				game.resume_training()
+				
+				
+			}
 		}
 		
 	})

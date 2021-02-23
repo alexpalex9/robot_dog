@@ -554,7 +554,7 @@ class PolicyBasedAgent
 
         // console.log("About to train Policy model ");
 
-        if (debug)
+        // if (debug)
             // this.printPolicyModelWeights();
 
 		// this.loss = {] = []
@@ -609,6 +609,7 @@ class PolicyBasedAgent
                     return tf.tidy(() => {
 						// console.log("statesSlice",statesSlice)
                         let predictionWithoutSoftmax = this.internalPredict(statesSlice, false);
+						console.log("internal predictionWithoutSoftmax",predictionWithoutSoftmax)
 						// console.log("predictionWithoutSoftmax",predictionWithoutSoftmax)
                         let loss = this.internalLoss(predictionWithoutSoftmax, actionsSlice, discountedRewardsSlice, debug);
 
