@@ -671,6 +671,7 @@ class PlayGame{
 		this.chart.addData("reward_loss_chart_episods",{
 			label:window.reinforcement_info.episode,
 			loss_total:VectorUtils.mean(window.reinforcement_model.loss.total),
+			loss_value:VectorUtils.mean(window.reinforcement_model.loss.value),
 			reward:VectorUtils.sum(this.m_dogInfo.episodeRewards)
 		})
 		await this.m_reinforcementEnvironment.init()
@@ -772,7 +773,7 @@ let g_settings = {
 		miniBatchSize : 1
 	},
 	reinforcement:{
-		maxSteps : 400,
+		maxSteps : 200,
 		miniBatchSize : 1,
 		// epochsPerEpisode : 1,
 		// layers : 3,
