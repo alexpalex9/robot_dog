@@ -780,7 +780,7 @@ let g_settings = {
 		// layers : 5,
 		units : 24,
 		// learningRate : 0.01, // 0.005,
-		learningRate : 0.001, // 0.005,
+		learningRate : 0.0001, // 0.005,
 		miniBatchSize : 1
 	},
 	reinforcement:{
@@ -790,7 +790,7 @@ let g_settings = {
 		// layers : 3,
 		units : 24,
 		// learningRate : 0.01, // 0.005,
-		learningRate : 0.001,
+		learningRate : 0.0001,
 		// gammaDiscountRate : 0.95,
 		gammaDiscountRate : 0.99,
 
