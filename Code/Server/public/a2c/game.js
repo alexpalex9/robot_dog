@@ -435,7 +435,7 @@ class PlayGame{
                 // if the algorithm works on n-steps (e.g. A2C) we do not train the models yet.
                 // We only restart the game
                 // this.m_waitRestart = true;
-				console.log("IS DONE ?",this.m_reinforcementEnvironment.isDone(),this.m_reinforcementEnvironment.sonic_state)
+				// console.log("IS DONE ?",this.m_reinforcementEnvironment.isDone(),this.m_reinforcementEnvironment.sonic_state)
                 await this.onTrainingOver(this.m_reinforcementEnvironment.isDone());
             }
             else
@@ -527,11 +527,14 @@ class PlayGame{
 		
 		
 		if (stop_training){
-			this.log("episode ended since out of boundaries")
+			this.log("episode ended since out of boundaries : " + this.m_reinforcementEnvironment.sonic_state  + 'cm')
+			this.active = false
 		}else{
 			this.log("episode ended after enough steps")
+			
+			await this.reset_training(stop_training)
 		}
-		await this.reset_training(stop_training)
+	
 		
 		// reset
         // this.scene.restart({ mode : this.m_mode});
@@ -562,8 +565,8 @@ class PlayGame{
 	
 		this.chart.addData('reward_loss_chart_periods',{
 			'label':this.m_dogInfo.episodeUpdateSteps,
-			'loss_value': window.reinforcement_model.loss.total[window.reinforcement_model.loss.total.length-1],
-			'loss_total': window.reinforcement_model.loss.value[window.reinforcement_model.loss.value.length-1],
+			'loss_total': window.reinforcement_model.loss.total[window.reinforcement_model.loss.total.length-1],
+			'loss_value': window.reinforcement_model.loss.value[window.reinforcement_model.loss.value.length-1],
 			'reward':episodeRewardsSum
 		})
 							
