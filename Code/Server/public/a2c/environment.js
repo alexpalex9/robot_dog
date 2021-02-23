@@ -65,6 +65,7 @@ class Environment
 	}
 	
 	isDone = function(){
+		console.log("this.sonic_state",this.sonic_state)
 		return (this.sonic_state<5 || this.sonic_state>50)
 	}
 	
@@ -98,9 +99,9 @@ class Environment
 		// console.log("STATES  INIT",statesA)
 		// console.log("STATES SCALED INIT",statesA_scaled)
 		
-		var sonic_state = await this.Sonic();
-		this.initial_distance = sonic_state
-		this.last_distance = sonic_state
+		this.sonic_state  = await this.Sonic();
+		this.initial_distance = this.sonic_state 
+		this.last_distance = this.sonic_state 
 		// console.log(gyro)
 		
 		// console.log(statesA)
@@ -286,17 +287,17 @@ class Environment
 			// var gyro_state = {'x':0,'y':0,'z':0}
 		// }
 		
-		var sonic_state = await this.Sonic();
+		this.sonic_state = await this.Sonic();
 		// var distance_change	 = (sonic_state - 50 )/ 100
 		if (!this.last_distance){
-			this.last_distance = sonic_state
+			this.last_distance = this.sonic_state 
 		}
 		
 		this.statesA = next_stateA
 		this.statesA_scaled = next_stateA_scaled
-		this.reward = (- (sonic_state - this.last_distance) / 10) + 0.5
+		this.reward = (- (this.sonic_state  - this.last_distance) / 10) - 0.5
 		
-		this.last_distance = sonic_state
+		this.last_distance = this.sonic_state
 	}
 	
 }

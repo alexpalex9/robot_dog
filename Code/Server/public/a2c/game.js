@@ -435,7 +435,7 @@ class PlayGame{
                 // if the algorithm works on n-steps (e.g. A2C) we do not train the models yet.
                 // We only restart the game
                 // this.m_waitRestart = true;
-				
+				console.log("IS DONE ?",this.m_reinforcementEnvironment.isDone(),this.m_reinforcementEnvironment.sonic_state)
                 await this.onTrainingOver(this.m_reinforcementEnvironment.isDone());
             }
             else
@@ -746,7 +746,7 @@ let g_settings = {
 		miniBatchSize : 1
 	},
 	reinforcement:{
-		maxSteps : 200,
+		maxSteps : 400,
 		miniBatchSize : 1,
 		// epochsPerEpisode : 1,
 		// layers : 3,
