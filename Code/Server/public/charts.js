@@ -266,7 +266,7 @@ var myCharts = function(parent){
 		data : {
 			labels: [],
 			datasets : [
-				JSON.parse(JSON.stringify(loss_critic_template)),
+				JSON.parse(JSON.stringify(loss_total_template)),
 				// JSON.parse(JSON.stringify(loss_actor_template)),
 				JSON.parse(JSON.stringify(reward_template))
 			]

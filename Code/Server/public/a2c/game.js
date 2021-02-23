@@ -647,7 +647,7 @@ class PlayGame{
 		
 		this.chart.addData("reward_loss_chart_episods",{
 			label:window.reinforcement_info.episode,
-			loss_value:VectorUtils.mean(window.reinforcement_model.loss.total),
+			loss_total:VectorUtils.mean(window.reinforcement_model.loss.total),
 			reward:VectorUtils.sum(this.m_dogInfo.episodeRewards)
 		})
 		window.reinforcement_info.episode++;
