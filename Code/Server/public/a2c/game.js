@@ -378,7 +378,7 @@ class PlayGame{
         // this.logMemory("before policy model predict");
 
 		let predictedActionSoftmax = await window.reinforcement_model.predict_action(state)
-		// console.log("policy",predictedActionSoftmax )
+		console.log("policy",predictedActionSoftmax )
         // predict the action to make with Policy model
         //  > compute action probability
         //  > choose action based on probability
@@ -488,7 +488,7 @@ class PlayGame{
         let episodeRewardsSum = VectorUtils.sum(this.m_dogInfo.episodeRewards) 
                                 + window.reinforcement_info.tmpNStepReward;
 
-		console.log(window.reinforcement_model)
+		// console.log(window.reinforcement_model)
 		 let episodeTotalLossMean = VectorUtils.mean(window.reinforcement_model.loss.total)
         // Add to the list of epidode rewards
         window.reinforcement_info.allRewards.push(episodeRewardsSum);
@@ -639,7 +639,7 @@ class PlayGame{
 	async reset_training(pause) {
 		// console.log("PAUSE TRAINING")
 		await this.m_reinforcementEnvironment.init()
-		console.log("RESET",this.m_dogInfo,window.reinforcement_info)
+		// console.log("RESET",this.m_dogInfo,window.reinforcement_info)
 		this.m_dogInfo.reset(true)
 		
 		this.chart.cleanData("reward_loss_chart_periods")
@@ -694,10 +694,11 @@ class PlayGame{
 		this.log("training stopped")
 		// this.chart.cleanData('reward_loss_chart_periods')
 		// this.chart.cleanData('reward_loss_chart_episods')
+		this.reset_training(true)
+		this.chart.cleanData('reward_loss_chart_periods')
+		this.chart.cleanData('reward_loss_chart_episods')
 		this.init()
-		// this.active = false
 		
-		// clearInterval(this.trainingJob)
 	}
 	log(text){
 		var now = new Date().toLocaleTimeString() //.replace(/([\d]+:[\d]{2})(:[\d]{2})(.*)/, "$1$3")
@@ -731,7 +732,7 @@ let g_settings = {
 	// mode :"RL_TRAIN",
 	agent:{
 		algorithm : "A2C", // REINFORCE REINFORCE_BASELINE A2C
-		nSteps : 8,
+		nSteps : 1,
 		depth : 4,
 		oneHotShape : 3  // class of action
 	},
@@ -743,8 +744,8 @@ let g_settings = {
 		miniBatchSize : 1
 	},
 	reinforcement:{
-		maxSteps : 64,
-		miniBatchSize : 200,
+		maxSteps : 200,
+		miniBatchSize : 1,
 		// epochsPerEpisode : 1,
 		// layers : 3,
 		units : 24,
