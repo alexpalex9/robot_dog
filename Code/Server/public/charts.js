@@ -155,7 +155,7 @@ var myCharts = function(parent){
 		type:'line',
 		yAxisID:"right"
 	}
-	loss_critic_template = {
+	loss_value_template = {
 		data : [],
 		borderWidth : 1,
 		borderColor: 'rgba(221, 151, 149, 1)',
@@ -254,7 +254,7 @@ var myCharts = function(parent){
 		data : {
 			labels: [],
 			datasets : [
-				JSON.parse(JSON.stringify(loss_critic_template)),
+				JSON.parse(JSON.stringify(loss_value_template)),
 				JSON.parse(JSON.stringify(loss_total_template)),
 				JSON.parse(JSON.stringify(reward_template))
 			]
