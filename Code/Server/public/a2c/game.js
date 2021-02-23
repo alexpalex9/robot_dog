@@ -412,6 +412,7 @@ class PlayGame{
 
         // Push the current reward
         this.m_dogInfo.episodeRewards.push(this.m_reinforcementEnvironment.getReward());
+        this.m_dogInfo.episodeAllRewards.push(this.m_reinforcementEnvironment.getReward());
 
         // Push done state
         let episodeDone = (this.m_reinforcementEnvironment.isDone() ||
@@ -421,6 +422,7 @@ class PlayGame{
         // check if the episode should end
         if (episodeDone)
         {
+			// this.m_dogInfo.
             // episode is over
             // if (debug)
                 // console.log("Episode over -- about to learn");
@@ -668,12 +670,12 @@ class PlayGame{
 		
 		this.chart.cleanData("reward_loss_chart_periods")
 		
-		console.log("CHECK REWARD EPISODE SUM",this.m_dogInfo.episodeRewards)
+		console.log("CHECK REWARD EPISODE SUM",this.m_dogInfo)
 		this.chart.addData("reward_loss_chart_episods",{
 			label:window.reinforcement_info.episode,
 			loss_total:VectorUtils.mean(window.reinforcement_model.loss.total),
 			loss_value:VectorUtils.mean(window.reinforcement_model.loss.value),
-			reward:VectorUtils.sum(this.m_dogInfo.episodeRewards)
+			reward:VectorUtils.sum(this.m_dogInfo.episodeAllRewards)
 		})
 		await this.m_reinforcementEnvironment.init()
 		this.m_dogInfo.reset(true)

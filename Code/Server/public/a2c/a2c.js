@@ -8,6 +8,7 @@ class EpisodeInfo
         this.episodeUpdateSteps = 0;
         this.episodeNStep = 0;
         this.episodeRewards = [];
+		this.episodeAllRewards = [];
         this.episodeActions = [];
         this.episodeStates = [];
         this.episodeStateValues = [];
@@ -28,7 +29,10 @@ class EpisodeInfo
         {
             this.globalStep = 0;
             this.episodeNStep = 0;
-            this.episodeRewards = [];
+            this.episodeRewards = []; // reset each nstep
+			
+            this.episodeAllRewards = []; // reset each episode
+			
             this.episodeActions = [];
             this.episodeStates = [];
             this.episodeStateValues = [];
@@ -43,12 +47,17 @@ class EpisodeInfo
         }
     }
 
+	// onNewEpisode(){
+		// this.episodeAllRewards = []
+		
+	// }
     onStep()
     {
         this.globalStep++;
         this.episodeUpdateSteps++;
     }
-
+	
+	
     onNewNStep()
     {
         // Do not reset the update step
@@ -105,8 +114,8 @@ class PolicyBasedAgent
 			value : [],
 			entropy : [],
 			total:[]
-			
 		}
+		this.reward = []
         //this.m_policyOptimizer = tf.train.adam(g_settings.reinforcement.learningRate, undefined, undefined, 0.1);
 
         // NB: adam(learningRate = 0.001, beta1 = 0.9, beta2 = 0.999, epsilon: number = null)
@@ -141,7 +150,18 @@ class PolicyBasedAgent
         this.m_visualizationValueModelLossData = [];
         this.m_visualizationValueModelLossIndex = 0;
     }
-
+	
+	newEpisode(){
+		this.loss = {
+			policy : [],
+			value : [],
+			entropy : [],
+			total:[]
+			
+		}
+		this.reward = []
+		
+	}
     hasValueModel()
     {
         if (this.m_algorithm === "REINFORCE")
