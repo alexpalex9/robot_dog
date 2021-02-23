@@ -615,10 +615,10 @@ class PlayGame{
 		if (!_this_game){
 			_this_game = this;
 		}
-		if (_this_game.started==false){
-			this.log("training started")
-			_this_game.started = true;
-		}
+		// if (_this_game.started==false){
+			// this.log("training started")
+		_this_game.started = true;
+		// }
 		// if (_this_game.waspaused==true){
 			// this.log("training resumed")
 			// _this_game.waspaused = false;
@@ -693,9 +693,9 @@ class PlayGame{
 	async resume_training() {
 		// console.log("PAUSE TRAINING")
 		if (this.started==true){			
-			this.log("training started")
+			this.log("training resumed")
 		}else{
-				this.log("training resumed")
+			this.log("training started")
 		}
 		this.active = true
 		$("#training_button").addClass('active')
