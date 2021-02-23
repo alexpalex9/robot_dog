@@ -170,7 +170,7 @@ class Environment
 			let timer;
 			_this.socket.emit('set servos angle',data)
 			function responseHandler(message) {
-				console.log("SERVOS ANGLE SET")
+				// console.log("SERVOS ANGLE SET")
 				resolve(message);
 				
 				// for (var s in message){

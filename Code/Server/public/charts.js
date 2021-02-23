@@ -268,7 +268,7 @@ var myCharts = function(parent){
 			datasets : [
 				JSON.parse(JSON.stringify(loss_critic_template)),
 				// JSON.parse(JSON.stringify(loss_actor_template)),
-				JSON.parse(JSON.stringify(distance_template))
+				JSON.parse(JSON.stringify(reward_template))
 			]
 		},
 		options: JSON.parse(JSON.stringify(reward_loss_options))
@@ -284,17 +284,24 @@ var myCharts = function(parent){
 		_this[chart_name].update()
 	}
 	_this.addData = function(chart_name,data){
+		// console.log("ADD DATA CHART",chart_name,data)
 		if (_this[chart_name].config.data.labels.length>200){
 			_this[chart_name].config.data.labels = _this[chart_name].config.data.labels.slice(1)
 			for (var c in _this[chart_name].config.data.datasets){
 				_this[chart_name].config.data.datasets[c].data = _this[chart_name].config.data.datasets[c].data.slice(1)
 			}
 		}
-		if (_this[chart_name].config.data.labels.length== 0){
-			_this[chart_name].config.data.labels = [0]
-		}else{
-			_this[chart_name].config.data.labels.push(_this[chart_name].config.data.labels[_this[chart_name].config.data.labels.length-1]+1)
-		}
+		// if (_this[chart_name].config.data.labels.length== 0){
+			// _this[chart_name].config.data.labels = [0]
+		// }else{
+			// _this[chart_name].config.data.labels.push(_this[chart_name].config.data.labels[_this[chart_name].config.data.labels.length-1]+1)
+			// if (data.label!==undefined){
+				console.log("pushing chart label",data.label)
+				_this[chart_name].config.data.labels.push(data.label)
+			// }else{
+				
+			// }
+		// }
 		for (var d in data){
 			for (var c in _this[chart_name].config.data.datasets){
 				if (_this[chart_name].config.data.datasets[c].label==d){

@@ -104,7 +104,7 @@ class PolicyBasedAgent
 			policy : [],
 			value : [],
 			entropy : [],
-			total_loss:[]
+			total:[]
 			
 		}
         //this.m_policyOptimizer = tf.train.adam(g_settings.reinforcement.learningRate, undefined, undefined, 0.1);
@@ -193,15 +193,15 @@ class PolicyBasedAgent
             });
         }
 
-        if (debug)
-            console.log("disc rw " + discountedRewards);
+        // if (debug)
+            // console.log("disc rw " + discountedRewards);
 
         return discountedRewards;
     }
 
     // Policy model: state to action
 	predict_value(state){
-		console.log("predict_value",state)
+		// console.log("predict_value",state)
 		return tf.tidy(() => {
 			var stateTensor = tf.tensor(state) //,g_settings.agent.oneHotShape) // 4 * 4 * 3
 			return this.m_valueModel.predict(stateTensor.reshape([1,this.m_inputCount,g_settings.agent.depth])).dataSync(); 	
@@ -401,8 +401,7 @@ class PolicyBasedAgent
         if (this.hasNSteps() && this.hasValueModel() && !done)
         {
             // Use the value model to estimate the last reward (currently a fake value is used)
-            episodesInfo.episodeRewards[episodesInfo.episodeRewards.length - 1]
-               = episodesInfo.episodeStateValues[episodesInfo.episodeRewards.length - 1];
+            episodesInfo.episodeRewards[episodesInfo.episodeRewards.length - 1] = episodesInfo.episodeStateValues[episodesInfo.episodeRewards.length - 1];
             episodesInfo.episodeDones[episodesInfo.episodeDones.length - 1] = 1.0;
             
             removeLastFakeValues = true;
@@ -424,21 +423,20 @@ class PolicyBasedAgent
             episodesInfo.discountedEpisodeRewards.pop();
             episodesInfo.episodeDones.pop();
         }
-            
-        if (debug)
-        {
-            console.log("trainModels: actions " + episodesInfo.episodeActions);
-            console.log("trainModels: states " + episodesInfo.episodeStates);
-            console.log("trainModels: rewards " + episodesInfo.episodeRewards);
-            console.log("trainModels: state values " + episodesInfo.episodeStateValues);
-            console.log("trainModels: dones " + episodesInfo.episodeDones);
-            console.log("trainModels: disc rw " + episodesInfo.discountedEpisodeRewards);
-        }
+          
+        // if (debug)
+        // {
+            // console.log("trainModels: actions " + episodesInfo.episodeActions);
+            // console.log("trainModels: states " + episodesInfo.episodeStates);
+            // console.log("trainModels: rewards " + episodesInfo.episodeRewards);
+            // console.log("trainModels: state values " + episodesInfo.episodeStateValues);
+            // console.log("trainModels: dones " + episodesInfo.episodeDones);
+            // console.log("trainModels: disc rw " + episodesInfo.discountedEpisodeRewards);
+        // }
             
         // Compute advantages with discounted rewards - value model predictions (baseline)
         episodesInfo.episodeAdvantages = [];
-        if (this.m_algorithm === "REINFORCE_BASELINE" ||
-                this.m_algorithm === "A2C")
+        if (this.m_algorithm === "REINFORCE_BASELINE" || this.m_algorithm === "A2C")
         {
             for (let i = 0; i < episodesInfo.discountedEpisodeRewards.length; i++)
             {
@@ -456,8 +454,8 @@ class PolicyBasedAgent
                     return value / std;
                 });
 
-                if (debug)
-                    console.log("normalized advantages " + episodesInfo.episodeAdvantages);
+                // if (debug)
+                    // console.log("normalized advantages " + episodesInfo.episodeAdvantages);
             }
         }
         else
@@ -471,7 +469,7 @@ class PolicyBasedAgent
         // train neural network
         //tf.tidy(() => {
 
-            this.logMemory("train A");
+            // this.logMemory("train A");
 			
             // Compute mini batch size for the policy and value models
             let miniBatchSize = g_settings.reinforcement.miniBatchSize;
@@ -491,10 +489,10 @@ class PolicyBasedAgent
             let actions = tf.tensor1d(episodesInfo.episodeActions, 'int32');
             let advantages = tf.tensor1d(episodesInfo.episodeAdvantages);
                 
-            this.logMemory("train B");
+            // this.logMemory("train B");
 
-            if (debug)
-                console.log("train after actions " + episodesInfo.episodeActions);   
+            // if (debug)
+                // console.log("train after actions " + episodesInfo.episodeActions);   
 
             // train value model
             if (this.hasValueModel())
@@ -503,7 +501,7 @@ class PolicyBasedAgent
                 await this.trainValueModel(states, discountedRewards, miniBatchSizeVM);
             }
 
-            this.logMemory("train C");
+            // this.logMemory("train C");
                 
             // train policy model with advantages
             await this.trainPolicyModel(states, actions, advantages, miniBatchSize, debug);
@@ -523,30 +521,35 @@ class PolicyBasedAgent
             actions.dispose();
             advantages.dispose();
 
-            this.logMemory("train D");
+            // this.logMemory("train D");
                 
         //});
     }
 
     async trainPolicyModel(states, actions, discountedRewards, miniBatchSize, debug)
     {
-		console.log("trainPolicyModel",states)
+		// console.log("trainPolicyModel",states)
         const datasetSize = states.shape[0];
 
-        console.log("About to train Policy model ");
+        // console.log("About to train Policy model ");
 
         if (debug)
             // this.printPolicyModelWeights();
 
 		// this.loss = {] = []
-        for (let epoch = 0; epoch < g_settings.reinforcement.epochsPerEpisode; epoch++)
-        {
+        // for (let epoch = 0; epoch < g_settings.reinforcement.epochsPerEpisode; epoch++)
+        // {
             // Use mini-batch gradient descent
             for (let start = 0; start < datasetSize; start += miniBatchSize)
             {
                 // build the minibatch
-				console.log("miniBatchSize",miniBatchSize)
+				console.log("states",states)
+				// console.log("miniBatchSize",states)
+				console.log("actions",actions)
+				console.log("discountedRewards",discountedRewards)
+				
                 let end = (start + miniBatchSize < datasetSize) ?  miniBatchSize  : (datasetSize - start);
+				console.log("start end",start,end)
                 const statesSlice = states.slice(start, end);
                 const actionsSlice = actions.slice(start, end);
                 const discountedRewardsSlice = discountedRewards.slice(start, end);
@@ -583,16 +586,16 @@ class PolicyBasedAgent
                 await this.m_policyOptimizer.minimize(() => {
 
                     return tf.tidy(() => {
-						console.log("statesSlice",statesSlice)
+						// console.log("statesSlice",statesSlice)
                         let predictionWithoutSoftmax = this.internalPredict(statesSlice, false);
-						console.log("predictionWithoutSoftmax",predictionWithoutSoftmax)
+						// console.log("predictionWithoutSoftmax",predictionWithoutSoftmax)
                         let loss = this.internalLoss(predictionWithoutSoftmax, actionsSlice, discountedRewardsSlice, debug);
 
                         // if (debug)
                         // {
                             let policyEntropyTensor = this.internalPolicyEntropy(statesSlice);
                             let policyEntropy = policyEntropyTensor.dataSync()[0];
-                            console.log("Epoch " + epoch + " - policy entropy = " + policyEntropy);
+                            // console.log("Epoch " + epoch + " - policy entropy = " + policyEntropy);
 
                             this.m_visualizationPolicyData.push(
                                 { x: 1.0 * this.m_visualizationPolicyIndex++, 
@@ -611,8 +614,8 @@ class PolicyBasedAgent
                     });
                 }); 
 
-                if (debug)
-				console.log("LOSS ALEX",this.loss)
+                // if (debug)
+				// console.log("LOSS ALEX",this.loss)
                     // this.printPolicyModelWeights();
 
                 // dispose tensors
@@ -620,7 +623,7 @@ class PolicyBasedAgent
                 actionsSlice.dispose();
                 discountedRewardsSlice.dispose();
             }
-        }
+        // }
 
         // Render policy entropy data
         //console.log(this.m_visualizationPolicyData);
@@ -675,12 +678,12 @@ class PolicyBasedAgent
             //*/
 
             // compute the action as a one hot encoded vector
-            if (debug)
-                console.log("actions " + this.m_actionCount + " " + actions.dataSync());
+            // if (debug)
+                // console.log("actions " + this.m_actionCount + " " + actions.dataSync());
             const choosen_actions_one_hot = tf.oneHot(actions, this.m_actionCount);
 
             let probabilities = predictedAction.softmax();
-			console.log("probabilities",probabilities)
+			// console.log("probabilities",probabilities)
             // compute the negative likelihoods
             //let neg_log_prob = tf.losses.softmaxCrossEntropy(choosen_actions_one_hot.asType("float32"), predictedAction);
             // compute the reduced mean of the weighted negative likelihoods (weighted by discounted rewards)
@@ -715,8 +718,9 @@ class PolicyBasedAgent
             let log_prob_v4 = tf.neg(tf.sum( tf.mul(choosen_actions_one_hot.asType("float32") , 
                                                     tf.log(tf.clipByValue(probabilities, 1e-5, 1.0 ))), [1]));
             let eligibilityV4 = tf.mul(log_prob_v4 ,discounted_rewards);
-            let total_loss_v4 = tf.sum(eligibilityV4);           
-			this.loss.total_loss.push(VectorUtils.sum(total_loss_v4.dataSync()))
+            let total_loss_v4 = tf.sum(eligibilityV4);
+			console.log("this.loss",this.loss)
+			this.loss.total.push(VectorUtils.sum(total_loss_v4.dataSync()))
             if (debug)
             {
 
@@ -724,7 +728,7 @@ class PolicyBasedAgent
                 //console.log("neglogprob = " + neg_log_prob.dataSync() + " - loss =" + loss.dataSync());
                 //console.log("logProbV2 = " + log_probabilities.dataSync() + " lossV2 = " + loss_v2.dataSync() );
                 //console.log("log_prob_v3 = " + log_prob_v3.dataSync() + " - loss_v3 = " + total_loss_v3.dataSync());
-                console.log("log_prob_v4 = " + log_prob_v4.dataSync() + " - loss_v4 = " + total_loss_v4.dataSync());
+                // console.log("log_prob_v4 = " + log_prob_v4.dataSync() + " - loss_v4 = " + total_loss_v4.dataSync());
                 // total_loss_v4.print();
             }
 

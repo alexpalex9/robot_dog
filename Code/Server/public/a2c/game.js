@@ -54,7 +54,7 @@ class PlayGame{
         }
 
         console.log("Scene launched in " + this.m_mode + " mode");
-        console.log(tf.memory());
+        // console.log(tf.memory());
 
         // create reinforcement learning model if required
         window.reinforcement_info.tmpNStepReward = 0;
@@ -81,7 +81,7 @@ class PlayGame{
         }
 
         // reset restart variable
-        this.m_waitRestart = false;
+        // this.m_waitRestart = false;
 
         // Create the environment
 
@@ -322,12 +322,12 @@ class PlayGame{
 
     async handleReinforcementLearning(debug)
     {
-		console.log("handleReinforcementLearning")
+		// console.log("handleReinforcementLearning")
         // current reward correspond to previous action and state
 
         // Compute current state
         let state = this.m_reinforcementEnvironment.getState();
-		console.log("STATE=",state)
+		// console.log("STATE=",state)
         // store reward corresponding to action and state choosen and computed at the previous update()
         //if (this.m_dogInfo.episodeRewards.length > 0)
         //{
@@ -337,7 +337,7 @@ class PlayGame{
         // predict reward with Value model
         if (window.reinforcement_model.hasValueModel())
         {
-            this.logMemory("before value model predict");
+            // this.logMemory("before value model predict");
 
             let predictedValueReward = window.reinforcement_model.predict_value(state)
             this.m_dogInfo.episodeStateValues.push(predictedValueReward);
@@ -349,7 +349,7 @@ class PlayGame{
             if (this.m_dogInfo.isEndOfNStep())
             {
                 console.log("###### n-step " + this.m_dogInfo.episodeNStep + " step=" + this.m_dogInfo.episodeUpdateSteps);
-                this.logMemory("before train (n-step)");
+                // this.logMemory("before train (n-step)");
 
                 // End the line
                 // NB: All the info will be cleared for the next n-steps (the same state will be retrieved again)
@@ -360,7 +360,7 @@ class PlayGame{
                 //this.m_dogInfo.episodeStateValues            // Already pushed
 
                 // Train the value and policy models
-                this.m_waitRestart = true;
+                // this.m_waitRestart = true;
                 await window.reinforcement_model.trainModels(this.m_dogInfo, false, debug)
                 .then(
                     onTrainingNStepOverCallback.bind( { game : this, debug : debug})
@@ -378,7 +378,7 @@ class PlayGame{
         // this.logMemory("before policy model predict");
 
 		let predictedActionSoftmax = await window.reinforcement_model.predict_action(state)
-		console.log("policy",predictedActionSoftmax )
+		// console.log("policy",predictedActionSoftmax )
         // predict the action to make with Policy model
         //  > compute action probability
         //  > choose action based on probability
@@ -399,7 +399,7 @@ class PlayGame{
 
         // Compute choice based on action using softmax result as probabilities
         let action = VectorUtils.randomChoice(predictedActionSoftmax);
-		console.log("action",action )
+		// console.log("action",action )
         this.m_dogInfo.episodeActions.push(action);
         //if (debug)
         //    console.log("RL predicted " + action);
@@ -422,22 +422,26 @@ class PlayGame{
         if (episodeDone)
         {
             // episode is over
-            if (debug)
-                console.log("Episode over -- about to learn");
-
-            this.logMemory("before train");
-
+            // if (debug)
+                // console.log("Episode over -- about to learn");
+				
+            // this.logMemory("before train");
+			// this.active = false;
+			// if (this.m_reinforcementEnvironment.isDone()){
+				// this.active = false;
+			// }
             if (window.reinforcement_model.hasNSteps())
             {
                 // if the algorithm works on n-steps (e.g. A2C) we do not train the models yet.
                 // We only restart the game
-                this.m_waitRestart = true;
-                this.onTrainingOver(debug);
+                // this.m_waitRestart = true;
+				
+                this.onTrainingOver(this.m_reinforcementEnvironment.isDone());
             }
             else
             {
                 // Train the value and policy models
-                this.m_waitRestart = true;
+                // this.m_waitRestart = true;
                 await window.reinforcement_model.trainModels(this.m_dogInfo, true, debug)
                 .then(
                     onTrainingOverCallback.bind( { game : this, debug : debug})
@@ -456,34 +460,36 @@ class PlayGame{
         this.m_dogInfo.onStep();
     }
 
-    logMemory(msg)
-    {
-        if (this.m_debugMemory)
-        {
-            console.log(msg);
-            console.log(tf.memory());
-        }
-    }
+    // logMemory(msg)
+    // {
+        // if (this.m_debugMemory)
+        // {
+            // console.log(msg);
+            // console.log(tf.memory());
+        // }
+    // }
 
-    endGame()
-    {
+    // endGame()
+    // {
         // return to title screen
-        this.scene.stop();
-        this.scene.start('Title');
-    }
+        // this.scene.stop();
+        // this.scene.start('Title');
+    // }
 
-    onTrainingOver(debug)
+    onTrainingOver(stop_training)
     {
         // Display histogram with chosen actions
         // tfvis.render.histogram(this.m_actionSurface, this.m_dogInfo.episodeActions, {});
 
-        this.logMemory("after train");
+        // this.logMemory("after train");
 
         // Store/display stats
         // compute the episode total reward
         let episodeRewardsSum = VectorUtils.sum(this.m_dogInfo.episodeRewards) 
                                 + window.reinforcement_info.tmpNStepReward;
 
+		console.log(window.reinforcement_model)
+		 let episodeTotalLossMean = VectorUtils.mean(window.reinforcement_model.loss.total)
         // Add to the list of epidode rewards
         window.reinforcement_info.allRewards.push(episodeRewardsSum);
 
@@ -491,32 +497,44 @@ class PlayGame{
         let meanReward = VectorUtils.mean( window.reinforcement_info.allRewards);
         let maxReward = VectorUtils.max( window.reinforcement_info.allRewards);
 
-        if (debug)
-        {
+        // if (debug)
+        // {
             console.log("======================");
             console.log("Episode " + window.reinforcement_info.episode);
             console.log("  episode reward : " + episodeRewardsSum);
             console.log("  mean reward    : " + meanReward);
             console.log("  max reward    : " + maxReward);
+            console.log(window.reinforcement_info);
             console.log("======================");
-        }
+        // }
 
         // write the score
         //this.m_scoreText.setText('Episode: ' +  window.reinforcement_info.episode + ' - Last/Mean Reward: ' + episodeRewardsSum + ' / ' + meanReward);
 
         // Add mean reward to visualization
-        this.m_visualizationRewardData.push(
-            { x: 1.0 *  window.reinforcement_info.episode, 
-            y: meanReward 
-            }
-        );
+        // this.m_visualizationRewardData.push(
+            // { x: 1.0 *  window.reinforcement_info.episode, 
+            // y: meanReward 
+            // }
+        // );
         // let series = { values : [ this.m_visualizationRewardData] , series : ["MeanRewards"]};
         // tfvis.render.linechart(this.m_visualizationSurface, series, {});
 
         // move to next episode
-        window.reinforcement_info.episode++;
-
-        this.scene.restart({ mode : this.m_mode});
+        
+		
+		
+		
+		
+		if (stop_training){
+			this.log("episode ended since out of boundaries")
+		}else{
+			this.log("episode ended after enough steps")
+		}
+		this.reset_training(stop_training)
+		
+		// reset
+        // this.scene.restart({ mode : this.m_mode});
            
     }
 
@@ -526,7 +544,7 @@ class PlayGame{
         //tfvis.render.histogram(this.m_actionSurface, this.m_dogInfo.episodeActions, {});
 		
 							
-        this.logMemory("after train n-step");
+        // this.logMemory("after train n-step");
 
         // Store/display stats
         // compute the episode total reward
@@ -540,10 +558,11 @@ class PlayGame{
 		// console.log(this.m_dogInfo)
 		
 		
-		console.log("LOSS",window.reinforcement_model.loss)
+		// console.log("LOSS",window.reinforcement_model.loss,this.m_dogInfo)
 	
 		this.chart.addData('reward_loss_chart_periods',{
-			'loss_value': window.reinforcement_model.loss.total_loss[window.reinforcement_model.loss.total_loss.length-1],
+			'label':this.m_dogInfo.globalStep,
+			'loss_value': window.reinforcement_model.loss.total[window.reinforcement_model.loss.total.length-1],
 			'loss_total': window.reinforcement_model.loss.value[window.reinforcement_model.loss.value.length-1],
 			'reward':episodeRewardsSum
 		})
@@ -559,7 +578,7 @@ class PlayGame{
         this.m_dogInfo.onNewNStep();
 
         //this.scene.restart({ mode : this.m_mode});
-        this.m_waitRestart = false;
+        // this.m_waitRestart = false;
            
     }
 
@@ -596,19 +615,19 @@ class PlayGame{
 			this.log("training started")
 			_this_game.started = true;
 		}
-		if (_this_game.waspaused==true){
-			this.log("training resumed")
-			_this_game.waspaused = false;
-		}
-		var reseted = false;
+		// if (_this_game.waspaused==true){
+			// this.log("training resumed")
+			// _this_game.waspaused = false;
+		// }
+		// var reseted = false;
 	
-		if (_this_game.reset==true){
+		// if (_this_game.reset==true){
 			// waspaused.reset = false;
-			reseted = true;
-			this.log("environement reseted")
-			this.log('episode ended since reset')
+			// reseted = true;
+			// this.log("environement reseted")
+			// this.log('episode ended since reset')
 			// waspaused.period = 0
-		}
+		// }
 		// console.log("GAME ACTIVE?",_this_game.active)
 		if (_this_game.active==true){
 			await _this_game.handleReinforcementLearning(true)
@@ -617,17 +636,48 @@ class PlayGame{
 		
 	}
 	
-	async reset_training() {
+	async reset_training(pause) {
 		// console.log("PAUSE TRAINING")
 		await this.m_reinforcementEnvironment.init()
-		this.log("training reseted")
+		console.log("RESET",this.m_dogInfo,window.reinforcement_info)
+		this.m_dogInfo.reset(true)
 		
-		// this.reset = true
-		if (this.active!=false){
-			this.log("training paused")	
+		this.chart.cleanData("reward_loss_chart_periods")
+		
+		
+		this.chart.addData("reward_loss_chart_episods",{
+			label:window.reinforcement_info.episode,
+			loss_value:VectorUtils.mean(window.reinforcement_model.loss.total),
+			reward:VectorUtils.sum(this.m_dogInfo.episodeRewards)
+		})
+		window.reinforcement_info.episode++;
+		window.reinforcement_model.loss = {
+			policy : [],
+			value : [],
+			entropy : [],
+			total:[]
+			
 		}
-		this.active = false
-		$("#reset_button").addClass('active')
+		
+		this.log("training reseted")
+		if (pause==true){
+		
+			
+		
+			// this.reset = true
+			if (this.active!=false){
+				this.log("training paused")	
+			}
+			this.active = false
+			$("#reset_button").addClass('active')
+		// }else{
+			
+		
+			// this.active = true;
+			// this.training()
+		}
+		
+		
 	}	
 	async resume_training() {
 		// console.log("PAUSE TRAINING")
@@ -693,9 +743,9 @@ let g_settings = {
 		miniBatchSize : 1
 	},
 	reinforcement:{
-		maxSteps : 1800,
+		maxSteps : 64,
 		miniBatchSize : 200,
-		epochsPerEpisode : 1,
+		// epochsPerEpisode : 1,
 		// layers : 3,
 		units : 24,
 		learningRate : 0.01, // 0.005,
