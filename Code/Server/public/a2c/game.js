@@ -648,10 +648,11 @@ class PlayGame{
 		
 			// this.reset = true
 			if (this.active!=false){
-				this.log("training paused")	
+				// this.log("training paused")	
+				this.pause_training()
 			}
 			this.active = false
-			$("#reset_button").addClass('active')
+			// $("#reset_button").addClass('active')
 		// }else{
 			
 		
@@ -667,7 +668,7 @@ class PlayGame{
 		
 		this.chart.cleanData("reward_loss_chart_periods")
 		
-		
+		console.log("CHECK REWARD EPISODE SUM",this.m_dogInfo.episodeRewards)
 		this.chart.addData("reward_loss_chart_episods",{
 			label:window.reinforcement_info.episode,
 			loss_total:VectorUtils.mean(window.reinforcement_model.loss.total),
@@ -774,7 +775,8 @@ let g_settings = {
 		epochs : 1,
 		// layers : 5,
 		units : 24,
-		learningRate : 0.01, // 0.005,
+		// learningRate : 0.01, // 0.005,
+		learningRate : 0.001, // 0.005,
 		miniBatchSize : 1
 	},
 	reinforcement:{
@@ -783,13 +785,15 @@ let g_settings = {
 		// epochsPerEpisode : 1,
 		// layers : 3,
 		units : 24,
-		learningRate : 0.01, // 0.005,
-		gammaDiscountRate : 0.95,
+		// learningRate : 0.01, // 0.005,
+		learningRate : 0.001,
+		// gammaDiscountRate : 0.95,
+		gammaDiscountRate : 0.99,
 
 		normalizeAdvantage : true,
 		// normalizeAdvantage : false,
 
-		slotCount : 10
+		// slotCount : 10
 	}
 
 	// type: Phaser.AUTO,
@@ -858,7 +862,7 @@ $(function(){
 		}
 	})	
 	$("#stop_button").on('click',function(){
-		if (!(this).hasClass('disabled')){
+		if (!$(this).hasClass('disabled')){
 			game.stop_training()
 
 		}
