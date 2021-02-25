@@ -279,8 +279,9 @@ class PlayGame {
             const stateTensor = tf.tensor2d(newState, [1, newState.length]);
             let prediction = window.reinforcement_model.m_model.predict(stateTensor).dataSync(); 
             //let prediction = window.reinforcement_model.internalPredict(stateTensor, true).dataSync(); // same result
-            return prediction;
 			console.log("PREDICTION = ",prediction)
+            return prediction;
+			
         });
         //if (debug)
         //    console.log("RL predicted softmax" + predictedActionSoftmax);
