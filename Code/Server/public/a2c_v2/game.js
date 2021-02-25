@@ -630,8 +630,8 @@ let g_settings = {
 		epochs : 1,
 		layers : 3,
 		units : 24,
-		// learningRate : 0.01, // 0.005,
-		learningRate : 0.005, // 0.005,
+		learningRate : 0.01, // 0.005,
+		// learningRate : 0.005, // 0.005,
 		miniBatchSize : 1
 	},
 	reinforcement:{
@@ -640,13 +640,13 @@ let g_settings = {
 		epochsPerEpisode : 1,
 		layers : 3,
 		units : 24,
-		// learningRate : 0.01, // 0.005,
-		learningRate : 0.005,
-		// gammaDiscountRate : 0.95,
+		learningRate : 0.01, // 0.005,
+		// learningRate : 0.005,
 		gammaDiscountRate : 0.95,
+		// gammaDiscountRate : 0.99,
 
 		// normalizeAdvantage : true,
-		normalizeAdvantage : false,
+		normalizeAdvantage : true,
 
 		// slotCount : 10
 	}
