@@ -31,7 +31,7 @@ class Servo:
             step = 2
             for pos in range(start+step,end+step,step):
                 print(pos)
-                self.setServoAngle(self,channel, angle)
+                self.setServoAngle(channel, angle)
                 time.sleep(1-speed)
  
 # Main program logic follows:
