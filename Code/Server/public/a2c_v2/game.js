@@ -613,16 +613,16 @@ let g_settings = {
 		// oneHotShape : 3  // class of action,
 		servos : [
 			{'name':2,'init':0,'used':false},
-			{'name':3,'init':80,'used':true,'min':70,'max':90,'step':10,'actions':[60,80,100]},
-			{'name':4,'init':90,'used':false},
+			{'name':3,'init':80,'used':true,'min':70,'max':90,'step':10,'actions':[70,80,90]},
+			{'name':4,'init':97,'used':false},
 			{'name':5,'init':0,'used':false},
-			{'name':6,'init':87,'used':true,'min':90,'max':110,'step':10,'actions':[67,87,107]},
-			{'name':7,'init':90,'used':false},
-			{'name':8,'init':90,'used':false},
-			{'name':9,'init':87,'used':true,'min':77,'max':97,'step':10,'actions':[67,87,107]},
+			{'name':6,'init':87,'used':true,'min':90,'max':110,'step':10,'actions':[77,87,97]},
+			{'name':7,'init':97,'used':false},
+			{'name':8,'init':85,'used':false},
+			{'name':9,'init':87,'used':true,'min':77,'max':97,'step':10,'actions':[77,87,97]},
 			{'name':10,'init':180,'used':false},
-			{'name':11,'init':90,'used':false},
-			{'name':12,'init':90,'used':true,'min':80,'max':100,'step':10,'actions':[70,90,110]},
+			{'name':11,'init':86,'used':false},
+			{'name':12,'init':90,'used':true,'min':80,'max':100,'step':10,'actions':[80,90,100]},
 			{'name':13,'init':180,'used':false},
 			{'name':15,'init':90,'used':false,'label':'head'},
 		]
@@ -637,7 +637,7 @@ let g_settings = {
 		miniBatchSize : 1
 	},
 	reinforcement:{
-		maxSteps : 500,
+		maxSteps : 100,
 		miniBatchSize : 1,
 		epochsPerEpisode : 1,
 		layers : 3,
