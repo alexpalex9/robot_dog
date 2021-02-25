@@ -280,6 +280,7 @@ class PlayGame {
             let prediction = window.reinforcement_model.m_model.predict(stateTensor).dataSync(); 
             //let prediction = window.reinforcement_model.internalPredict(stateTensor, true).dataSync(); // same result
             return prediction;
+			console.log("PREDICTION = ",prediction)
         });
         //if (debug)
         //    console.log("RL predicted softmax" + predictedActionSoftmax);
@@ -308,7 +309,7 @@ class PlayGame {
                             (g_settings.reinforcement.maxSteps > 0 && this.m_cartPoleInfo.episodeUpdateSteps >=  g_settings.reinforcement.maxSteps));
         this.m_cartPoleInfo.episodeDones.push((episodeDone ? 1.0 : 0.0));
 
-		console.log("CHECK EPISODE OVER",episodeDone,this.m_reinforcementEnvironment.isDone(),this.m_cartPoleInfo.episodeUpdateSteps,g_settings.reinforcement.maxSteps)
+		// console.log("CHECK EPISODE OVER",episodeDone,this.m_reinforcementEnvironment.isDone(),this.m_cartPoleInfo.episodeUpdateSteps,g_settings.reinforcement.maxSteps)
         // check if the episode should end
         if (episodeDone)
         {
@@ -606,7 +607,7 @@ let g_settings = {
 	// mode :"RL_TRAIN",
 	agent:{
 		algorithm : "A2C", // REINFORCE REINFORCE_BASELINE A2C
-		nSteps : 50,
+		nSteps : 4,
 		depth : 4,
 		// oneHotShape : 3  // class of action,
 		servos : [
