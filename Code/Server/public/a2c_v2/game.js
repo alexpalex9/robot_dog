@@ -608,7 +608,7 @@ let g_settings = {
 	// mode :"RL_TRAIN",
 	agent:{
 		algorithm : "A2C", // REINFORCE REINFORCE_BASELINE A2C
-		nSteps : 4,
+		nSteps : 8,
 		depth : 4,
 		// oneHotShape : 3  // class of action,
 		servos : [
@@ -625,12 +625,11 @@ let g_settings = {
 			{'name':12,'init':90,'used':true,'min':80,'max':100,'step':10,'actions':[80,90,100]},
 			{'name':13,'init':180,'used':false},
 			{'name':15,'init':90,'used':false,'label':'head'},
-		]
-		
+		]	
 	},
 	valuemodel:{
 		epochs : 1,
-		layers : 3,
+		layers : 5,
 		units : 24,
 		learningRate : 0.0001, // 0.005,
 		// learningRate : 0.005, // 0.005,
@@ -640,7 +639,7 @@ let g_settings = {
 		maxSteps : 100,
 		miniBatchSize : 1,
 		epochsPerEpisode : 1,
-		layers : 3,
+		layers : 5,
 		units : 24,
 		learningRate : 0.0001, // 0.005,
 		// learningRate : 0.005,
