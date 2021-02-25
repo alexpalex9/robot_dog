@@ -227,7 +227,7 @@ class Server():
             print('set servos angle',data)
             for servo in data:
                 if DEV==False:
-                    self.control.servo.setServoAngle(int(servo),data[servo])
+                    self.control.servo.setServoAngleSpeed(int(servo),data[servo],0.7)
                 else:
                     pass
             if DEV==False:
@@ -235,7 +235,7 @@ class Server():
                 emit('servos angle',self.control.servo.values)
                 emit('servos angle await',self.control.servo.values)
             else:
-                time.sleep(0.5)
+                time.sleep(0.1)
                 emit('servos angle',data)
                 emit('servos angle await',data)
                 

@@ -22,6 +22,17 @@ class Servo:
         #print(date,date/4096*0.02)
         self.values[channel] = angle
         self.pwm.set_pwm(channel, 0, int(date))
+    def setServoAngleSpeed(self,channel, angle,speed=1):
+        if speed==1:
+            self.setServoAngle(channel, angle)
+        else:
+            start = self.values[channel]
+            end = angle
+            step = 2
+            for pos in range(start+step,end+step,step):
+                print(pos)
+                self.setServoAngle(self,channel, angle)
+                time.sleep(1-speed)
  
 # Main program logic follows:
 if __name__ == '__main__':

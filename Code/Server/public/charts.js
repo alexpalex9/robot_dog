@@ -1,4 +1,4 @@
-var myCharts = function(parent){
+var myCharts = function(chartsArray){
 	
 	reward_loss_options = {
 		animation: {
@@ -121,7 +121,7 @@ var myCharts = function(parent){
 			}]
 		}
 	}
-	reward_template = {
+	var reward_template = {
 		data : [],
 		borderWidth : 1,
 		borderColor: 'rgba(197, 216, 156, 1)',
@@ -138,7 +138,7 @@ var myCharts = function(parent){
 		type:'line',
 		yAxisID:"right"
 	}
-	distance_template = {
+	var distance_template = {
 		data : [],
 		borderWidth : 1,
 		borderColor: 'rgba(197, 216, 156, 1)',
@@ -155,7 +155,7 @@ var myCharts = function(parent){
 		type:'line',
 		yAxisID:"right"
 	}
-	loss_value_template = {
+	var loss_value_template = {
 		data : [],
 		borderWidth : 1,
 		borderColor: 'rgba(221, 151, 149, 1)',
@@ -168,11 +168,12 @@ var myCharts = function(parent){
 		pointBackgroundColor : 'rgba(221, 151, 149, 1)',
 		fill: false,
 		spanGaps: true,
-		label: "loss_value",
+		label: "value_loss",
 		yAxisID:"left",
 		type:'line'
 	}
-	loss_total_template = {
+
+	var PolicyEntropy_template = {
 		data : [],
 		borderWidth : 1,
 		borderColor: 'rgba(149, 151, 221, 1)',
@@ -185,11 +186,11 @@ var myCharts = function(parent){
 		pointBackgroundColor : 'rgba(149, 151, 221, 1)',
 		fill: false,
 		spanGaps: true,
-		label: "loss_total",
+		label: "PolicyEntropy",
 		yAxisID:"left",
 		type:'line'
 	}
-	inventory_template = {
+	var inventory_template = {
 		data : [],
 		borderWidth : 3,
 		borderColor: 'rgba(147, 183, 221, 1)',
@@ -205,7 +206,7 @@ var myCharts = function(parent){
 		yAxisID : "left",
 		type:"line"
 	}
-	stockouts_template = {
+	var stockouts_template = {
 		data : [],
 		borderWidth : 1,
 		borderColor: 'rgba(221, 151, 149, 1)',
@@ -247,34 +248,69 @@ var myCharts = function(parent){
 	
 	Chart.defaults.global.defaultFontColor = '#FFFFFF';
 	
-	
-	
-	var configSet_reward_loss_periods = {
+	var configSet_reward = {
 		type: 'bar',
 		data : {
 			labels: [],
 			datasets : [
-				JSON.parse(JSON.stringify(loss_value_template)),
-				JSON.parse(JSON.stringify(loss_total_template)),
 				JSON.parse(JSON.stringify(reward_template))
 			]
 		},
 		options: JSON.parse(JSON.stringify(reward_loss_options))
 	}
+	var configSet_loss_value = {
+		type: 'bar',
+		data : {
+			labels: [],
+			datasets : [
+				JSON.parse(JSON.stringify(loss_value_template))
+			]
+		},
+		options: JSON.parse(JSON.stringify(reward_loss_options))
+	}
+	var configSet_PolicyEntropy = {
+		type: 'bar',
+		data : {
+			labels: [],
+			datasets : [
+				JSON.parse(JSON.stringify(PolicyEntropy_template))
+			]
+		},
+		options: JSON.parse(JSON.stringify(reward_loss_options))
+	}
+	
+	// var configSet_reward_loss_periods = {
+		// type: 'bar',
+		// data : {
+			// labels: [],
+			// datasets : [
+				// JSON.parse(JSON.stringify(loss_value_template)),
+				// JSON.parse(JSON.stringify(loss_total_template)),
+				// JSON.parse(JSON.stringify(reward_template))
+			// ]
+		// },
+		// options: JSON.parse(JSON.stringify(reward_loss_options))
+	// }
 	var configSet_reward_loss_episods = {
 		type: 'line',
 		data : {
 			labels: [],
 			datasets : [
-				JSON.parse(JSON.stringify(loss_total_template)),
 				JSON.parse(JSON.stringify(loss_value_template)),
+				JSON.parse(JSON.stringify(PolicyEntropy_template)),
 				JSON.parse(JSON.stringify(reward_template))
 			]
 		},
 		options: JSON.parse(JSON.stringify(reward_loss_options))
-	}	
-	_this.reward_loss_chart_episods  = new Chart(document.getElementById("loss_reward_chart_episodes").getContext("2d"),configSet_reward_loss_episods);
-	_this.reward_loss_chart_periods = new Chart(document.getElementById("loss_reward_chart_periods").getContext("2d"),configSet_reward_loss_periods);
+	}
+	
+
+	// _this.reward_loss_chart_episods  = new Chart(document.getElementById("loss_reward_chart_episodes").getContext("2d"),configSet_reward_loss_episods);
+	// _this.reward_loss_chart_periods = new Chart(document.getElementById("loss_reward_chart_periods").getContext("2d"),configSet_reward_loss_periods);
+	_this.value_loss = new Chart(document.getElementById("value_loss").getContext("2d"),configSet_loss_value);
+	_this.PolicyEntropy = new Chart(document.getElementById("PolicyEntropy").getContext("2d"),configSet_PolicyEntropy);
+	_this.reward = new Chart(document.getElementById("reward").getContext("2d"),configSet_reward);
+	_this.reward_episodes = new Chart(document.getElementById("reward_episodes").getContext("2d"),configSet_reward_loss_episods);
 
 	_this.cleanData = function(chart_name){
 		_this[chart_name].config.data.labels = []
@@ -283,9 +319,10 @@ var myCharts = function(parent){
 		}
 		_this[chart_name].update()
 	}
+	
 	_this.addData = function(chart_name,data){
 		// console.log("ADD DATA CHART",chart_name,data)
-		if (_this[chart_name].config.data.labels.length>200){
+		if (_this[chart_name].config.data.labels.length>100){
 			_this[chart_name].config.data.labels = _this[chart_name].config.data.labels.slice(1)
 			for (var c in _this[chart_name].config.data.datasets){
 				_this[chart_name].config.data.datasets[c].data = _this[chart_name].config.data.datasets[c].data.slice(1)
@@ -296,7 +333,7 @@ var myCharts = function(parent){
 		// }else{
 			// _this[chart_name].config.data.labels.push(_this[chart_name].config.data.labels[_this[chart_name].config.data.labels.length-1]+1)
 			// if (data.label!==undefined){
-				console.log("pushing chart label",data.label)
+				// console.log("pushing chart label",data.label)
 				_this[chart_name].config.data.labels.push(data.label)
 			// }else{
 				
