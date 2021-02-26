@@ -206,10 +206,11 @@ class Server():
                 })
     
         socketio.on('git pull', namespace='/robot')
-        import git 
-        g = git.cmd.Git(os.path.dirname(os.path.realpath(__file__)))
-        act = g.pull()
-        emit('git pulled',act)
+        def get_pull():
+            import git 
+            g = git.cmd.Git(os.path.dirname(os.path.realpath(__file__)))
+            act = g.pull()
+            emit('git pulled',act)
         @socketio.on('gyro', namespace='/robot')
         def get_gyro():
             print("Get Gyro")
