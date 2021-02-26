@@ -26,12 +26,14 @@ class Environment
 		this.AMOUNT_INPUTS = 0
 		this.actions_index = []
 		this.servos_walk = [];
+		this.actions_labels = []
 		for (var i in this.SERVOS){
 			if (this.SERVOS[i].used==true){
 				this.servos_walk.push(this.SERVOS[i])
 				this.AMOUNT_INPUTS = this.AMOUNT_INPUTS + 1
 				for (var act in this.SERVOS[i].actions){
 					this.actions_index.push({'servo':this.SERVOS[i].name,'angle':this.SERVOS[i].actions[act],'index':this.actions_index.length})
+					this.actions_labels.push(this.SERVOS[i].name + '-'+ this.SERVOS[i].actions[act])
 				}
 			}
 		}
@@ -66,6 +68,9 @@ class Environment
 		
 	}
 	
+	get_actions_label(){
+		return this.actions_labels
+	}
 	get_actions_count(){
 		return this.actions_index.length
 	}

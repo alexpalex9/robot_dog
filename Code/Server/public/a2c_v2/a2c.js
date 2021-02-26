@@ -10,6 +10,10 @@
  
  // https://github.com/NoxisStyle/AI_JS_experiments/tree/master/cart-pole-02
  
+  // git config --global credential.helper cache
+ // git config credential.helper store
+ // git remote set-url origin https://3f1d26e5393dd967f689d1e1bcd44e7d8154725d@github.com/alexpalex9/mH
+ 
 class EpisodeInfo
 {
     constructor() 
@@ -535,7 +539,7 @@ class PolicyBasedAgent
         // render loss
         let loss = history.history.loss[0];
 		this.charts.addData('value_loss',{
-			label : 1.0 * this.m_visualizationPolicyIndex++,
+			label : 1.0 * this.m_visualizationValueModelLossIndex++,
 			value_loss : loss
 		})
 		this.m_visualizationValueModelLossData.push(loss)

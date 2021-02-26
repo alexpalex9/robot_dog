@@ -280,6 +280,13 @@ class PlayGame {
             let prediction = window.reinforcement_model.m_model.predict(stateTensor).dataSync(); 
             //let prediction = window.reinforcement_model.internalPredict(stateTensor, true).dataSync(); // same result
 			console.log("PREDICTION = ",prediction)
+			window.reinforcement_model.charts.updateData('actions',{
+				labels : this.m_reinforcementEnvironment.get_actions_label(),
+				actions : prediction
+			})
+		
+		
+			
             return prediction;
 			
         });
