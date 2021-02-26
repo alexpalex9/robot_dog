@@ -426,7 +426,7 @@ var init = function(){
 	// $("#servo_3").val(45).trigger('change');
 	// $("#servo_3").attr("data-isTriggering","no");
 	
-	$('git_pull').on('click',function(){
+	$('#git_pull').on('click',function(){
 		_this.socket.emit('git pull', [_this.COMMAND.CMD_SONIC])
 	})
 	_this.socket.on('git pulled', function(data){
