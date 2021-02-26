@@ -1,4 +1,15 @@
-
+// A2C in node : https://naifmehanna.com/2019-02-01-implementing-a2c-algorithm-using-tensorflow-js/
+// some code in github https://github.com/naifmeh/smartbotjs/blob/remotecrawlers/utils/math_utils.js
+// tf.js tutorials : https://www.tensorflow.org/js/tutorials
+ 
+ // pi 4 leg : https://sebastianfoerster86.wordpress.com/2016/11/07/robot-controlled-by-artificial-neural-network/ 
+ 
+ 
+ // https://github.com/naifmeh/smartbotjs/blob/remotecrawlers/algorithm/environment.js
+ 
+ 
+ https://github.com/NoxisStyle/AI_JS_experiments/tree/master/cart-pole-02
+ 
 class EpisodeInfo
 {
     constructor() 

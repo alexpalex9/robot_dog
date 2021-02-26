@@ -600,16 +600,12 @@ function onTrainingNStepOverCallback()
     this.game.onTrainingNStepOver(this.debug);
 }
 
-
-
-
-
 let g_settings = {
 	// mode :"RL_TRAIN",
 	agent:{
 		algorithm : "A2C", // REINFORCE REINFORCE_BASELINE A2C
-		nSteps : 8,
-		depth : 4,
+		nSteps : 1,
+		depth : 2,
 		// oneHotShape : 3  // class of action,
 		servos : [
 			{'name':2,'init':0,'used':false},
@@ -629,25 +625,25 @@ let g_settings = {
 	},
 	valuemodel:{
 		epochs : 1,
-		layers : 5,
+		layers : 3,
 		units : 24,
-		learningRate : 0.0001, // 0.005,
-		// learningRate : 0.005, // 0.005,
+		// learningRate : 0.0001, // 0.005,
+		learningRate : 0.001, // 0.005,
 		miniBatchSize : 1
 	},
 	reinforcement:{
 		maxSteps : 100,
 		miniBatchSize : 1,
 		epochsPerEpisode : 1,
-		layers : 5,
+		layers : 3,
 		units : 24,
-		learningRate : 0.0001, // 0.005,
-		// learningRate : 0.005,
-		// gammaDiscountRate : 0.95,
-		gammaDiscountRate : 0.99,
+		// learningRate : 0.0001, // 0.005,
+		learningRate : 0.001,
+		gammaDiscountRate : 0.95,
+		// gammaDiscountRate : 0.99,
 
 		// normalizeAdvantage : true,
-		normalizeAdvantage : true,
+		normalizeAdvantage : false,
 
 		// slotCount : 10
 	}
