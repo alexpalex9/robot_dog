@@ -8,7 +8,7 @@
  // https://github.com/naifmeh/smartbotjs/blob/remotecrawlers/algorithm/environment.js
  
  
- https://github.com/NoxisStyle/AI_JS_experiments/tree/master/cart-pole-02
+ // https://github.com/NoxisStyle/AI_JS_experiments/tree/master/cart-pole-02
  
 class EpisodeInfo
 {
