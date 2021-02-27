@@ -395,6 +395,12 @@ var myCharts = function(chartsArray){
 		},
 		options: JSON.parse(JSON.stringify(oneaxis_options))
 	}
+	configSet_actions.options.scales.yAxes[0].ticks {
+		beginAtZero: true,
+		// steps: 10,
+		// stepValue: 5,
+		max: 1
+	}
 	
 	// _this.reward_loss_chart_episods  = new Chart(document.getElementById("loss_reward_chart_episodes").getContext("2d"),configSet_reward_loss_episods);
 	// _this.reward_loss_chart_periods = new Chart(document.getElementById("loss_reward_chart_periods").getContext("2d"),configSet_reward_loss_periods);

@@ -12,7 +12,7 @@
  
   // git config --global credential.helper cache
  // git config credential.helper store
- // git remote set-url origin https://3f1d26e5393dd967f689d1e1bcd44e7d8154725d@github.com/alexpalex9/mH
+ // git remote set-url origin https://3f1d26e5393dd967f689d1e1bcd44e7d8154725d@github.com/alexpalex9/robot_dog
  
 class EpisodeInfo
 {

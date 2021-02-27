@@ -212,6 +212,7 @@ class PlayGame {
         // Compute current state
 		console.log("---------------NEW handleReinforcementLearning function-------------",this.m_cartPoleInfo)
         let newState = this.m_reinforcementEnvironment.getState();
+
 		// console.log("newState",newState)
         // store reward corresponding to action and state choosen and computed at the previous update()
         //if (this.m_cartPoleInfo.episodeRewards.length > 0)
@@ -507,13 +508,27 @@ class PlayGame {
 		if (!_this_game){
 			_this_game = this;
 		}
-
-		_this_game.started = true;
-
-		if (_this_game.active==true){
-			await _this_game.handleReinforcementLearning(new Date(),false)
-			await _this_game.training(_this_game)
+		if (_this_game.servos_start_date==undefined){
+			_this_game.servos_start_date = new Date()
 		}
+		var t = new Date()
+		// if (t-_this_game.servos_start_date>3 * 60 * 1000){
+		// if (t-_this_game.servos_start_date>10 * 1000){
+			// _this_game.freeze_training()
+			// setInterval(function(){
+				// _this_game.servos_start_date = new Date()
+				// _this_game.unfreeze_training()
+				
+				await _this_game.training(_this_game)
+			// },5000)
+		// }else{
+			_this_game.started = true;
+
+			if (_this_game.active==true){
+				await _this_game.handleReinforcementLearning(new Date(),false)
+				await _this_game.training(_this_game)
+			}
+		// }
 		
 	}
 	
@@ -545,7 +560,19 @@ class PlayGame {
 		
 		
 		
-	}	
+	}
+	async freeze_training() {
+		this.log("dog tired")
+		$("#train_button").addClass('disabled')
+		this.pause_training()
+		// $("#reset_button").addClass('disabled')
+		// $("#stop_button").addClass('disabled')
+	}
+	async unfreeze_training() {
+		this.log("dog relieved")
+		$("#train_button").removeClass('disabled')
+		this.resume_training()
+	}
 	async resume_training() {
 		// console.log("PAUSE TRAINING")
 		if (this.started==true){			
@@ -558,7 +585,7 @@ class PlayGame {
 		$("#reset_button").removeClass('disabled')
 		$("#sonar_button").addClass('disabled')
 		$("#stop_button").removeClass('disabled')
-		this.training()
+		await this.training()
 	}
 	async pause_training() {
 		// console.log("PAUSE TRAINING")
