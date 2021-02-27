@@ -347,7 +347,9 @@ class PlayGame {
                     await onTrainingOverCallback.bind( { game : this, debug : debug})
                 );
             }
-
+			if (this.m_reinforcementEnvironment.isDone()){
+				this.reset_training(true)
+			}
 
         }
 
@@ -563,6 +565,7 @@ class PlayGame {
 	async freeze_training() {
 		this.log("dog tired")
 		$("#train_button").addClass('disabled')
+		$("#reset_button").addClass('disabled')
 		this.pause_training()
 		// $("#reset_button").addClass('disabled')
 		// $("#stop_button").addClass('disabled')
@@ -570,6 +573,7 @@ class PlayGame {
 	async unfreeze_training() {
 		this.log("dog relieved")
 		$("#train_button").removeClass('disabled')
+		$("#reset_button").removeClass('disabled')
 		this.resume_training()
 	}
 	async resume_training() {
@@ -710,6 +714,7 @@ $(function(){
 	}).then(function(){
 		// game.handleReinforcementLearning()
 		$("#train_button").removeClass('disabled')
+		// $("#reset_button").removeClass('disabled')
 	})
 	// console.log()
 	// sars.active = false
