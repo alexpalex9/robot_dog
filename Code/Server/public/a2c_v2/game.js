@@ -637,8 +637,8 @@ let g_settings = {
 	// mode :"RL_TRAIN",
 	agent:{
 		algorithm : "A2C", // REINFORCE REINFORCE_BASELINE A2C
-		nSteps : 1,
-		depth : 2,
+		nSteps : 12,
+		depth : 3,
 		// oneHotShape : 3  // class of action,
 		servos : [
 			{'name':2,'init':0,'used':false},
@@ -665,7 +665,7 @@ let g_settings = {
 		miniBatchSize : 1
 	},
 	reinforcement:{
-		maxSteps : 100,
+		maxSteps : 120,
 		miniBatchSize : 1,
 		epochsPerEpisode : 1,
 		layers : 3,
