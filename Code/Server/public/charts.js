@@ -395,7 +395,7 @@ var myCharts = function(chartsArray){
 		},
 		options: JSON.parse(JSON.stringify(oneaxis_options))
 	}
-	configSet_actions.options.scales.yAxes[0].ticks {
+	configSet_actions.options.scales.yAxes[0].ticks = {
 		beginAtZero: true,
 		// steps: 10,
 		// stepValue: 5,

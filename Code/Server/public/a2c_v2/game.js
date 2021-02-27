@@ -511,7 +511,7 @@ class PlayGame {
 		if (_this_game.servos_start_date==undefined){
 			_this_game.servos_start_date = new Date()
 		}
-		var t = new Date()
+		// var t = new Date()
 		// if (t-_this_game.servos_start_date>3 * 60 * 1000){
 		// if (t-_this_game.servos_start_date>10 * 1000){
 			// _this_game.freeze_training()
@@ -519,7 +519,7 @@ class PlayGame {
 				// _this_game.servos_start_date = new Date()
 				// _this_game.unfreeze_training()
 				
-				await _this_game.training(_this_game)
+				
 			// },5000)
 		// }else{
 			_this_game.started = true;
