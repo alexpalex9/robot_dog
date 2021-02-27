@@ -10,7 +10,7 @@
  
  // https://github.com/NoxisStyle/AI_JS_experiments/tree/master/cart-pole-02
  
-  // git config --global credential.helper cache
+ // git config --global credential.helper cache
  // git config credential.helper store
  // git remote set-url origin https://3f1d26e5393dd967f689d1e1bcd44e7d8154725d@github.com/alexpalex9/robot_dog
  

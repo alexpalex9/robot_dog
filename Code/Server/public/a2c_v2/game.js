@@ -662,7 +662,7 @@ let g_settings = {
 		units : 24,
 		// learningRate : 0.0001, // 0.005,
 		learningRate : 0.001, // 0.005,
-		miniBatchSize : 1
+		miniBatchSize : 200
 	},
 	reinforcement:{
 		maxSteps : 120,
