@@ -336,7 +336,6 @@ class PlayGame {
                 // this.m_waitRestart = true;
 				
                 await this.onTrainingOver(debug,this.m_reinforcementEnvironment.isDone());
-				this.reset_training(true,"out of boundaries")
             }
             else
             {
@@ -560,7 +559,7 @@ class PlayGame {
 			
 		// }
 		$("#train_button").removeClass('disabled')
-		if (msg){
+		if (msg==undefined){
 			this.log("training reseted : end of episode")
 		}else{
 			this.log("training reseted : " + msg)
