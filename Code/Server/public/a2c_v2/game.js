@@ -664,7 +664,7 @@ let g_settings = {
 	// mode :"RL_TRAIN",
 	agent:{
 		algorithm : "A2C", // REINFORCE REINFORCE_BASELINE A2C
-		nSteps : 12,
+		nSteps : 1,
 		depth : 3,
 		// oneHotShape : 3  // class of action,
 		servos : [
