@@ -348,7 +348,7 @@ class PlayGame {
                 );
             }
 			if (this.m_reinforcementEnvironment.isDone()){
-				this.reset_training(true)
+				this.reset_training(true,"out of boundaries")
 			}
 
         }
@@ -534,7 +534,7 @@ class PlayGame {
 	}
 	
 	
-	async reset_training(pause) {
+	async reset_training(pause,msg) {
 		
 		if (pause==true){
 			if (this.active!=false){
@@ -557,29 +557,34 @@ class PlayGame {
 			
 		// }
 		$("#train_button").removeClass('disabled')
-		this.log("training reseted")
-		
-		
-		
+		if (msg){
+			this.log("training reseted : end of episode")
+		}else{
+			this.log("training reseted : " + msg)
+		}
 	}
 	async freeze_training() {
 		this.log("dog tired")
 		$("#train_button").addClass('disabled')
 		$("#reset_button").addClass('disabled')
-		this.pause_training()
+		this.pause_training("dog tired")
 		// $("#reset_button").addClass('disabled')
 		// $("#stop_button").addClass('disabled')
 	}
 	async unfreeze_training() {
-		this.log("dog relieved")
+		// this.log("dog relieved")
 		$("#train_button").removeClass('disabled')
 		$("#reset_button").removeClass('disabled')
-		this.resume_training()
+		this.resume_training("dog relieved")
 	}
-	async resume_training() {
+	async resume_training(msg) {
 		// console.log("PAUSE TRAINING")
-		if (this.started==true){			
-			this.log("training resumed")
+		if (this.started==true){
+			if (msg){
+				this.log("training resumed, " + msg)
+			}else{
+				this.log("training resumed")	
+			}
 		}else{
 			this.log("training started")
 		}
@@ -590,9 +595,13 @@ class PlayGame {
 		$("#stop_button").removeClass('disabled')
 		await this.training()
 	}
-	async pause_training() {
+	async pause_training(msg) {
 		// console.log("PAUSE TRAINING")
-		this.log("training paused")
+		if (msg){
+			this.log("training paused, " + msg)
+		}else{
+			this.log("training paused")	
+		}
 		$("#train_button").removeClass('active')
 		this.active = false
 	}
