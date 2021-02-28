@@ -114,23 +114,26 @@ class PolicyBasedAgent
         this.m_algorithm = g_settings.agent.algorithm;
 
         // policy model
-        this.m_model = this.createPolicyNeuralNetwork(this.m_inputCount, 
-                                                        g_settings.reinforcement.units, 
-                                                        g_settings.reinforcement.layers,
-                                                        this.m_actionCount);
-        
-        // value model
-        if (this.hasValueModel())
-        {
-            this.m_valueModel = this.createValueModel(this.m_inputCount,
-                                                            g_settings.valuemodel.units,
-                                                            g_settings.valuemodel.layers);
-        }
-        else
-        {
-            this.m_valueModel = null;
-        }
-
+		
+	
+			
+			this.m_model = this.createPolicyNeuralNetwork(this.m_inputCount, 
+															g_settings.reinforcement.units, 
+															g_settings.reinforcement.layers,
+															this.m_actionCount);
+			
+			// value model
+			if (this.hasValueModel())
+			{
+				this.m_valueModel = this.createValueModel(this.m_inputCount,
+																g_settings.valuemodel.units,
+																g_settings.valuemodel.layers);
+			}
+			else
+			{
+				this.m_valueModel = null;
+			}
+		// }
         // Get a surface
         // this.m_visualizationSurface = tfvis.visor().surface({ name: 'PolicyEntropy', tab: 'Charts' });
 		
@@ -144,7 +147,7 @@ class PolicyBasedAgent
 		this.charts = new myCharts()
 		
     }
-
+	
     hasValueModel()
     {
         if (this.m_algorithm === "REINFORCE")
@@ -251,7 +254,7 @@ class PolicyBasedAgent
          *      - https://res.mdpi.com/sensors/sensors-18-03575/article_deploy/sensors-18-03575.pdf?filename=&attachment=1
          *      - https://medium.com/@joshpatterson_5192/deep-q-learning-for-self-driving-cars-c482f1a39367
          */
-
+	
         return model;
     }
 
@@ -286,7 +289,23 @@ class PolicyBasedAgent
 
         return model;
     }
-
+	async saveModels(){
+		console.log("SAVING models")
+		this.m_valueModel.save("localstorage://actor")
+		this.m_model.save("localstorage://critic")
+						// agent.critic.save(window.location.origin + '/mymodels')	
+	}
+	
+	async loadModels(){
+		try{
+			this.m_model = await tf.loadLayersModel('localstorage://actor');	
+			this.m_valueModel = await tf.loadLayersModel('localstorage://critic');	
+			return true
+		}catch(e){
+			return e
+		}
+		
+	}
     async trainModels(episodesInfo, done, debug)
     {
         let episodeRewards = episodesInfo.episodeRewards;
@@ -409,7 +428,8 @@ class PolicyBasedAgent
             advantages.dispose();
 
             // this.logMemory("train D");
-                
+			// console.log("SAVING MODELS")
+             this.saveModels()
         //});
     }
 

@@ -44,7 +44,7 @@ class PlayGame {
 
         this.m_debugMemory = false;
 
-        this.m_waitRestart = false;
+        // this.m_waitRestart = false;
         
     }
      
@@ -99,6 +99,17 @@ class PlayGame {
         if (this.m_mode == "RL_TRAIN" && (window.reinforcement_model === null || typeof window.reinforcement_model === 'undefined'))
         {
             window.reinforcement_model = new PolicyBasedAgent(this.m_reinforcementEnvironment.get_inputs_count() * g_settings.agent.depth,this.m_reinforcementEnvironment.get_actions_count());
+			
+			// try{
+			var t = await window.reinforcement_model.loadModels()
+			if (t==true){
+				this.log("model loaded from local storage")
+			}else{
+					this.log("could not load models :",e)
+			}
+			// }catch(e)#
+			
+		// }
             window.reinforcement_info.episode = 0;
             window.reinforcement_info.allRewards = [];
             window.aiModeInitialized = false;
@@ -213,7 +224,7 @@ class PlayGame {
 		console.log("---------------NEW handleReinforcementLearning function-------------",this.m_cartPoleInfo)
         let newState = this.m_reinforcementEnvironment.getState();
 
-		// console.log("newState",newState)
+		console.log("newState",newState)
         // store reward corresponding to action and state choosen and computed at the previous update()
         //if (this.m_cartPoleInfo.episodeRewards.length > 0)
         //{
@@ -540,7 +551,7 @@ class PlayGame {
 		
 		if (pause==true){
 			if (this.active!=false){
-				this.pause_training()
+				this.pause_training(msg)
 			}
 			this.active = false
 		}
@@ -581,6 +592,8 @@ class PlayGame {
 	}
 	async resume_training(msg) {
 		// console.log("PAUSE TRAINING")
+		
+		
 		if (this.started==true){
 			if (msg){
 				this.log("training resumed, " + msg)
@@ -623,9 +636,8 @@ class PlayGame {
 			$("#train_button").removeClass('disabled')
 			$("#stop_button").removeClass('disabled')
 		})
-		
-		
 	}
+	
 
 }
 
@@ -731,6 +743,10 @@ $(function(){
 	// sars.active = false
 	
 	$("#train_button").on('click',function(){
+		
+		
+		
+		
 		if (!$(this).hasClass('disabled')){
 			// console.log($(this).hasClass("active"))
 			if($(this).hasClass("active")){
@@ -758,7 +774,7 @@ $(function(){
 		if (!$(this).hasClass('disabled') && !$(this).hasClass('active')){
 			// console.log("CLICK RESET")
 			// sars.active = false
-			game.reset_training(true)
+			game.reset_training(true,"manually reseted")
 			// $("#train_button").removeClass("active")
 			// sars.reset = true
 		}
