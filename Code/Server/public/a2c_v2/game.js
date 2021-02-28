@@ -101,12 +101,12 @@ class PlayGame {
             window.reinforcement_model = new PolicyBasedAgent(this.m_reinforcementEnvironment.get_inputs_count() * g_settings.agent.depth,this.m_reinforcementEnvironment.get_actions_count());
 			
 	
-			// var t = await window.reinforcement_model.loadModels()
-			// if (t==true){
-				// this.log("model loaded from local storage")
-			// }else{
-				// this.log("could not load models :"  + t)
-			// }
+			var t = await window.reinforcement_model.loadModels()
+			if (t==true){
+				this.log("model loaded from local storage")
+			}else{
+				this.log("could not load models :"  + t)
+			}
 		
 			
 		// }

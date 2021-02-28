@@ -291,8 +291,8 @@ class PolicyBasedAgent
     }
 	async saveModels(){
 		console.log("SAVING models")
-		this.m_valueModel.save("localstorage://actor")
-		this.m_model.save("localstorage://critic")
+		this.m_model.save("localstorage://actor")
+		this.m_valueModel.save("localstorage://critic")
 						// agent.critic.save(window.location.origin + '/mymodels')	
 	}
 	
