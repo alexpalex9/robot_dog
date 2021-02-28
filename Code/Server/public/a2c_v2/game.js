@@ -100,14 +100,14 @@ class PlayGame {
         {
             window.reinforcement_model = new PolicyBasedAgent(this.m_reinforcementEnvironment.get_inputs_count() * g_settings.agent.depth,this.m_reinforcementEnvironment.get_actions_count());
 			
-			// try{
-			var t = await window.reinforcement_model.loadModels()
-			if (t==true){
-				this.log("model loaded from local storage")
-			}else{
-					this.log("could not load models :",t)
-			}
-			// }catch(e)#
+	
+			// var t = await window.reinforcement_model.loadModels()
+			// if (t==true){
+				// this.log("model loaded from local storage")
+			// }else{
+				// this.log("could not load models :"  + t)
+			// }
+		
 			
 		// }
             window.reinforcement_info.episode = 0;

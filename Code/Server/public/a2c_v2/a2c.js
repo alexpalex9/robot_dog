@@ -262,7 +262,7 @@ class PolicyBasedAgent
     createValueModel(inputCount, unitCount, layerCount)
     {
         let model = tf.sequential();
-        let valueOptimizer = tf.train.adam(g_settings.valuemodel.learningRate);
+        this.valueOptimizer = tf.train.adam(g_settings.valuemodel.learningRate);
 
         // Add dense layers
         for (let i = 0; i < layerCount; i++)
@@ -285,7 +285,7 @@ class PolicyBasedAgent
             model.add(layer);
         }
 
-        model.compile({loss: 'meanSquaredError', optimizer: valueOptimizer});
+        model.compile({loss: 'meanSquaredError', optimizer: this.valueOptimizer});
 
         return model;
     }
@@ -300,8 +300,11 @@ class PolicyBasedAgent
 		try{
 			this.m_model = await tf.loadLayersModel('localstorage://actor');	
 			this.m_valueModel = await tf.loadLayersModel('localstorage://critic');	
+			this.m_model.compile({loss: 'meanSquaredError', optimizer: this.m_policyOptimizer});
+			this.m_valueModel.compile({loss: 'meanSquaredError', optimizer: this.valueOptimizer});
 			return true
 		}catch(e){
+			console.log(e)
 			return e
 		}
 		
