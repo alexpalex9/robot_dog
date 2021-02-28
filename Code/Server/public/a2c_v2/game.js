@@ -105,7 +105,7 @@ class PlayGame {
 			if (t==true){
 				this.log("model loaded from local storage")
 			}else{
-					this.log("could not load models :",e)
+					this.log("could not load models :",t)
 			}
 			// }catch(e)#
 			
