@@ -126,7 +126,7 @@ class PlayGame {
         }
 
         // reset restart variable
-        this.m_waitRestart = false;
+        // this.m_waitRestart = false;
 
 		
 
@@ -335,8 +335,8 @@ class PlayGame {
 				// console.log("TRAINING OVER",this.m_reinforcementEnvironment.isDone(),g_settings.reinforcement.maxSteps,this.m_cartPoleInfo.episodeUpdateSteps)
                 // this.m_waitRestart = true;
 				
-                await this.onTrainingOver(debug);
-				
+                await this.onTrainingOver(debug,this.m_reinforcementEnvironment.isDone());
+				this.reset_training(true,"out of boundaries")
             }
             else
             {
@@ -347,9 +347,9 @@ class PlayGame {
                     await onTrainingOverCallback.bind( { game : this, debug : debug})
                 );
             }
-			if (this.m_reinforcementEnvironment.isDone()){
-				this.reset_training(true,"out of boundaries")
-			}
+			// if (this.m_reinforcementEnvironment.isDone()){
+				// this.reset_training(true,"out of boundaries")
+			// }
 
         }
 
@@ -378,7 +378,7 @@ class PlayGame {
         this.scene.start('Title');
     }
 
-    async onTrainingOver(debug)
+    async onTrainingOver(debug,done)
     {
         // Display histogram with chosen actions
         // tfvis.render.histogram(this.m_actionSurface, this.m_cartPoleInfo.episodeActions, {});
@@ -440,6 +440,9 @@ class PlayGame {
 		// console.log("TRAINING OVER")
         // this.scene.restart({ mode : this.m_mode});
 		await this.create({ mode : this.m_mode})
+		if (done){
+			this.pause_training('out of boundaries')
+		}
            
     }
 
@@ -564,7 +567,7 @@ class PlayGame {
 		}
 	}
 	async freeze_training() {
-		this.log("dog tired")
+		// this.log("dog tired")
 		$("#train_button").addClass('disabled')
 		$("#reset_button").addClass('disabled')
 		this.pause_training("dog tired")
