@@ -186,6 +186,23 @@ var myCharts = function(suffix){
 		type:'line',
 		yAxisID:"left"
 	}
+	var policy_template_left = {
+		data : [],
+		borderWidth : 1,
+		borderColor: 'rgba(197, 216, 156, 1)',
+		pointBorderWidth : 0,
+		pointRadius: 0,
+		lineTension : 0,
+		pointHitRadius: 5,
+		// type:'line',
+		pointBorderColor : 'rgba(197, 216, 156, 1)',
+		pointBackgroundColor : 'rgba(197, 216, 156, 1)',
+		fill: false,
+		spanGaps: true,
+		label: "policy_loss",
+		type:'line',
+		yAxisID:"left"
+	}
 	var reward_template_right = {
 		data : [],
 		borderWidth : 1,
@@ -255,56 +272,6 @@ var myCharts = function(suffix){
 		yAxisID:"left",
 		type:'line'
 	}
-	var inventory_template = {
-		data : [],
-		borderWidth : 3,
-		borderColor: 'rgba(147, 183, 221, 1)',
-		pointBorderWidth : 0,
-		pointRadius: 0,
-		lineTension : 0,
-		pointHitRadius: 5,
-		pointBorderColor : 'rgba(147, 183, 221, 1)',
-		pointBackgroundColor : 'rgba(147, 183, 221, 1)',
-		fill: false,
-		spanGaps: true,
-		label: "inventory",
-		yAxisID : "left",
-		type:"line"
-	}
-	var stockouts_template = {
-		data : [],
-		borderWidth : 1,
-		borderColor: 'rgba(221, 151, 149, 1)',
-		pointBorderWidth : 0,
-		pointRadius: 0,
-		lineTension : 0,
-		pointHitRadius: 5,
-		// type:'line',
-		pointBorderColor : 'rgba(221, 151, 149, 1)',
-		pointBackgroundColor : 'rgba(221, 151, 149, 1)',
-		fill: false,
-		spanGaps: true,
-		label: "stockouts",
-		yAxisID:"right",
-		type:'bar'
-	}
-	costs_template = {
-		data : [],
-		borderWidth : 1,
-		borderColor: 'rgba(221, 151, 149, 1)',
-		pointBorderWidth : 0,
-		pointRadius: 0,
-		lineTension : 0,
-		pointHitRadius: 5,
-		// type:'line',
-		pointBorderColor : 'rgba(221, 151, 149, 1)',
-		pointBackgroundColor : 'rgba(221, 151, 149, 1)',
-		fill: false,
-		spanGaps: true,
-		label: "costs",
-		yAxisID:"left",
-		type:'bar'
-	}
 	actions_template = {
 		data : [],
 		borderWidth : 1,
@@ -350,6 +317,16 @@ var myCharts = function(suffix){
 		},
 		options: JSON.parse(JSON.stringify(oneaxis_options))
 	}
+	var configSet_policy = {
+		type: 'bar',
+		data : {
+			labels: [],
+			datasets : [
+				JSON.parse(JSON.stringify(reward_template_left))
+			]
+		},
+		options: JSON.parse(JSON.stringify(oneaxis_options))
+	}
 	var configSet_PolicyEntropy = {
 		type: 'bar',
 		data : {
@@ -360,7 +337,16 @@ var myCharts = function(suffix){
 		},
 		options: JSON.parse(JSON.stringify(oneaxis_options))
 	}
-	
+	var configSet_policy = {
+		type: 'bar',
+		data : {
+			labels: [],
+			datasets : [
+				JSON.parse(JSON.stringify(policy_template_left))
+			]
+		},
+		options: JSON.parse(JSON.stringify(oneaxis_options))
+	}	
 	// var configSet_reward_loss_periods = {
 		// type: 'bar',
 		// data : {
@@ -408,6 +394,7 @@ var myCharts = function(suffix){
 	// console.log(this.suffix)
 	_this.value_loss = new Chart(document.getElementById("value_loss" + suffix).getContext("2d"),configSet_loss_value);
 	_this.PolicyEntropy = new Chart(document.getElementById("PolicyEntropy" + suffix).getContext("2d"),configSet_PolicyEntropy);
+	_this.policy = new Chart(document.getElementById("policy_loss" + suffix).getContext("2d"),configSet_policy);
 	_this.reward = new Chart(document.getElementById("reward").getContext("2d"),configSet_reward);
 	_this.reward_episodes = new Chart(document.getElementById("reward_episodes" + suffix).getContext("2d"),configSet_reward_loss_episods);
 	_this.actions = new Chart(document.getElementById("actions" + suffix).getContext("2d"),configSet_actions);

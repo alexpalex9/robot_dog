@@ -87,11 +87,14 @@ class Environment
 		var data = {}
 		this.states = []
 		this.states_scaled = []
+		for (var s in this.SERVOS){
+			data[s] = this.SERVOS[s]['state']	
+		}
 		for (var s in this.servos_walk){
 			this.states.push([])
 			this.states_scaled.push([])
 			console.log("doing servo",s)
-			data[this.servos_walk[s].name] = this.servos_walk[s].state
+			
 			for (var d=0;d<this.depth;d++){
 				this.states[s].push(this.servos_walk[s]['state'])
 				for (var a in this.servos_walk[s].actions_index){

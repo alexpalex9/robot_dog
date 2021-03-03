@@ -487,6 +487,13 @@ class PolicyBasedAgent
                 //*/
 				// var PolicyEntry
 				// var policyEntropy
+				// return tf.tidy(() => {
+					// optimizer.applyGradients(
+						// scaleAndAverageGradients(allGradients, normalizedRewards));
+					// });
+				// }
+	
+	
                 await this.m_policyOptimizer.minimize(() => {
 
                     return tf.tidy(() => {
@@ -499,7 +506,7 @@ class PolicyBasedAgent
                         // {
                             let policyEntropyTensor = this.internalPolicyEntropy(statesSlice);
                             let policyEntropy = policyEntropyTensor.dataSync()[0];
-                            // console.log("Epoch " + epoch + " - policy entropy = " + policyEntropy);
+                            console.log("Epoch " + epoch + " - policy entropy = " + policyEntropy);
 
                             // this.m_visualizationPolicyData.push(
                                 // { x: 1.0 * this.m_visualizationPolicyIndex++, 
@@ -652,7 +659,11 @@ class PolicyBasedAgent
                 console.log("log_prob_v4 = " + log_prob_v4.dataSync() + " - loss_v4 = " + total_loss_v4.dataSync());
                 // total_loss_v4.print();
             }
-
+			
+			this.charts.addData('policy',{
+			label : 1.0 * this.m_visualizationValueModelLossIndex-1,
+			policy_loss : total_loss_v4.dataSync()[0]
+		})
             //return loss;
             return total_loss_v4;
         });
