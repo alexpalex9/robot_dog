@@ -210,7 +210,7 @@ class PolicyBasedAgent
     createPolicyNeuralNetwork(inputCount, unitCount, layerCount, actionCount)
     {
         let model = tf.sequential();
-		console.log(inputCount, unitCount, layerCount, actionCount)
+		// console.log(inputCount, unitCount, layerCount, actionCount)
         // Add dense layers
         for (let i = 0; i < layerCount; i++)
         {

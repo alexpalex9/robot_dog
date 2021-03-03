@@ -405,7 +405,7 @@ var myCharts = function(suffix){
 	
 	// _this.reward_loss_chart_episods  = new Chart(document.getElementById("loss_reward_chart_episodes").getContext("2d"),configSet_reward_loss_episods);
 	// _this.reward_loss_chart_periods = new Chart(document.getElementById("loss_reward_chart_periods").getContext("2d"),configSet_reward_loss_periods);
-	console.log(this.suffix)
+	// console.log(this.suffix)
 	_this.value_loss = new Chart(document.getElementById("value_loss" + suffix).getContext("2d"),configSet_loss_value);
 	_this.PolicyEntropy = new Chart(document.getElementById("PolicyEntropy" + suffix).getContext("2d"),configSet_PolicyEntropy);
 	_this.reward = new Chart(document.getElementById("reward").getContext("2d"),configSet_reward);

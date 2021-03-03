@@ -34,41 +34,15 @@ class Environment
 				this.SERVOS[i]['actions_index']= []
 				this.AMOUNT_INPUTS = this.AMOUNT_INPUTS + 1
 				for (var act in this.SERVOS[i].actions){
-					this.SERVOS[i].actions_index.push({'servo':this.SERVOS[i].name,'angle':this.SERVOS[i].actions[act]})
+					this.SERVOS[i].actions_index.push({'servo':this.SERVOS[i].name,'angle':this.SERVOS[i].actions[act],'angle_scaled':(this.SERVOS[i].actions[act]-this.SERVOS[i].actions[0])/(this.SERVOS[i].actions[this.SERVOS[i].actions.length-1]-this.SERVOS[i].actions[0])})
 					this.SERVOS[i].actions_labels.push(this.SERVOS[i].name + '-'+ this.SERVOS[i].actions[act])
+					
+					// this.SERVOS[i].actions_index_scaled.push(this.SERVOS[i].name + '-'+ this.SERVOS[i].actions[act])
 				}
+				this.SERVOS[i]['state'] = this.SERVOS[i]['init']
 				this.servos_walk.push(this.SERVOS[i])
 			}
 		}
-
-		this.servos_object = {}
-		this.initial_servos_state = {}
-		
-		
-		for (var s in this.SERVOS){
-			this.initial_servos_state[this.SERVOS[s].name] = this.SERVOS[s]['init']
-			if (this.SERVOS[s]['used']==true){
-				this.servos_object[this.SERVOS[s].name] = {}
-				this.servos_object[this.SERVOS[s].name]['state'] = this.SERVOS[s]['init']
-				this.servos_object[this.SERVOS[s].name]['scale_a'] = 1 / (this.SERVOS[s].actions[this.SERVOS[s].actions.length-1] - this.SERVOS[s].actions[0])
-				this.servos_object[this.SERVOS[s].name]['scale_b'] = - this.SERVOS[s].actions[0] * this.servos_object[this.SERVOS[s].name]['scale_a']
-				
-				// make closure below?
-				// var _thistemp = this;
-				// this.servos_object[servos[s].name].scale = function(state){
-						// return (function(a,b){
-						// console.log(state,a,b)
-						// return state * a + b
-					// })(_thistemp.servos_object[servos[s].name]['scale_a'],_thistemp.servos_object[servos[s].name]['scale_b'])
-				// }
-				
-				// console.log("TEST TEST TEST",this.servos_object[servos[s].name].scale(90))	
-			}
-		}	
-		// if (use_gyro==true){
-			// this.AMOUNT_INPUTS = this.AMOUNT_INPUTS + 3 ;
-		// }
-		console.log("this.servos_walk",this.servos_walk)
 	}
 	get_servos_count(){
 		return this.servos_walk.length
@@ -90,10 +64,10 @@ class Environment
 	
 	getState = function(){
 		var states = []
-		for (var s in this.statesA_scaled){
-			states = states.concat(this.statesA_scaled[s])
+		for (var s in this.states_scaled){
+			states = states.concat(this.states_scaled[s])
 		}
-		
+		// console.log(states)
 		
 		return states 
 	}
@@ -105,64 +79,48 @@ class Environment
 	init = async function () {
 		console.log("INIT environment - started")
 		// this.servos_actions = servos_actions
-
 	
-		await this.SetServosAngles(this.initial_servos_state)
+	
 		
-		// console.log("INIT",this.servos_object)
-		var statesA = []
-		var statesA_scaled = []
-		for (var s in this.servos_object){
-			statesA.push([])
-			statesA_scaled.push([])
+		// console.log("this.servos_walk",this.servos_walk)
+		// console.log("INIT",this.servos_object).
+		var data = {}
+		this.states = []
+		this.states_scaled = []
+		for (var s in this.servos_walk){
+			this.states.push([])
+			this.states_scaled.push([])
+			console.log("doing servo",s)
+			data[this.servos_walk[s].name] = this.servos_walk[s].state
 			for (var d=0;d<this.depth;d++){
-				statesA[statesA.length-1].push(this.servos_object[s]['state'])
-				statesA_scaled[statesA_scaled.length-1].push(this.servos_scale_sate(s,this.servos_object[s]['state']))
+				this.states[s].push(this.servos_walk[s]['state'])
+				for (var a in this.servos_walk[s].actions_index){
+					if (this.servos_walk[s].actions_index[a].angle==this.servos_walk[s]['state']){
+						this.states_scaled[s].push(this.servos_walk[s].actions_index[a].angle_scaled)
+					}
+				}
+				// this.states_scaled.push(this.servos_scale_sate(s,this.servos_object[s]['state']))
 			}
-			
 		}
-		// console.log("STATES  INIT",statesA)
-		// console.log("STATES SCALED INIT",statesA_scaled)
+		
+		// console.log("SET ANGLE",data)
+		await this.SetServosAngles(data)
+		
+		console.log("STATES  INIT",this.states)
+		console.log("STATES SCALED INIT",this.states_scaled)
 		
 		this.sonic_state  = await this.Sonic();
 		this.initial_distance = this.sonic_state 
 		this.last_distance = this.sonic_state
-		// console.log(gyro)
-		
-		// console.log(statesA)
-		
-		// if (this.use_gyro==true){
-			// var gyro_state = await this.Gyro();
-			// for (var g in gyro_state){
-				// statesA.push([])
-				// statesA_scaled.push([])
-				// for (var d=0;d<this.depth;d++){
-					// statesA[statesA.length-1].push(gyro_state[g])
-					// statesA_scaled[statesA_scaled.length-1].push(gyro_state[g]/100)
-				// }
-				
-			// }
-			
-		// }else{
-			// var gyro_state = {'x':0,'y':0,'z':0}
-		// }
-		// console.log(gyro_state,statesA,statesA_scaled)
+
 		$("#reset_button").removeClass('active')
-		
-		this.statesA = statesA
-		this.statesA_scaled = statesA_scaled
+		console.log("init state",this.states)
+		console.log("init state",this.states_scaled)
+
 		this.reward = 0
-		// console.log("INIT environment - finished")
-		// return  {
-			// gyro_state : gyro_state,
-			// state : statesA,
-			// state_scaled : statesA_scaled
-		// }
+
 		
 	}
-
-	
-
 
 	servos_scale_sate = function(servo,state){
 		// console.log("servos_scale_sate",state,servo,this.servos_object)
@@ -247,90 +205,29 @@ class Environment
 		var actions_angle = {}
 		for (var a in actions_index){
 			var action_index = actions_index[a]
-			var action = this.servos_walk[a].actions_index[action_index]
-			var l = this.statesA[0].length - 1
-			// next_stateA = Array.from(state);
-			var next_stateA = [];
-			var next_stateA_scaled = [];
-			
-			// var new_angle = {}
-			// for (var s in state){
-			var s = 0
-			
+			console.log("action", a, action_index)
+			var servo = this.servos_walk[a].actions_index[action_index].servo
+			var angle = this.servos_walk[a].actions_index[action_index].angle
+			var angle_scaled = this.servos_walk[a].actions_index[action_index].angle_scaled
 
-				actions_angle[action.servo] =  action.angle
-				this.servos_object[action.servo]['state'] = action.angle
-
-			for (var servo in this.servos_object){
-				next_stateA.push(Array.from(this.statesA[s]));
-				next_stateA_scaled.push(Array.from(this.statesA_scaled[s]));
-				// console.log("servo",next_stateA,next_stateA_scaled)
-				next_stateA[s] = next_stateA[s].slice(1)
-				next_stateA_scaled[s] = next_stateA_scaled[s].slice(1)
-				
-				if (servo==action.servo){
-					next_stateA[s].push(action.angle)
-					// console.log("pushing next state",servo,s,action.angle,this.servos_scale_sate(action.servo,action.angle))
-					next_stateA_scaled[s].push(this.servos_scale_sate(action.servo,action.angle))
-				}else{
-					
-					// console.log("no action, pushing at i=",next_stateA[s].length-1,next_stateA[s])
-					var last_item = next_stateA[s][next_stateA[s].length-1]
-					var last_item_scaled = next_stateA_scaled[s][next_stateA_scaled[s].length-1]
-					// next_stateA[s].push(next_stateA[s][next_stateA[s].length-1])
-					next_stateA[s].push(last_item)
-					 
-					// console.log("pushing result",next_stateA[s].length-1,next_stateA[s])
-					// next_stateA_scaled[s].push(next_stateA_scaled[s][next_stateA_scaled[s].length-1])
-					next_stateA_scaled[s].push(last_item_scaled)
-					
-				}
-				
-				// new_angle[servo] = st
-				
-				s = s +1
-			}
+			this.states[a] = this.states[a].slice(1)
+			this.states_scaled[a] = this.states_scaled[a].slice(1)
+			this.states[a].push(angle)
+			this.states_scaled[a].push(angle_scaled)
+			actions_angle[servo] = angle
+			
 		}
-		console.log("ACTIONS",actions_angle)
+		console.log("ACTIONS",actions_angle,this.states,this.states_scaled)
 		await this.SetServosAngles(actions_angle)
-		
-		// if (this.use_gyro==true){
-			// var gyro_state = await this.Gyro();
-			
-			
-			// for (var dim in gyro_state){
 
-				
-				// next_stateA.push(Array.from(this.statesA[s]));
-				// next_stateA_scaled.push(Array.from(this.state_scaled[s]));
-				
-				// next_stateA[s] = next_stateA[s].slice(1)
-				// next_stateAA_scaled[s] = next_stateAA_scaled[s].slice(1)
-				
-				// var st = gyro_state[dim]
-				// next_stateA[s].push(st)
-				// next_stateA_scaled[s].push(st/100)
-				// s = s + 1
-			// }
-		// }else{
-			// var gyro_state = {'x':0,'y':0,'z':0}
-		// }
-		
 		this.sonic_state = await this.Sonic();
 		// var distance_change	 = (sonic_state - 50 )/ 100
 		if (!this.last_distance){
 			this.last_distance = this.sonic_state 
-		}
-		
-		this.statesA = next_stateA
-		this.statesA_scaled = next_stateA_scaled
+		}		
+
 		var improvement = this.last_distance - this.sonic_state
-		// if (improvement>0){
-			this.reward = improvement / 5
-		// }else{
-			// this.reward = 0
-		// }
-		
+		this.reward = improvement / 5
 		this.last_distance = this.sonic_state
 	}
 	
