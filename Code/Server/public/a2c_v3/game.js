@@ -736,7 +736,7 @@ let g_settings = {
 		miniBatchSize : 200
 	},
 	reinforcement:{
-		maxSteps : 5,
+		maxSteps :100,
 		miniBatchSize : 1,
 		epochsPerEpisode : 1,
 		// layers : 3,
