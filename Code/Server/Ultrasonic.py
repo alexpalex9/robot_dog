@@ -28,7 +28,7 @@ class Ultrasonic:
             pulse_len = finish-start
             distance_cm[i] = pulse_len/0.000058
         distance_cm=sorted(distance_cm)
-        return distance_cm[1]
+        return int(distance_cm[1]*10)/10
         
 # Main program logic follows:
 if __name__ == '__main__':
