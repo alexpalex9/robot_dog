@@ -706,9 +706,9 @@ function onTrainingNStepOverCallback()
 let g_settings = {
 	// mode :"RL_TRAIN",
 	agent:{
-		algorithm : "A2C", // REINFORCE REINFORCE_BASELINE A2C
-		nSteps : 4,
-		depth : 2,
+		algorithm : "REINFORCE", // REINFORCE REINFORCE_BASELINE A2C
+		nSteps : 10,
+		depth : 3,
 		// oneHotShape : 3  // class of action,
 		servos : [
 			{'name':2,'init':0,'used':false},
@@ -732,23 +732,23 @@ let g_settings = {
 	},
 	valuemodel:{
 		epochs : 1,
-		layers : 4,
+		layers : 3,
 		// units : 24,
-		units : 36,
+		units : 24,
 		// learningRate : 0.0001, // 0.005,
-		learningRate : 0.001, // 0.005,
+		learningRate : 0.01, // 0.005,
 		miniBatchSize : 200
 	},
 	reinforcement:{
-		maxSteps :100,
-		miniBatchSize : 1,
+		maxSteps :1000,
+		miniBatchSize : 200,
 		epochsPerEpisode : 1,
 		// layers : 3,
-		layers : 4,
+		layers : 3,
 		// units : 24,
-		units : 36,
+		units : 24,
 		// learningRate : 0.0001, // 0.005,
-		learningRate : 0.001,
+		learningRate : 0.01,
 		gammaDiscountRate : 0.95,
 		// gammaDiscountRate : 0.99,
 

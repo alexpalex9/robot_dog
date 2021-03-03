@@ -349,15 +349,15 @@ class PolicyBasedAgent
             episodesInfo.episodeDones.pop();
         }
             
-        if (debug)
-        {
+        // if (debug)
+        // {
             console.log("trainModels: actions " + episodesInfo.episodeActions);
             console.log("trainModels: states " + episodesInfo.episodeStates);
             console.log("trainModels: rewards " + episodesInfo.episodeRewards);
             console.log("trainModels: state values " + episodesInfo.episodeStateValues);
             console.log("trainModels: dones " + episodesInfo.episodeDones);
             console.log("trainModels: disc rw " + episodesInfo.discountedEpisodeRewards);
-        }
+        // }
             
         // Compute advantages with discounted rewards - value model predictions (baseline)
         episodesInfo.episodeAdvantages = [];
