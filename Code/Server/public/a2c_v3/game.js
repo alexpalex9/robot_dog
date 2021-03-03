@@ -707,21 +707,25 @@ let g_settings = {
 	// mode :"RL_TRAIN",
 	agent:{
 		algorithm : "A2C", // REINFORCE REINFORCE_BASELINE A2C
-		nSteps : 1,
-		depth : 3,
+		nSteps : 4,
+		depth : 2,
 		// oneHotShape : 3  // class of action,
 		servos : [
 			{'name':2,'init':0,'used':false},
-			{'name':3,'init':80,'used':true,'min':70,'max':90,'step':10,'actions':[70,80,90]},
+			// {'name':3,'init':80,'used':true,'min':70,'max':90,'step':10,'actions':[70,80,90]},
+			{'name':3,'init':80,'used':true,'min':70,'max':90,'step':10,'actions':[70,90]},
 			{'name':4,'init':97,'used':false},
 			{'name':5,'init':0,'used':false},
-			{'name':6,'init':87,'used':true,'min':90,'max':110,'step':10,'actions':[77,87,97]},
+			// {'name':6,'init':87,'used':true,'min':90,'max':110,'step':10,'actions':[77,87,97]},
+			{'name':6,'init':87,'used':true,'min':90,'max':110,'step':10,'actions':[77,97]},
 			{'name':7,'init':97,'used':false},
 			{'name':8,'init':85,'used':false},
-			{'name':9,'init':87,'used':true,'min':77,'max':97,'step':10,'actions':[77,87,97]},
+			// {'name':9,'init':87,'used':true,'min':77,'max':97,'step':10,'actions':[77,87,97]},
+			{'name':9,'init':87,'used':true,'min':77,'max':97,'step':10,'actions':[77,97]},
 			{'name':10,'init':180,'used':false},
 			{'name':11,'init':86,'used':false},
-			{'name':12,'init':90,'used':true,'min':80,'max':100,'step':10,'actions':[80,90,100]},
+			// {'name':12,'init':90,'used':true,'min':80,'max':100,'step':10,'actions':[80,90,100]},
+			{'name':12,'init':90,'used':true,'min':80,'max':100,'step':10,'actions':[80,100]},
 			{'name':13,'init':180,'used':false},
 			{'name':15,'init':90,'used':false,'label':'head'},
 		]	
@@ -788,11 +792,7 @@ $(function(){
 	// console.log()
 	// sars.active = false
 	
-	$("#train_button").on('click',function(){
-		
-		
-		
-		
+	$("#train_button").on('click',function(){	
 		if (!$(this).hasClass('disabled')){
 			// console.log($(this).hasClass("active"))
 			if($(this).hasClass("active")){
