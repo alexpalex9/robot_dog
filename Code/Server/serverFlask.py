@@ -157,6 +157,11 @@ class Server():
         @app.route('/learn')
         def learn():
             return render_template('learn.html')
+        
+        @app.route('/learn3')
+        def learn3():
+            return render_template('learn_v3.html')
+        
         def gen(camera=None):
             while True:
                 if DEV==False:

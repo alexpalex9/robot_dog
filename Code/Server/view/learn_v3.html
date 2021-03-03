@@ -51,26 +51,56 @@
 	</div>
 	</div>
 	<div style="100%">
-		<!-- <div id="loss_reward_chart_episodes_container" style="height:250px;width:30%;display:inline-block"> -->
-			<!-- <canvas id="loss_reward_chart_episodes" style="display:inline" ></canvas> -->
-		<!-- </div> -->
-		<!-- <div id="loss_reward_chart_episodes_container" style="height:250px;width:65%;display:inline-block"> -->
-			<!-- <canvas id="loss_reward_chart_periods" style="display:inline" ></canvas> -->
-		<!-- </div>	 -->
-		<div id="actions_container" style="height:250px;width:100%;display:inline-block">
-			<canvas id="actions" style="display:inline" ></canvas>
+		<div id="actions_container0" style="height:250px;width:24%;display:inline-block">
+			<canvas id="actions0" style="display:inline" ></canvas>
+		</div>
+		<div id="actions_container1" style="height:250px;width:24%;display:inline-block">
+			<canvas id="actions1" style="display:inline" ></canvas>
+		</div>
+		<div id="actions_container2" style="height:250px;width:24%;display:inline-block">
+			<canvas id="actions2" style="display:inline" ></canvas>
+		</div>
+		<div id="actions_container3" style="height:250px;width:24%;display:inline-block">
+			<canvas id="actions3" style="display:inline" ></canvas>
 		</div>
 		<div id="reward_container" style="height:250px;width:100%;display:inline-block">
-			<canvas id="reward_episodes" style="display:inline" ></canvas>
-		</div>		
-		<div id="reward_episodes_container" style="height:250px;width:100%;display:inline-block">
 			<canvas id="reward" style="display:inline" ></canvas>
+		</div>		
+		<div id="reward_episodes_container0" style="height:250px;width:24%;display:inline-block">
+			<canvas id="reward_episodes0" style="display:inline" ></canvas>
 		</div>
-		<div id="PolicyEntropy_container" style="height:250px;width:100%;display:inline-block">
-			<canvas id="PolicyEntropy" style="display:inline" ></canvas>
+		<div id="reward_episodes_container1" style="height:250px;width:24%;display:inline-block">
+			<canvas id="reward_episodes1" style="display:inline" ></canvas>
 		</div>
-		<div id="loss_value_container" style="height:250px;width:100%;display:inline-block">
-			<canvas id="value_loss" style="display:inline" ></canvas>
+		<div id="reward_episodes_container2" style="height:250px;width:24%;display:inline-block">
+			<canvas id="reward_episodes2" style="display:inline" ></canvas>
+		</div>
+		<div id="reward_episodes_container3" style="height:250px;width:24%;display:inline-block">
+			<canvas id="reward_episodes3" style="display:inline" ></canvas>
+		</div>
+		<div id="PolicyEntropy_container0" style="height:250px;width:48%;display:inline-block">
+			<canvas id="PolicyEntropy0" style="display:inline" ></canvas>
+		</div>
+		<div id="loss_value_container0" style="height:250px;width:48%;display:inline-block">
+			<canvas id="value_loss0" style="display:inline" ></canvas>
+		</div>
+		<div id="PolicyEntropy_container1" style="height:250px;width:48%;display:inline-block">
+			<canvas id="PolicyEntropy1" style="display:inline" ></canvas>
+		</div>
+		<div id="loss_value_container1" style="height:250px;width:48%;display:inline-block">
+			<canvas id="value_loss1" style="display:inline" ></canvas>
+		</div>
+		<div id="PolicyEntropy_container2" style="height:250px;width:48%;display:inline-block">
+			<canvas id="PolicyEntropy2" style="display:inline" ></canvas>
+		</div>
+		<div id="loss_value_container2" style="height:250px;width:48%;display:inline-block">
+			<canvas id="value_loss2" style="display:inline" ></canvas>
+		</div>
+		<div id="PolicyEntropy_container3" style="height:250px;width:48%;display:inline-block">
+			<canvas id="PolicyEntropy3" style="display:inline" ></canvas>
+		</div>
+		<div id="loss_value_container3" style="height:250px;width:48%;display:inline-block">
+			<canvas id="value_loss3" style="display:inline" ></canvas>
 		</div>
 	</div>
 	<div id="log">
@@ -80,7 +110,7 @@
 	<!-- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.8.2/dist/tf.js"></script> -->
 	<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.0.0/dist/tf.js"></script>
 	<script type="text/javascript" src="Chart.bundle.min.js"></script>
-	<script type="text/javascript" src="a2c_v2/charts.js"></script>
+	<script type="text/javascript" src="a2c_v3/charts.js"></script>
 	<script src="joy.min.js"></script>
 	<!-- <script src="face-api.js"></script> -->
 	<script src="motion.js"></script>
@@ -89,10 +119,10 @@
 	
 	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.0/socket.io.min.js"></script>
 	<script src="main.js"></script>
-	<script src="a2c_v2/environment.js"></script>
-	<script src="a2c_v2/a2c.js"></script>
-	<script src="a2c_v2/vectorutils.js"></script>
-	<script src="a2c_v2/game.js"></script>
+	<script src="a2c_v3/environment.js"></script>
+	<script src="a2c_v3/a2c.js"></script>
+	<script src="a2c_v3/vectorutils.js"></script>
+	<script src="a2c_v3/game.js"></script>
 	<!-- <script src="a2c/game.js"></script> -->
 	<!-- <script src="a2c_seq.js"></script> -->
 </html>
