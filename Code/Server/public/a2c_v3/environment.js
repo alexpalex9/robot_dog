@@ -61,6 +61,7 @@ class Environment
 		// console.log("this.sonic_state",this.sonic_state)
 		// return (this.sonic_state<5 || this.sonic_state>50)
 		// has moved backward more than 1 cm
+		console.log("isDone",this.sonic_state - this.initial_distance,this.initial_distance)
 		return (this.sonic_state - this.initial_distance)>1
 	}
 	
