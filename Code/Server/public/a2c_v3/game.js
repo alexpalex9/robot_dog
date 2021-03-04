@@ -484,11 +484,11 @@ class PlayGame {
 		if (i==window.reinforcement_info.length-1){
 			await this.create({ mode : this.m_mode})
 		}
-		// if (done){
-			// if (i==window.reinforcement_model.length-1){
-				// this.pause_training('out of boundaries')
-			// }
-		// }
+		if (done){
+			if (i==window.reinforcement_model.length-1){
+				this.pause_training('out of boundaries')
+			}
+		}
            
     }
 

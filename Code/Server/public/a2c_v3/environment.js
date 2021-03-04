@@ -59,10 +59,10 @@ class Environment
 	}	
 	isDone = function(){
 		// console.log("this.sonic_state",this.sonic_state)
-		// return (this.sonic_state<5 || this.sonic_state>50)
+		return (this.sonic_state<5 || this.sonic_state>50)
 		// has moved backward more than 1 cm
-		console.log("isDone",this.sonic_state - this.initial_distance,this.initial_distance)
-		return (this.sonic_state - this.initial_distance)>1
+		// console.log("isDone",this.sonic_state - this.initial_distance,this.initial_distance)
+		// return (this.sonic_state - this.initial_distance)>1
 	}
 	
 	getState = function(){
@@ -75,12 +75,17 @@ class Environment
 		return states 
 	}
 	getReward = function(){
-		console.log("REWARD",this.sonic_state,this.last_distance)
-		if (this.sonic_state < this.last_distance){
-			this.last_distance = this.sonic_state
-			return 1.0
-		}else{
+		// console.log("REWARD",this.sonic_state,this.last_distance)
+		// if (this.sonic_state < this.last_distance){
+			// this.last_distance = this.sonic_state
+			// return 1.0
+		// }else{
+			// return 0.0
+		// }
+		if (this.reward<0){
 			return 0.0
+		}else{
+			return this.reward
 		}
 		// return this.reward
 	}
@@ -241,18 +246,18 @@ class Environment
 
 		var improvement = this.last_distance - this.sonic_state
 		this.reward = improvement / 5
-		// this.last_distance = this.sonic_state
+		this.last_distance = this.sonic_state
 		
-        let done = this.isDone();
+        // let done = this.isDone();
 
-        if (!done)
-        {
-            this.m_reward = 1.0;
-        }
-        else
-        {
-            this.m_reward = 0.0;
-        }
+        // if (!done)
+        // {
+            // this.m_reward = 1.0;
+        // }
+        // else
+        // {
+            // this.m_reward = 0.0;
+        // }
 
 	}
 }
