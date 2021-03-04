@@ -95,7 +95,7 @@ class Environment
 		this.states = []
 		this.states_scaled = []
 		for (var s in this.SERVOS){
-			data[s] = this.SERVOS[s]['state']	
+			data[this.SERVOS[s].name] = this.SERVOS[s]['init']	
 		}
 		for (var s in this.servos_walk){
 			this.states.push([])
@@ -113,7 +113,7 @@ class Environment
 			}
 		}
 		
-		// console.log("SET ANGLE",data)
+		console.log("SET ANGLE",data)
 		await this.SetServosAngles(data)
 		
 		console.log("STATES  INIT",this.states)
