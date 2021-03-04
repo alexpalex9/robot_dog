@@ -75,7 +75,8 @@ class Environment
 		return states 
 	}
 	getReward = function(){
-		if (this.sonic_state - this.initial_distance<0){
+		if (this.sonic_state - this.last_distance<0){
+			this.last_distance = this.sonic_state
 			return 1.0
 		}else{
 			return 0.0
