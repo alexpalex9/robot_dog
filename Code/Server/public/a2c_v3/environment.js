@@ -59,7 +59,9 @@ class Environment
 	}	
 	isDone = function(){
 		// console.log("this.sonic_state",this.sonic_state)
-		return (this.sonic_state<5 || this.sonic_state>50)
+		// return (this.sonic_state<5 || this.sonic_state>50)
+		// has moved backward more than 1 cm
+		return (this.sonic_state - this.initial_distance)>1
 	}
 	
 	getState = function(){
@@ -72,7 +74,12 @@ class Environment
 		return states 
 	}
 	getReward = function(){
-		return this.reward
+		if (this.sonic_state - this.initial_distance<-1){
+			return 1.0
+		}else{
+			return 0.0
+		}
+		// return this.reward
 	}
 	
 	
@@ -121,7 +128,7 @@ class Environment
 		console.log("init state",this.states_scaled)
 
 		this.reward = 0
-
+		this.initial_distance_state = await this.Sonic();
 		
 	}
 
@@ -226,12 +233,23 @@ class Environment
 		this.sonic_state = await this.Sonic();
 		// var distance_change	 = (sonic_state - 50 )/ 100
 		if (!this.last_distance){
-			this.last_distance = this.sonic_state 
+			this.last_distance = this.initial_distance 
 		}		
 
 		var improvement = this.last_distance - this.sonic_state
 		this.reward = improvement / 5
 		this.last_distance = this.sonic_state
+		
+        let done = this.isDone();
+
+        if (!done)
+        {
+            this.m_reward = 1.0;
+        }
+        else
+        {
+            this.m_reward = 0.0;
+        }
+
 	}
-	
 }

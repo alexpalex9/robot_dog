@@ -106,7 +106,7 @@ class PlayGame {
 			for (var i=0;i<model_count;i++){
 				
 				this.m_cartPoleInfo[i] = new EpisodeInfo();
-				
+				console.log("CREATE NEW MODEL")
 				
 				window.reinforcement_model.push(new PolicyBasedAgent(this.m_reinforcementEnvironment.get_inputs_count() * g_settings.agent.depth,this.m_reinforcementEnvironment.get_actions_count(i),i))
 				
