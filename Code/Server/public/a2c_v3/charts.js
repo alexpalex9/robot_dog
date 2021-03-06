@@ -408,7 +408,7 @@ var myCharts = function(suffix){
 	}
 	
 	_this.updateData = function(chart_name,data){
-		console.log("UPDATE DATA CHART",chart_name,data,_this.suffix)
+		// console.log("UPDATE DATA CHART",chart_name,data,_this.suffix)
 		_this[chart_name].config.data.labels = data.labels
 		for (var d in data){
 			for (var c in _this[chart_name].config.data.datasets){
@@ -423,7 +423,7 @@ var myCharts = function(suffix){
 	}
 	_this.addData = function(chart_name,data){
 		
-		console.log("ADD DATA CHART",chart_name,data,this.suffix)
+		// console.log("ADD DATA CHART",chart_name,data,this.suffix)
 		// var max= 200
 		// if (chart_name=="reward_episodes"){
 			// max = 

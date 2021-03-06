@@ -324,10 +324,11 @@ class PolicyBasedAgent
         if (this.hasNSteps() && this.hasValueModel() && !done)
         {
             // Use the value model to estimate the last reward (currently a fake value is used)
+			console.log("episodesInfo.episodeStateValues",episodesInfo.episodeStateValues)
             episodesInfo.episodeRewards[episodesInfo.episodeRewards.length - 1]
                = episodesInfo.episodeStateValues[episodesInfo.episodeRewards.length - 1];
             episodesInfo.episodeDones[episodesInfo.episodeDones.length - 1] = 1.0;
-            
+            console.log("episodesInfo.episodeRewards",episodesInfo)
             removeLastFakeValues = true;
         }
 

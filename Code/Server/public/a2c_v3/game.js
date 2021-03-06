@@ -158,12 +158,12 @@ class PlayGame {
         // reset episode info
         // In Actor Critic n-step we should not reset everything as
         // we may not have a complete n-step
-		for (var i=0;i<this.m_cartPoleInfo.length;i++){
+		for (var i=0; i<this.m_cartPoleInfo.length ;i++){
 			// console.log("RESETTTTTTTTTTTTTTTTTT")
 			let resetingDuringNStep = (this.m_mode == "RL_TRAIN" && window.reinforcement_model[i] !== null && window.reinforcement_model[i].hasNSteps() && !reinforcementModelJustCreated);
 			this.m_cartPoleInfo[i].reset(resetingDuringNStep);
         }
-
+		console.log("INIT DONE",this.m_cartPoleInfo)
         // let world_width = this.m_reinforcementEnvironment.getWorldWidth();
         // let scale = game.config.width / world_width;
 
@@ -249,18 +249,20 @@ class PlayGame {
         // predict reward with Value model
 		
 		for(var i in window.reinforcement_model){
+			console.log("MODEL",i)
 			if (window.reinforcement_model[i].hasValueModel())
 			{
-				this.logMemory("before value model predict");
+				// this.logMemory("before value model predict");
 
-				let predictedValueReward = tf.tidy(() => {
+				let predictedValueReward = await tf.tidy(() => {
 
 					const stateTensor = tf.tensor2d(newState, [1, newState.length]);
 					let prediction = window.reinforcement_model[i].m_valueModel.predict(stateTensor).dataSync(); 
 					//let prediction = window.reinforcement_model.internalPredict(stateTensor, true).dataSync(); // same result
 					return prediction;
 				});
-				this.m_cartPoleInfo[i].episodeStateValues.push(predictedValueReward);
+				console.log("predictedValueReward",predictedValueReward,i)
+				this.m_cartPoleInfo[i].episodeStateValues.push(predictedValueReward[0]);
 			}
 		
         // Check if algorithm works on n-steps (e.g. A2C)
@@ -281,6 +283,7 @@ class PlayGame {
 
 					// Train the value and policy models
 					// this.m_waitRestart = true;
+					console.log("train models",this.m_cartPoleInfo[i])
 					await window.reinforcement_model[i].trainModels(this.m_cartPoleInfo[i], false, debug)
 					// .then(
 						// if(i==window.reinforcement_model.length-1)
@@ -289,8 +292,12 @@ class PlayGame {
 					// );
 
 					// leave function now
-					console.log("-> early stop")
-					return;
+					
+						if (i==this.m_reinforcementEnvironment.length-1){
+							console.log("-> early stop")
+							return;
+						}
+					console.log("train FIRST done",this.m_cartPoleInfo)
 				}
 				else
 				{
@@ -306,20 +313,20 @@ class PlayGame {
         //  > choose action based on probability
 		var actions = []
 		for(var i in window.reinforcement_model){
-			let predictedActionSoftmax = tf.tidy(() => {
+			console.log("calculate predictedActionSoftmax",i)
+			var predictedActionSoftmax = await tf.tidy(() => {
 				// NB: tf.tidy will clean up all the GPU memory used by tensors inside
 				// this function, other than the tensor that is returned.
 
-				const stateTensor = tf.tensor2d(newState, [1, newState.length]);
-				let prediction = window.reinforcement_model[i].m_model.predict(stateTensor).dataSync(); 
+				var stateTensor = tf.tensor2d(newState, [1, newState.length]);
+				var prediction = window.reinforcement_model[i].m_model.predict(stateTensor).dataSync(); 
 				//let prediction = window.reinforcement_model.internalPredict(stateTensor, true).dataSync(); // same result
-				console.log("PREDICTION = ",prediction)
+				console.log("PREDICTION = ",i,prediction)
+				// console.log("states = ",i,stateTensor.dataSync())
 				window.reinforcement_model[i].charts.updateData('actions',{
 					labels : this.m_reinforcementEnvironment.get_actions_label(i),
 					actions : prediction
 				})
-			
-			
 				
 				return prediction;
 				
@@ -331,14 +338,16 @@ class PlayGame {
 
 			// Compute choice based on action using softmax result as probabilities
 			var action = VectorUtils.randomChoice(predictedActionSoftmax);
-			actions.push(action)
 			this.m_cartPoleInfo[i].episodeActions.push(action);
+			actions.push(action)
         //if (debug)
         //    console.log("RL predicted " + action);
 		}
         // Apply the action
-		
+		console.log("END OF ACTIONS",this.m_cartPoleInfo)
 		await this.applyReinforcementAction(time, actions);
+		console.log("END OF applyReinforcementAction",this.m_cartPoleInfo)
+		
 		// console.log("TIME NEW STEP",new Date() - t)
         // Compute the state
 		let episodeDone = (this.m_reinforcementEnvironment.isDone() ||
@@ -348,12 +357,12 @@ class PlayGame {
 
 			// Push the current reward
 			this.m_cartPoleInfo[i].episodeRewards.push(this.m_reinforcementEnvironment.getReward());
-
+			console.log("push reward",i,this.m_cartPoleInfo[i])
         // Push done state
 		
 			
 			this.m_cartPoleInfo[i].episodeDones.push((episodeDone ? 1.0 : 0.0));
-
+			console.log("end of handleaction",this.m_cartPoleInfo)
 		// console.log("CHECK EPISODE OVER",episodeDone,this.m_reinforcementEnvironment.isDone(),this.m_cartPoleInfo.episodeUpdateSteps,g_settings.reinforcement.maxSteps)
         // check if the episode should end
 			if (episodeDone)
@@ -397,6 +406,7 @@ class PlayGame {
     async applyReinforcementAction(time, actions)
     {
         // Update environment
+		console.log("APPLY REINFORCEMENT ACTION",actions)
         await this.m_reinforcementEnvironment.step(actions);
 		for (var i in this.m_cartPoleInfo){
 			this.m_cartPoleInfo[i].onStep();
@@ -497,7 +507,7 @@ class PlayGame {
         // Display histogram with chosen actions
         //tfvis.render.histogram(this.m_actionSurface, this.m_cartPoleInfo.episodeActions, {});
 
-        this.logMemory("after train n-step");
+        // this.logMemory("after train n-step");
 
         // Store/display stats
         // compute the episode total reward
@@ -519,9 +529,10 @@ class PlayGame {
 				label : 1.0 *  this.m_cartPoleInfo[i].globalStep,
 				reward : episodeRewardsSum
 			})
+			this.m_cartPoleInfo[i].onNewNStep();
 		}
         // Move to next n-step
-        this.m_cartPoleInfo[i].onNewNStep();
+        
 
         //this.scene.restart({ mode : this.m_mode});
         // this.m_waitRestart = false;
@@ -706,8 +717,8 @@ function onTrainingNStepOverCallback()
 let g_settings = {
 	// mode :"RL_TRAIN",
 	agent:{
-		algorithm : "A2C", // REINFORCE REINFORCE_BASELINE A2C
-		nSteps : 1,
+		algorithm : "REINFORCE", // REINFORCE REINFORCE_BASELINE A2C
+		nSteps : 10,
 		depth : 3,
 		// oneHotShape : 3  // class of action,
 		servos : [

@@ -82,12 +82,13 @@ class Environment
 		// }else{
 			// return 0.0
 		// }
-		if (this.reward<0){
-			return 0.0
-		}else{
-			return this.reward
-		}
-		// return this.reward
+		// if (this.reward<0){
+			// return 0.0
+		// }else{
+			// return this.reward
+		// }
+		// console.log("REWARd",this.reward)
+		return this.reward
 	}
 	
 	

@@ -243,7 +243,10 @@ class PlayGame {
                 //let prediction = window.reinforcement_model.internalPredict(stateTensor, true).dataSync(); // same result
                 return prediction;
             });
+			console.log("predictedValueReward",predictedValueReward)
+			
             this.m_cartPoleInfo.episodeStateValues.push(predictedValueReward);
+			console.log("this.m_cartPoleInfo.episodeStateValues",this.m_cartPoleInfo.episodeStateValues)
         }
 
         // Check if algorithm works on n-steps (e.g. A2C)
@@ -664,7 +667,7 @@ let g_settings = {
 	// mode :"RL_TRAIN",
 	agent:{
 		algorithm : "A2C", // REINFORCE REINFORCE_BASELINE A2C
-		nSteps : 1,
+		nSteps :5,
 		depth : 3,
 		// oneHotShape : 3  // class of action,
 		servos : [
