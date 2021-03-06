@@ -105,8 +105,8 @@ class PlayGame {
 			this.m_cartPoleInfo = []
 			for (var i=0;i<model_count;i++){
 				
-				this.m_cartPoleInfo[i] = new EpisodeInfo();
-				console.log("CREATE NEW MODEL")
+				this.m_cartPoleInfo[i] = new EpisodeInfo(i);
+				// console.log("CREATE NEW MODEL")
 				
 				window.reinforcement_model.push(new PolicyBasedAgent(this.m_reinforcementEnvironment.get_inputs_count() * g_settings.agent.depth,this.m_reinforcementEnvironment.get_actions_count(i),i))
 				
@@ -236,10 +236,10 @@ class PlayGame {
         // current reward correspond to previous action and state
 
         // Compute current state
-		console.log("---------------NEW handleReinforcementLearning function-------------",this.m_cartPoleInfo)
+		console.log("---------------NEW handleReinforcementLearning function-------------")
         let newState = this.m_reinforcementEnvironment.getState();
 
-		console.log("newState",newState)
+		// console.log("newState",newState)
         // store reward corresponding to action and state choosen and computed at the previous update()
         //if (this.m_cartPoleInfo.episodeRewards.length > 0)
         //{
@@ -249,7 +249,7 @@ class PlayGame {
         // predict reward with Value model
 		
 		for(var i in window.reinforcement_model){
-			console.log("MODEL",i)
+			// console.log("MODEL",i)
 			if (window.reinforcement_model[i].hasValueModel())
 			{
 				// this.logMemory("before value model predict");
@@ -261,7 +261,7 @@ class PlayGame {
 					//let prediction = window.reinforcement_model.internalPredict(stateTensor, true).dataSync(); // same result
 					return prediction;
 				});
-				console.log("predictedValueReward",predictedValueReward,i)
+				// console.log("predictedValueReward",predictedValueReward,i)
 				this.m_cartPoleInfo[i].episodeStateValues.push(predictedValueReward[0]);
 			}
 		
@@ -275,25 +275,29 @@ class PlayGame {
 					
 					// End the line
 					// NB: All the info will be cleared for the next n-steps (the same state will be retrieved again)
+					
 					this.m_cartPoleInfo[i].episodeActions.push(0);         // fake action
 					this.m_cartPoleInfo[i].episodeStates.push(newState);   // new state
 					this.m_cartPoleInfo[i].episodeRewards.push(0);         // fake reward
 					this.m_cartPoleInfo[i].episodeDones.push(0.0);           // fake done
 					//this.m_cartPoleInfo.episodeStateValues            // Already pushed
 
+					console.log(i,"END OF NE STEPS","episodeRewards",this.m_cartPoleInfo[i].episodeRewards.length,this.m_cartPoleInfo[i].episodeRewards)
+					console.log(i,"END OF NE STEPS","episodeStateValues",this.m_cartPoleInfo[i].episodeStateValues.length,this.m_cartPoleInfo[i].episodeStateValues)
 					// Train the value and policy models
 					// this.m_waitRestart = true;
-					console.log("train models",this.m_cartPoleInfo[i])
+					// console.log("train models",this.m_cartPoleInfo[i])
 					await window.reinforcement_model[i].trainModels(this.m_cartPoleInfo[i], false, debug)
 					// .then(
 						// if(i==window.reinforcement_model.length-1)
 						// onTrainingNStepOverCallback.bind( { game : this, debug : debug, index:i})
+						// console.log("onTrainingNStepOver",i)
 						this.onTrainingNStepOver(debug, i)
 					// );
 
 					// leave function now
 					
-						if (i==this.m_reinforcementEnvironment.length-1){
+						if (i==window.reinforcement_model.length-1){
 							console.log("-> early stop")
 							return;
 						}
@@ -362,7 +366,7 @@ class PlayGame {
 		
 			
 			this.m_cartPoleInfo[i].episodeDones.push((episodeDone ? 1.0 : 0.0));
-			console.log("end of handleaction",this.m_cartPoleInfo)
+			
 		// console.log("CHECK EPISODE OVER",episodeDone,this.m_reinforcementEnvironment.isDone(),this.m_cartPoleInfo.episodeUpdateSteps,g_settings.reinforcement.maxSteps)
         // check if the episode should end
 			if (episodeDone)
@@ -399,8 +403,13 @@ class PlayGame {
 				// }
 
 			}
+			
+			
 		}
-
+			for (var i in this.m_cartPoleInfo){
+				console.log("end of handleaction episodeRewards",i, this.m_cartPoleInfo[i].episodeRewards.length, this.m_cartPoleInfo[i].episodeRewards)
+				console.log("end of handleaction episodeStateValues",i, this.m_cartPoleInfo[i].episodeStateValues.length,this.m_cartPoleInfo[i].episodeStateValues)
+			}
     }
 
     async applyReinforcementAction(time, actions)
@@ -524,12 +533,17 @@ class PlayGame {
 		// let meanReward = VectorUtils.mean( window.reinforcement_info.allRewards);
         // let maxReward = VectorUtils.max( window.reinforcement_info.allRewards);
 		// console.log("REWARD CHART STEP",episodeRewardsSum)
+		var step = this.m_cartPoleInfo[i].globalStep
+		
+		this.m_cartPoleInfo[i].onNewNStep();
+		console.log("onTrainingNStepOver",this.m_cartPoleInfo[i].episodeStateValues)
+		console.log(this.m_cartPoleInfo[i].episodeRewards)
 		if (i==window.reinforcement_model.length-1){
 			window.reinforcement_model[i].charts.addData('reward',{
-				label : 1.0 *  this.m_cartPoleInfo[i].globalStep,
+				label : 1.0 *  step,
 				reward : episodeRewardsSum
 			})
-			this.m_cartPoleInfo[i].onNewNStep();
+			
 		}
         // Move to next n-step
         
@@ -717,8 +731,8 @@ function onTrainingNStepOverCallback()
 let g_settings = {
 	// mode :"RL_TRAIN",
 	agent:{
-		algorithm : "REINFORCE", // REINFORCE REINFORCE_BASELINE A2C
-		nSteps : 10,
+		algorithm : "A2C", // REINFORCE REINFORCE_BASELINE A2C
+		nSteps : 6,
 		depth : 3,
 		// oneHotShape : 3  // class of action,
 		servos : [

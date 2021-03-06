@@ -16,8 +16,9 @@
  
 class EpisodeInfo
 {
-    constructor() 
+    constructor(i) 
     {
+		this.index = i
         this.globalStep = 0;
         this.episodeUpdateSteps = 0;
         this.episodeNStep = 0;
@@ -61,7 +62,8 @@ class EpisodeInfo
 
     onNewNStep()
     {
-        // Do not reset the update step
+        // console.log("onNewNStep",this.index)
+		// Do not reset the update step
         // this.episodeUpdateSteps = 0; 
         this.episodeNStep = Math.floor((this.globalStep + 1)  / g_settings.agent.nSteps);
 
@@ -650,9 +652,9 @@ class PolicyBasedAgent
             let eligibilityV4 = tf.mul(log_prob_v4 ,discounted_rewards);
             let total_loss_v4 = tf.sum(eligibilityV4);
             //*/
-			console.log("chosen action",choosen_actions_one_hot.asType("float32").dataSync())
-			console.log("probabilities",probabilities.dataSync())
-			console.log("discounted_rewards",discounted_rewards.dataSync())
+			// console.log("chosen action",choosen_actions_one_hot.asType("float32").dataSync())
+			// console.log("probabilities",probabilities.dataSync())
+			// console.log("discounted_rewards",discounted_rewards.dataSync())
             let log_prob_v4 = tf.neg(tf.sum( tf.mul(choosen_actions_one_hot.asType("float32") , 
                                                     tf.log(tf.clipByValue(probabilities, 1e-5, 1.0 ))), [1]));
             let eligibilityV4 = tf.mul(log_prob_v4 ,discounted_rewards);
