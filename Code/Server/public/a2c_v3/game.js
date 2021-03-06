@@ -747,7 +747,7 @@ let g_settings = {
 		// units : 24,
 		units : 24,
 		// learningRate : 0.0001, // 0.005,
-		learningRate : 0.01, // 0.005,
+		learningRate : 0.005, // 0.005,
 		miniBatchSize : 200
 	},
 	reinforcement:{
@@ -759,8 +759,8 @@ let g_settings = {
 		// units : 24,
 		units : 24,
 		// learningRate : 0.0001, // 0.005,
-		learningRate : 0.01,
-		gammaDiscountRate : 0.95,
+		learningRate : 0.0001,
+		gammaDiscountRate : 0.99,
 		// gammaDiscountRate : 0.99,
 
 		// normalizeAdvantage : true,
