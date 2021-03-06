@@ -531,7 +531,7 @@ class PolicyBasedAgent
                             policyEntropyTensor.dispose();
                         // }
                         predictionWithoutSoftmax.dispose();
-
+						
                         return loss;
                     });
                 }); 
@@ -657,7 +657,7 @@ class PolicyBasedAgent
                                                     tf.log(tf.clipByValue(probabilities, 1e-5, 1.0 ))), [1]));
             let eligibilityV4 = tf.mul(log_prob_v4 ,discounted_rewards);
             let total_loss_v4 = tf.sum(eligibilityV4);           
-
+			// console.log("LOSS LOSS LOSS LOSS",total_loss_v4.dataSync())
             if (debug)
             {
 
