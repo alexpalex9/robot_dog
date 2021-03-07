@@ -289,7 +289,7 @@ let g_settings = {
 	// mode :"RL_TRAIN",
 	agent:{
 		// nSteps : 200,
-		depth : 3,
+		depth : 2,
 		hiddenLayerSizes:[24,24],
 		// maxStepsPerGame : 200,
 		maxStepsPerGame : 100,
