@@ -50,6 +50,7 @@ class Orchestrator {
         let state_tensor = tf.tensor2d(state, [1, state.length])
         let totalReward = 0;
         let step = 0;
+		this.eps = MAX_EPSILON;
         while (step < this.maxStepsPerGame) {
 			
 
@@ -146,15 +147,42 @@ class Orchestrator {
         y.dispose();
     }
 	
-	log(text){
-	var now = new Date().toLocaleTimeString() //.replace(/([\d]+:[\d]{2})(:[\d]{2})(.*)/, "$1$3")
-	$('#log').prepend('<div>' + now + ': ' + text + '</div>')		
+	async play(){
+        // this.environment.init();
+        
+        // let totalReward = 0;
+        let step = 0;
+        while (step < this.maxStepsPerGame) {
+			var state = this.environment.getState();
+        
+			var state_tensor = tf.tensor2d(state, [1, state.length])
+            // Interaction with the environment
+            const action = this.model.chooseAction(state_tensor, this.eps);
+			// console.log("action",action)
+            await this.environment.step(action);
+            const reward = this.environment.getReward();
+			this.chart.addData('step_reward',{
+				label : step,
+				reward : reward,
+				epsilon : this.eps
+			})
+			var done = this.environment.isDone()
+			await this.environment.step(action)
+		
+			this.steps += 1;
+			// state_tensor = nextState_tensor;
+			// totalReward += reward;
+			step += 1;
+			
+        }		
 	}
 	
-	async play(){
-		
-		
+	log(text){
+		var now = new Date().toLocaleTimeString() //.replace(/([\d]+:[\d]{2})(:[\d]{2})(.*)/, "$1$3")
+		$('#log').prepend('<div>' + now + ': ' + text + '</div>')		
 	}
+	
+
 	async training(_this_game){
 		
 		if (!_this_game){
@@ -296,6 +324,7 @@ let g_settings = {
 		hiddenLayerSizes:[24,24],
 		// maxStepsPerGame : 200,
 		maxStepsPerGame : 100,
+		// maxStepsPerGame : 5,
 		// maxStepsPerGame : 2,
 		discountRate : 0.99,
 		servos : [
@@ -365,7 +394,15 @@ $(function(){
 		}
 		
 	})	
-	
+	$("#play_button").on('click',function(){
+		if (!$(this).hasClass('disabled')){
+			$(this).addClass('disabled')
+			game.play()
+			$(this).removeClass('disabled')
+
+		}
+		
+	})		
 })
 
 

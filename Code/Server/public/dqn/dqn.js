@@ -86,7 +86,7 @@ class Model {
                 // const probs = tf.div(sigmoid, tf.sum(sigmoid));
 				// console.log("probs",probs.dataSync())
                 // return tf.multinomial(probs, 4).dataSync()[0] - 1;
-				console.log(actions)
+				// console.log(actions)
 				return actions
             });
 			
