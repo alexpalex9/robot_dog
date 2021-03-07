@@ -67,7 +67,7 @@ class Orchestrator {
 			await this.environment.step(action)
 			
             let nextState =  this.environment.getState();
-            let nextState_tensor =  tf.tensor2d(state, [1, nextState.length])
+            let nextState_tensor =  tf.tensor2d(nextState, [1, nextState.length])
 
             // Keep the car on max position if reached
             // if (this.mountainCar.position > maxPosition) maxPosition = this.mountainCar.position;
@@ -151,7 +151,10 @@ class Orchestrator {
 	$('#log').prepend('<div>' + now + ': ' + text + '</div>')		
 	}
 	
-	
+	async play(){
+		
+		
+	}
 	async training(_this_game){
 		
 		if (!_this_game){

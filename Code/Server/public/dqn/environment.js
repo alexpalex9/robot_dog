@@ -261,11 +261,6 @@ class Environment
 		await this.SetServosAngles(actions_angle)
 
 		this.sonic_state = await this.get_sonic();
-		// var distance_change	 = (sonic_state - 50 )/ 100
-		// if (!this.last_distance){
-			// this.last_distance = this.initial_distance 
-		// }		
-		console.log("SONIC",this.last_distance,this.sonic_state)
 		var improvement = this.last_distance - this.sonic_state
 		this.reward = improvement / 5
 		this.last_distance = this.sonic_state
