@@ -162,6 +162,10 @@ class Server():
         def learn3():
             return render_template('learn_v3.html')
         
+        @app.route('/dqn')
+        def dqn():
+            return render_template('learn_dqn.html')
+                
         def gen(camera=None):
             while True:
                 if DEV==False:
