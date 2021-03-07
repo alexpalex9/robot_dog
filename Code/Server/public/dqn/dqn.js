@@ -52,8 +52,8 @@ class Model {
 
     chooseAction(state, eps) {
 		// console.log("ACTION ? ",eps)
-        // if (Math.random() < eps) {
-        if (Math.random() < 2 ) {
+        if (Math.random() < eps) {
+        // if (Math.random() < 2 ) {
 			// console.log("Random action")
 			var actions = []
 			for (var s = 0 ; s<this.numServos;s++){
