@@ -2,7 +2,8 @@
 // robot 4 leg C = https://github.com/Counterfeiter/Q-LearningRobot/blob/master/Src/ann.c
 
 const MIN_EPSILON = 0.01;
-const MAX_EPSILON = 0.2;
+// const MAX_EPSILON = 0.2;
+const MAX_EPSILON = 1;
 const LAMBDA = 0.01;
 
 class Orchestrator {
@@ -29,18 +30,6 @@ class Orchestrator {
         this.discountRate = g_settings.agent.discountRate;
 
         // Initialization of the rewards and max positions containers
-		this.store = [
-			[], //state
-			[], // action
-			[], // reward
-			[]  // next state
-		]
-		this.store = {
-			state : [], //state
-			action : [], // action
-			reward : [], // reward
-			nextState : []  // next state
-		}
 		
         this.rewardStore = new Array();
         // this.maxPositionStore = new Array();
@@ -71,10 +60,11 @@ class Orchestrator {
             const reward = this.environment.getReward();
 			this.chart.addData('step_reward',{
 				label : step,
-				reward : reward
+				reward : reward,
+				epsilon : this.eps
 			})
 			var done = this.environment.isDone()
-			this.environment.step(action)
+			await this.environment.step(action)
 			
             let nextState =  this.environment.getState();
             let nextState_tensor =  tf.tensor2d(state, [1, nextState.length])
@@ -83,16 +73,7 @@ class Orchestrator {
             // if (this.mountainCar.position > maxPosition) maxPosition = this.mountainCar.position;
             if (done) nextState = null;
 
-            // this.memory.addSample([state, action, reward, reward]);
-			// this.store.state.push(state)
-			// this.store[0].push(state_tensor)
-			// this.store[1].push(action)
-			// this.store[2].push(reward)
-			// this.store[3].push(nextState_tensor)
-			// this.store.state.push(state_tensor)
-			// this.store.action.push(action)
-			// this.store.reward.push(reward)
-			// this.store.nextState.push(nextState_tensor)
+       
 			 this.memory.addSample([state_tensor, action, reward, nextState_tensor]);
 			 // console.log('memory',this.memory)
 			// }

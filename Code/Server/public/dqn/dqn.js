@@ -51,14 +51,15 @@ class Model {
     }
 
     chooseAction(state, eps) {
-		console.log("ACTION ? ",eps)
-        if (Math.random() < eps) {
+		// console.log("ACTION ? ",eps)
+        // if (Math.random() < eps) {
+        if (Math.random() < 2 ) {
 			// console.log("Random action")
 			var actions = []
 			for (var s = 0 ; s<this.numServos;s++){
 				actions.push(Math.floor(Math.random() * this.numActions/this.numServos) )
 			}
-			console.log(actions)
+			// console.log("actions",actions,this.numActions/this.numServos)
 			return actions
 		
         } else {

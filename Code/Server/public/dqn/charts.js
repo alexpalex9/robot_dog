@@ -223,19 +223,19 @@ var myCharts = function(){
 	var epsilon_template = {
 		data : [],
 		borderWidth : 1,
-		borderColor: 'rgba(197, 216, 156, 1)',
+		borderColor: 'rgba(197, 156,216,  1)',
 		pointBorderWidth : 0,
 		pointRadius: 0,
 		lineTension : 0,
 		pointHitRadius: 5,
 		// type:'line',
-		pointBorderColor : 'rgba(197, 216, 156, 1)',
-		pointBackgroundColor : 'rgba(197, 216, 156, 1)',
+		pointBorderColor : 'rgba(197, 156,216,  1)',
+		pointBackgroundColor : 'rgba(197, 156,216,  1)',
 		fill: false,
 		spanGaps: true,
 		label: "epsilon",
 		type:'line',
-		yAxisID:"right"
+		yAxisID:"left"
 	}
 	var loss_template = {
 		data : [],
@@ -298,7 +298,8 @@ var myCharts = function(){
 		data : {
 			labels: [],
 			datasets : [
-				JSON.parse(JSON.stringify(reward_template_right))
+				JSON.parse(JSON.stringify(reward_template_right)),
+				JSON.parse(JSON.stringify(epsilon_template))
 			]
 		},
 		options: JSON.parse(JSON.stringify(twoaxis_options))
