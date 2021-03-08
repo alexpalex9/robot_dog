@@ -41,26 +41,30 @@ class Orchestrator {
 	async create(){
 		console.log("Creating game")
 		await this.environment.init();
+		var state = this.environment.getState();
+		this.state_tensor = tf.tensor2d(state, [1, state.length])
+		this.totalReward = 0
+		
 	}
    
     async handleReinforcementLearning() {
 		console.log('------------- handleReinforcementLearning ---------------')
         // this.environment.init();
-        let state = this.environment.getState();
-        let state_tensor = tf.tensor2d(state, [1, state.length])
-        let totalReward = 0;
-        let step = 0;
-		this.eps = MAX_EPSILON;
-        while (step < this.maxStepsPerGame) {
+        // let state = this.environment.getState();
+        // let state_tensor = tf.tensor2d(state, [1, state.length])
+        // let totalReward = 0;
+        // let step = 0;
+		// this.eps = MAX_EPSILON;
+        
 			
 
             // Interaction with the environment
-            const action = this.model.chooseAction(state_tensor, this.eps);
+            const action = this.model.chooseAction(this.state_tensor, this.eps);
 			console.log("action",action)
             await this.environment.step(action);
             const reward = this.environment.getReward();
 			this.chart.addData('step_reward',{
-				label : step,
+				label : this.steps,
 				reward : reward,
 				epsilon : this.eps
 			})
@@ -75,26 +79,31 @@ class Orchestrator {
             if (done) nextState = null;
 
        
-			 this.memory.addSample([state_tensor, action, reward, nextState_tensor]);
+			 this.memory.addSample([this.state_tensor, action, reward, nextState_tensor]);
 			 // console.log('memory',this.memory)
 			// }
 			this.steps += 1;
 			// Exponentially decay the exploration parameter
 			this.eps = MIN_EPSILON + (MAX_EPSILON - MIN_EPSILON) * Math.exp(-LAMBDA * this.steps);
-
-			state_tensor = nextState_tensor;
-			totalReward += reward;
-			step += 1;
+			// if(this.eps > 0.1)
+			// epsilon -= ( 1.0 / epochs );
+	
+			this.state_tensor = nextState_tensor;
+			this.totalReward += reward;
+			this.steps += 1;
 			
-			// Keep track of the max position reached and store the total reward
-			if (done || step == this.maxStepsPerGame) {
-				// this.rewardStore.push(totalReward);
-				this.rewardStore.push(totalReward);
-				// this.maxPositionStore.push(maxPosition);
-				break;
+			if (done){
+				this.reset_training(true,"out of boundaries")
 			}
-        }
-        await this.replay()
+			// Keep track of the max position reached and store the total reward
+			// if (done || step == this.maxStepsPerGame) {
+				// this.rewardStore.push(totalReward);
+				// this.rewardStore.push(totalReward);
+				// this.maxPositionStore.push(maxPosition);
+				// break;
+			// }
+        // }
+        // await this.replay()
     }
 
     async replay() {
@@ -123,7 +132,13 @@ class Orchestrator {
                 y.push(currentQ.dataSync());
             }
         );
-
+			// for(int x = 0; x < NUM_SERVO_MOT; x++)
+				// {
+					// oldQ[batch_mem[mini_pos].servo_actions[x] * NUM_SERVO_MOT + x] = (batch_mem[mini_pos].reward[x] < 0.1) ? \
+							// (batch_mem[mini_pos].reward[x] + (gamma * maxQ[x])) : batch_mem[mini_pos].reward[x];
+				// }
+							
+							
         // Clean unused tensors
         qsa.forEach((state) => state.dispose());
         qsad.forEach((state) => state.dispose());
@@ -204,10 +219,14 @@ class Orchestrator {
 		}else{
 			_this_game.started = true;
 			// console.log(_this_game.active)
+			// while (step < this.maxStepsPerGame) {
 			if (_this_game.active==true){
-				
-				await _this_game.handleReinforcementLearning(new Date(),false)
-				await _this_game.training(_this_game)
+				if (this.steps < this.maxStepsPerGame) {
+					await _this_game.handleReinforcementLearning(new Date(),false)
+					await _this_game.training(_this_game)
+				}else{
+					await this.replay()
+				}
 			}
 		}
 		
@@ -323,7 +342,7 @@ let g_settings = {
 		depth : 2,
 		hiddenLayerSizes:[24,24],
 		// maxStepsPerGame : 200,
-		maxStepsPerGame : 100,
+		maxStepsPerGame : 700,
 		// maxStepsPerGame : 5,
 		// maxStepsPerGame : 2,
 		discountRate : 0.99,

@@ -1,3 +1,15 @@
+// https://sebastianfoerster86.wordpress.com/2016/11/07/robot-controlled-by-artificial-neural-network/
+
+// ann_start_qlearning(700, 0.8, 1.0, 50);
+// epoch = 700
+// gamma = 0.8
+// epsilon = 1.0
+// step = 50
+
+
+// fann_set_learning_momentum(ann, 0.95); 	//google deep mind (Atari) -> 0.95
+// fann_set_learning_rate(ann, 0.1);
+
 class Model {
 
 
