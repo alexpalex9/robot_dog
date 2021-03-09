@@ -72,7 +72,7 @@ class Model {
     saveModel(){
 		try{
 			var fake = localStorage.getItem('table');
-			localStorage.setItem('table', JSON.stringify(testObject));
+			localStorage.setItem('table', JSON.stringify(this.table));
 		}
 		catch(e)
 		{
