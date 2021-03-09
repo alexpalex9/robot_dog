@@ -19,7 +19,7 @@ class Orchestrator {
 		var numInputs = this.environment.get_inputs_count()
 		// TODO: dyn actions count
 		// console.log("numInputs",numInputs)
-        this.model = new Model(this.environment.get_actions_index(),this.environment.get_states_index(),clean)
+        this.model = new Model(this.environment.get_actions_index(),this.environment.get_states_index())
 		this.model.loadModel()
      // hiddenLayerSizes, numStates, numActions)
 		// this.memory = new Memory(100)
@@ -40,10 +40,13 @@ class Orchestrator {
 		this.chart = new myCharts()
     }
 
-	async create(){
+	async create(clean){
 		console.log("Creating game")
 		await this.environment.init();
 		this.state = this.environment.getState();
+		if (clean==true){
+			this.model.cleanModel()
+		}
 		// this.state_tensor = tf.tensor2d(state, [1, state.length])
 		this.totalReward = 0
 		

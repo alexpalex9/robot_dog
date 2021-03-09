@@ -13,7 +13,7 @@
 class Model {
 
 
-    constructor(servoActions_index,servoStates_index,save) {
+    constructor(servoActions_index,servoStates_index) {
 		console.log("model input - action",servoActions_index)
 		console.log("model input - state",servoStates_index)
 		// this.numInputs = numInputs;
@@ -59,12 +59,12 @@ class Model {
 		var html = html + '</table>'
 		// console.log("HTML table",html)
 		$('#table_container').html(html)
-		if (save){
-			this.saveModel()
-		}
     }
 
-  
+	cleanModel(){
+		this.table = {}
+			this.saveModel()
+	}
     predict(states) {
         return tf.tidy(() => this.network.predict(states));
     }
@@ -82,7 +82,9 @@ class Model {
 	loadModel(){
 		try{
 			this.table = JSON.parse(localStorage.getItem('table'));
-
+			if (this.table==null){
+				this.table = {}
+			}
 		}
 		catch(e)
 		{
@@ -148,9 +150,9 @@ class Model {
 		
     }
 	updateHtmlTable(state,action_index){
-		console.log(state,action_index)
+		// console.log(state,action_index)
 		var id = '#' + state.join('-') + '¤' + this.actions_index[action_index].join('-')
-		console.log("id to fill",id)
+		// console.log("id to fill",id)
 		$(id).html(parseInt(this.table[state.join('-')][action_index]*10)/10)
 		$(id).css('backgroundColor',getColorForPercentage(this.table[state.join('-')][action_index]/2))
 	}
