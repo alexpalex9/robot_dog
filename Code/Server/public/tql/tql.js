@@ -42,14 +42,14 @@ class Model {
 		html = html + '<th>' + 'states\\actions' + '</th>'
 		for (var a in this.actions_index){
 			
-			html = html + '<th>' + this.actions_index[a] + '</th>'
+			html = html + '<th id=' + this.actions_index[a].join('-') + '>' + this.actions_index[a] + '</th>'
 			
 		}
 		html = html + '</tr>'
 		
 		for (var s in this.states_index){
 			html = html + '<tr>'
-			html = html + '<td>' + this.states_index[s] + '</td>'
+			html = html + '<td  id=' + this.states_index[s].join('-') + '>' + this.states_index[s] + '</td>'
 			for (var a in this.actions_index){
 				html = html + '<td class="blackcolor" id=' + this.states_index[s].join('-') + '¤' + this.actions_index[a].join('-') + '>x</td>'
 			}
@@ -81,7 +81,7 @@ class Model {
 	}
 	loadModel(){
 		try{
-			this.table = localStorage.getItem('table');
+			this.table = JSON.parse(localStorage.getItem('table'));
 			for (var t in this.table){
 				for (var s in this.table[s]){
 						this.updateHtmlTable(t,s)
