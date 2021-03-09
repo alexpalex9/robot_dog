@@ -337,6 +337,7 @@ $(function(){
 	game.create().then(function(){
 		// game.handleReinforcementLearning()
 		$("#train_button").removeClass('disabled')
+		$("#reset_button").removeClass('disabled')
 		$("#play_button").removeClass('disabled')
 		// $("#reset_button").removeClass('disabled')
 	})

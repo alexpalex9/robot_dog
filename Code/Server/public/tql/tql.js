@@ -83,8 +83,8 @@ class Model {
 		try{
 			this.table = JSON.parse(localStorage.getItem('table'));
 			for (var state in this.table){
-				for (var action in this.table[s]){
-						this.updateHtmlTable(state,this.actions_index[action])
+				for (var action in this.table[state]){
+					this.updateHtmlTable(state,this.actions_index[action])
 				}
 			}
 		}
