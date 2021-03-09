@@ -82,16 +82,17 @@ class Model {
 	loadModel(){
 		try{
 			this.table = JSON.parse(localStorage.getItem('table'));
-			for (var state in this.table){
-				for (var action in this.table[state]){
-					this.updateHtmlTable(state,this.actions_index[action])
-				}
-			}
+
 		}
 		catch(e)
 		{
 			console.warn("error while loading model",e)
 			this.table = {}
+		}
+		for (var state in this.table){
+			for (var action in this.table[state]){
+				this.updateHtmlTable(state.split("-"),action)
+			}
 		}
 	}
     async train(state, reward,action_index, nextState) {
