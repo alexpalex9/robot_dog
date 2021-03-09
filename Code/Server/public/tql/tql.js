@@ -91,6 +91,7 @@ class Model {
 		catch(e)
 		{
 			console.warn("error while loading model",e)
+			this.table = {}
 		}
 	}
     async train(state, reward,action_index, nextState) {
