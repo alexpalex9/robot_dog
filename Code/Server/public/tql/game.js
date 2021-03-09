@@ -123,7 +123,7 @@ class Orchestrator {
         let step = 0;
         while (this.isplay!=false && this.environment.isDone()!=true) {
 			var state = this.environment.getState();
-            const { actions,actions_index} = this.model.chooseAction(state, this.eps);
+            const { actions,actions_index} = this.model.chooseAction(state, -1);
             await this.environment.step(actions);
             const reward = this.environment.getReward();
 			this.chart.addData('step_reward',{

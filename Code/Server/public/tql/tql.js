@@ -82,8 +82,8 @@ class Model {
 	loadModel(){
 		try{
 			this.table = localStorage.getItem('table');
-			for (var t in table){
-				for (var s in table[s]){
+			for (var t in this.table){
+				for (var s in this.table[s]){
 						this.updateHtmlTable(t,s)
 				}
 			}
@@ -150,6 +150,12 @@ class Model {
 		var id = '#' + state.join('-') + '¤' + this.actions_index[action_index].join('-')
 		$(id).html(parseInt(this.table[state.join('-')][action_index]*10)/10)
 		$(id).css('backgroundColor',getColorForPercentage(this.table[state.join('-')][action_index]/2))
+	}
+	flashStateAction(state,action_index){
+		var id = '#' + state.join('-') + '¤' + this.actions_index[action_index].join('-')
+		var stateId = 	'#' + state.join('-')
+		var actionId = 	'#' +  this.actions_index[action_index].join('-')
+		
 	}
     chooseAction(state, eps) {
 		// console.log("ACTION ? ",eps)
