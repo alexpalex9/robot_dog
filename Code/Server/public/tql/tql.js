@@ -153,12 +153,14 @@ class Model {
 		$(id).html(parseInt(this.table[state.join('-')][action_index]*10)/10)
 		$(id).css('backgroundColor',getColorForPercentage(this.table[state.join('-')][action_index]/2))
 	}
-	flashStateAction(state,action_index){
-		var id = '#' + state.join('-') + '¤' + this.actions_index[action_index].join('-')
-		var stateId = 	'#' + state.join('-')
-		var actionId = 	'#' +  this.actions_index[action_index].join('-')
-		$(stateId).css('font-color'
-	}
+	// flashStateAction(state,action_index){
+		// var id = '#' + state.join('-') + '¤' + this.actions_index[action_index].join('-')
+		// var stateId = 	'#' + state.join('-')
+		// var actionId = 	'#' +  this.actions_index[action_index].join('-')
+		// $(stateId).css('font-color','red').delay(200).css('font-color','')
+		// $(actionId).css('font-color','red').delay(200).css('font-color','')
+		// $(id).css('font-color','red').delay(200).css('font-color','')
+	// }
     chooseAction(state, eps) {
 		// console.log("ACTION ? ",eps)
 		// state = [0,0,0,1]
