@@ -91,3 +91,18 @@ background: #3C3C3C;
 	display:inline-block;
 	text-align:center;
 }
+
+/* .table_container table, */
+#table_container th,
+#table_container td {
+  border-bottom: 1px solid grey;
+  border-right: 1px solid grey;
+  display:inline-block;
+  width : 45px;
+  overflow-x:hidden;
+  font-size:10px;
+  text-align:center;
+}
+.blackcolor{
+	color:#484848;
+}

@@ -124,6 +124,8 @@ class Server():
             self.sonic=Ultrasonic()
             self.control.Thread_conditiona.start()
             self.battery_voltage=[8.4,8.4,8.4,8.4,8.4]
+        else:
+            self.devSonic = random.randrange(8, 52)
         app = Flask(__name__,
                     static_url_path='',
                     static_folder='public',
@@ -165,6 +167,10 @@ class Server():
         @app.route('/dqn')
         def dqn():
             return render_template('learn_dqn.html')
+
+        @app.route('/tql')
+        def tql():
+            return render_template('learn_tql.html')
                 
         def gen(camera=None):
             while True:
@@ -294,7 +300,7 @@ class Server():
                     if DEV==False:
                         sonic = self.sonic.getDistance()
                     else:
-                        sonic = random.randrange(8, 52)
+                        sonic = random.randrange(self.devSonic-4, self.devSonic+4)
                     emit('sonic',sonic)
                     emit('sonic await',sonic)
                 elif cmd.CMD_POWER in data:

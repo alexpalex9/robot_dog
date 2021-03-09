@@ -32,11 +32,14 @@ class Environment
 				
 				this.SERVOS[i]['actions_labels'] = []
 				this.SERVOS[i]['actions_index']= []
+				this.SERVOS[i]['states_index'] = []
 				this.AMOUNT_INPUTS = this.AMOUNT_INPUTS + 1
 				for (var act in this.SERVOS[i].actions){
 					this.SERVOS[i].actions_index.push({'servo':this.SERVOS[i].name,'angle':this.SERVOS[i].actions[act],'angle_scaled':(this.SERVOS[i].actions[act]-this.SERVOS[i].actions[0])/(this.SERVOS[i].actions[this.SERVOS[i].actions.length-1]-this.SERVOS[i].actions[0])})
 					this.SERVOS[i].actions_labels.push(this.SERVOS[i].name + '-'+ this.SERVOS[i].actions[act])
-					
+					for (var d=0;d<this.depth;d++){
+						this.SERVOS[i].states_index.push(act)
+					}
 					// this.SERVOS[i].actions_index_scaled.push(this.SERVOS[i].name + '-'+ this.SERVOS[i].actions[act])
 				}
 				this.SERVOS[i]['state'] = this.SERVOS[i]['init']
@@ -47,8 +50,27 @@ class Environment
 	get_servos_count(){
 		return this.servos_walk.length
 	}		
-	get_actions_label(i){
-		return this.servos_walk[i].actions_labels
+	get_states_index(){
+		var states_index = []
+		for (var s in this.servos_walk){
+			states_index.push([])
+			for (var a in this.servos_walk[s].states_index){
+				states_index[s].push( this.servos_walk[s].states_index[a] * 1.0)
+			}
+		}
+		
+		return states_index
+	}
+	get_actions_index(){
+		var actions_index = []
+		for (var s in this.servos_walk){
+			actions_index.push([])
+			for (var a in this.servos_walk[s].actions_index){
+				actions_index[s].push( a * 1.0)
+			}
+		}
+		
+		return actions_index
 	}
 	get_actions_count(i){
 		// console.log(this.servos_walk[i].actions_index)
@@ -59,7 +81,7 @@ class Environment
 	}	
 	isDone = function(){
 		// console.log("this.sonic_state",this.sonic_state)
-		return (this.sonic_state<5 || this.sonic_state>50)
+		return (this.sonic_state<5 || this.sonic_state>70)
 		// has moved backward more than 1 cm
 		// console.log("isDone",this.sonic_state - this.initial_distance,this.initial_distance)
 		// return (this.sonic_state - this.initial_distance)>1
@@ -110,7 +132,7 @@ class Environment
 		for (var s in this.servos_walk){
 			this.states.push([])
 			this.states_scaled.push([])
-			// console.log("doing servo",s)
+			console.log("doing servo",s)
 			
 			for (var d=0;d<this.depth;d++){
 				this.states[s].push(this.servos_walk[s]['state'])
@@ -138,7 +160,8 @@ class Environment
 		// console.log("init state",this.states_scaled)
 
 		this.reward = 0
-		this.initial_distance_state = await this.get_sonic();
+		// this.initial_distance_state = await this.get_sonic();
+		this.initial_distance_state = await this.Sonic();
 		
 	}
 
@@ -228,7 +251,7 @@ class Environment
 	async get_sonic(){
 		var sum = 0
 		var item = 0
-		for (var s = 0;s<3;s++){
+		for (var s = 0;s<1;s++){
 			var son = await this.Sonic()
 			if (son>3 && son <70){
 				sum = son + sum
@@ -260,7 +283,8 @@ class Environment
 		// console.log("ACTIONS",actions_angle,this.states,this.states_scaled)
 		await this.SetServosAngles(actions_angle)
 
-		this.sonic_state = await this.get_sonic();
+		// this.sonic_state = await this.get_sonic();
+		this.sonic_state = await this.Sonic();
 		var improvement = this.last_distance - this.sonic_state
 		this.reward = improvement / 5
 		this.last_distance = this.sonic_state
