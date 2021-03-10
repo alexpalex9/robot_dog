@@ -42,14 +42,14 @@ class Model {
 		html = html + '<th>' + 'states\\actions' + '</th>'
 		for (var a in this.actions_index){
 			
-			html = html + '<th id=' + this.actions_index[a].join('-') + '>' + this.actions_index[a] + '</th>'
+			html = html + '<th id=action_' + this.actions_index[a].join('-') + '>' + this.actions_index[a] + '</th>'
 			
 		}
 		html = html + '</tr>'
 		
 		for (var s in this.states_index){
 			html = html + '<tr>'
-			html = html + '<td  id=' + this.states_index[s].join('-') + '>' + this.states_index[s] + '</td>'
+			html = html + '<td  id=state_' + this.states_index[s].join('-') + '>' + this.states_index[s] + '</td>'
 			for (var a in this.actions_index){
 				html = html + '<td class="blackcolor" id=' + this.states_index[s].join('-') + '¤' + this.actions_index[a].join('-') + '>x</td>'
 			}
@@ -156,16 +156,17 @@ class Model {
 		$(id).html(parseInt(this.table[state.join('-')][action_index]*10)/10)
 		$(id).css('backgroundColor',getColorForPercentage(this.table[state.join('-')][action_index]/2))
 	}
-	// flashStateAction(state,action_index){
-		// var id = '#' + state.join('-') + '¤' + this.actions_index[action_index].join('-')
-		// var stateId = 	'#' + state.join('-')
-		// var actionId = 	'#' +  this.actions_index[action_index].join('-')
-		// $(stateId).css('font-color','red').delay(200).css('font-color','')
-		// $(actionId).css('font-color','red').delay(200).css('font-color','')
-		// $(id).css('font-color','red').delay(200).css('font-color','')
-	// }
+	flashStateAction(state,actions_index){
+		// console.log("flashStateAction",state,actions_index)
+		// var id = '#' + state.join('-') + '¤' + this.actions_index[actions_index].join('-')
+		// var stateId = 	'#state_' + state.join('-')
+		// var actionId = 	'#action_' +  this.actions_index[actions_index].join('-')
+		// $(stateId).fadeOut('fast').delay('fast').fadeIn('fast')
+		// $(actionId).fadeOut('fast').delay('fast').fadeIn('fast')
+		// $(id).fadeOut('fast').delay('fast').fadeIn('fast')
+	}
     chooseAction(state, eps) {
-		// console.log("ACTION ? ",eps)
+		console.log("ACTION ? ",state,eps)
 		// state = [0,0,0,1]
 		var state_join = state.join('-')
 		// eps = -1 
@@ -177,25 +178,33 @@ class Model {
 				var actions_index = Math.floor(Math.random() * this.actions_index.length) 
 				// console.log("actioin
 				// return this.actions_index[actions_index]
-				return { actions : this.actions_index[actions_index], actions_index : actions_index}
+				// return { actions : this.actions_index[actions_index], actions_index : actions_index}
 
         } else {
 
 			const logits = this.table[state.join('-')];
 			console.log("logitis",logits)
-			var action_index = this.indexOfMax(logits)
+			var actions_index = this.indexOfMax(logits,state)
 
-			return { actions : this.actions_index[action_index], actions_index : action_index}
+			// return { actions : this.actions_index[action_index], actions_index : actions_index}
 
         }
+		this.flashStateAction(state,actions_index)
+		return { actions : this.actions_index[actions_index], actions_index : actions_index}
     }
 	
 	
-	indexOfMax(arr) {
+	indexOfMax(arr,state) {
+		
 		if (arr.length === 0) {
 			return -1;
 		}
 
+		// check before if not all equal in array
+		if (arr => arr.every( v => v === arr[0] )){
+			console.log("all equals")
+			return Math.floor(Math.random() * this.actions_index.length) 
+		}
 		var max = arr[0];
 		var maxIndex = 0;
 
@@ -210,7 +219,6 @@ class Model {
 	}
 
 }
-
 
 function combineArrays( array_of_arrays ){
 
