@@ -158,10 +158,12 @@ class Model {
 	}
 	flashStateAction(state,actions_index){
 		// console.log("flashStateAction",state,actions_index)
-		// var id = '#' + state.join('-') + '¤' + this.actions_index[actions_index].join('-')
-		// var stateId = 	'#state_' + state.join('-')
-		// var actionId = 	'#action_' +  this.actions_index[actions_index].join('-')
-		// $(stateId).fadeOut('fast').delay('fast').fadeIn('fast')
+		var id = '#' + state.join('-') + '¤' + this.actions_index[actions_index].join('-')
+		var stateId = 	'#state_' + state.join('-')
+		var actionId = 	'#action_' +  this.actions_index[actions_index].join('-')
+		$(stateId).fadeTo('fast',0.1).delay('fast').fadeTo('fast',1)
+		$(actionId).fadeTo('fast',0.1).delay('fast').fadeTo('fast',1)
+		$(id).fadeTo('fast',0.1).delay('fast').fadeTo('fast',1)
 		// $(actionId).fadeOut('fast').delay('fast').fadeIn('fast')
 		// $(id).fadeOut('fast').delay('fast').fadeIn('fast')
 	}
