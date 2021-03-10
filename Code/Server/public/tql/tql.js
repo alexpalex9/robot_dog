@@ -187,7 +187,7 @@ class Model {
 			const logits = this.table[state.join('-')];
 			console.log("logitis",logits)
 			var actions_index = this.indexOfMax(logits,state)
-
+			console.log("index of max is",actions_index,logits)
 			// return { actions : this.actions_index[action_index], actions_index : actions_index}
 
         }
