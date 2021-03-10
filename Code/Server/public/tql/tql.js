@@ -325,6 +325,9 @@ var percentColors = [
     { pct: 1.0, color: { r: 0x00, g: 0xff, b: 0 } } ];
 
 var getColorForPercentage = function(pct) {
+	if (pct==0){
+		return ''
+	}
     for (var i = 1; i < percentColors.length - 1; i++) {
         if (pct < percentColors[i].pct) {
             break;
