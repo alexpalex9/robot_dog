@@ -207,7 +207,7 @@ class Model {
 
 		// check before if not all equal in array
 		
-		if (allEqual(arr)){
+		if (this.allEqual(arr)){
 			console.log("all equals")
 			return Math.floor(Math.random() * this.actions_index.length) 
 		}
