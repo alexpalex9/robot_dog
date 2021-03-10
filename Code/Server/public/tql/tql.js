@@ -195,6 +195,9 @@ class Model {
 		return { actions : this.actions_index[actions_index], actions_index : actions_index}
     }
 	
+	allEqual(arr){
+		return arr.every( v => v === arr[0]
+	}
 	
 	indexOfMax(arr,state) {
 		
@@ -203,7 +206,8 @@ class Model {
 		}
 
 		// check before if not all equal in array
-		if (arr => arr.every( v => v === arr[0] )){
+		
+		if (allEqual(arr)){
 			console.log("all equals")
 			return Math.floor(Math.random() * this.actions_index.length) 
 		}
