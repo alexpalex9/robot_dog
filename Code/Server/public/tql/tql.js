@@ -196,7 +196,7 @@ class Model {
     }
 	
 	allEqual(arr){
-		return arr.every( v => v === arr[0]
+		return arr.every( v => v === arr[0])
 	}
 	
 	indexOfMax(arr,state) {
