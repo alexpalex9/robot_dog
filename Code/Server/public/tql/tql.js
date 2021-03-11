@@ -63,7 +63,7 @@ class Model {
 
 	cleanModel(){
 		this.table = {}
-			this.saveModel()
+		// this.saveModel()
 	}
     predict(states) {
         return tf.tidy(() => this.network.predict(states));
@@ -168,7 +168,7 @@ class Model {
 		// $(id).fadeOut('fast').delay('fast').fadeIn('fast')
 	}
     chooseAction(state, eps) {
-		console.log("ACTION ? ",state,eps)
+		// console.log("ACTION ? ",state,eps)
 		// state = [0,0,0,1]
 		var state_join = state.join('-')
 		// eps = -1 
@@ -185,9 +185,9 @@ class Model {
         } else {
 
 			const logits = this.table[state.join('-')];
-			console.log("logitis",logits)
+			// console.log("logitis",logits)
 			var actions_index = this.indexOfMax(logits,state)
-			console.log("index of max is",actions_index,logits)
+			// console.log("index of max is",actions_index,logits)
 			// return { actions : this.actions_index[action_index], actions_index : actions_index}
 
         }

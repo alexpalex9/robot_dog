@@ -311,7 +311,7 @@ var myCharts = function(){
 	// console.log(this.suffix)
 	// _this.value_loss = new Chart(document.getElementById("value_loss").getContext("2d"),configSet_loss_value);
 	// _this.PolicyEntropy = new Chart(document.getElementById("PolicyEntropy" ).getContext("2d"),configSet_PolicyEntropy);
-	_this.episode_loss = new Chart(document.getElementById("episode_loss").getContext("2d"),configSet_episode_loss);
+	// _this.episode_loss = new Chart(document.getElementById("episode_loss").getContext("2d"),configSet_episode_loss);
 	_this.step_reward = new Chart(document.getElementById("step_reward").getContext("2d"),configSet_step_reward);
 	// _this.reward_episodes = new Chart(document.getElementById("reward_episodes").getContext("2d"),configSet_reward_loss_episods);
 	// _this.actions = new Chart(document.getElementById("actions").getContext("2d"),configSet_actions);

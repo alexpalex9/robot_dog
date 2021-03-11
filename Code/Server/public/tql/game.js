@@ -9,7 +9,7 @@ const LAMBDA = 0.001;
 
 class Orchestrator {
    
-    constructor(clean) {
+    constructor() {
 		
 		this.batchSize = 1
 		
@@ -24,31 +24,32 @@ class Orchestrator {
      // hiddenLayerSizes, numStates, numActions)
 		// this.memory = new Memory(100)
         // The exploration parameter
-        this.eps = MAX_EPSILON;
+        this.maxStepsPerGame = g_settings.agent.maxStepsPerGame;
+        // this.discountRate = g_settings.agent.discountRate;
 
         // Keep tracking of the elapsed steps
-        this.steps = 0;
-        this.maxStepsPerGame = g_settings.agent.maxStepsPerGame;
-        this.discountRate = g_settings.agent.discountRate;
+       
 
         // Initialization of the rewards and max positions containers
 		
-        this.rewardStore = new Array();
+        
         // this.maxPositionStore = new Array();
-		this.episode = 0
+		// this.episode = 0
 		
-		this.chart = new myCharts()
+		
     }
 
-	async create(clean){
+	async init(){
 		console.log("Creating game")
 		await this.environment.init();
 		this.state = this.environment.getState();
-		if (clean==true){
-			this.model.cleanModel()
-		}
-		// this.state_tensor = tf.tensor2d(state, [1, state.length])
 		this.totalReward = 0
+		this.episode = 0
+		this.chart = new myCharts()
+		this.rewardStore = new Array();
+		 this.eps = MAX_EPSILON;
+		  this.steps = 0;
+       
 		
 	}
    
@@ -124,7 +125,7 @@ class Orchestrator {
         
         // let totalReward = 0;
         let step = 0;
-        while (this.isplay!=false && this.environment.isDone()!=true) {
+        while (this.isplay!=false) {// && this.environment.isDone()!=true) {
 			var state = this.environment.getState();
             const { actions,actions_index} = this.model.chooseAction(state, -1);
             await this.environment.step(actions);
@@ -196,6 +197,7 @@ class Orchestrator {
 		// console.log("CHECK REWARD EPISODE SUM",this.m_dogInfo)
 
 		await this.environment.init()
+		$("#reset_button").removeClass('active')
 		// for (var i=0; i<this.m_cartPoleInfo.length;i++){
 			// this.m_cartPoleInfo[i].reset(false)
 		// }
@@ -246,6 +248,7 @@ class Orchestrator {
 		$("#reset_button").removeClass('disabled')
 		$("#sonar_button").addClass('disabled')
 		$("#stop_button").removeClass('disabled')
+		$("#play_button").addClass('disabled')
 		await this.training()
 	}
 	async pause_training(msg) {
@@ -260,26 +263,29 @@ class Orchestrator {
 	}
 
 	async stop_training() {
-		this.log("training stopped")
-		$("#train_button").removeClass('active')
-		$("#train_button").addClass('disabled')
-		$("#reset_button").addClass('disabled')
-		$("#stop_button").addClass('disabled')
-		$("#play_button").removeClass('active')
-		$("#play_button").addClass('disabled')
-		this.active = false
-		this.play = false
-		// let training finish
-		this.started = false
-		setTimeout(function(){
-			game = new Orchestrator();
-			game.create(true).then(function(){
-				// game.handleReinforcementLearning()
-				$("#train_button").removeClass('disabled')
-				$("#stop_button").removeClass('disabled')
-				$("#play_button").removeClass('disabled')
-			})
-		},2000)
+		// if (this.active==true){
+			this.log("training stopped")
+			$("#train_button").removeClass('active')
+			$("#train_button").addClass('disabled')
+			$("#reset_button").addClass('disabled')
+			$("#stop_button").addClass('disabled')
+			// $("#play_button").removeClass('active')
+			// $("#play_button").removeClass('disabled')
+			this.active = false
+			this.isplay = false
+			// let training finish
+			this.started = false
+			setTimeout(function(){
+				// game = new Orchestrator();
+				game.init().then(function(){
+					// game.handleReinforcementLearning()
+					$("#train_button").removeClass('disabled')
+					$("#stop_button").removeClass('disabled')
+					$("#play_button").removeClass('disabled')
+					// game.play()
+				})
+			},2000)
+		// }
 	}
 	
 }
@@ -337,11 +343,12 @@ $(function(){
 		// sars.train();
 	// })();
 	game = new Orchestrator();
-	game.create().then(function(){
+	game.init().then(function(){
 		// game.handleReinforcementLearning()
 		$("#train_button").removeClass('disabled')
 		$("#reset_button").removeClass('disabled')
 		$("#play_button").removeClass('disabled')
+		$("#reset_button").removeClass('active')
 		// $("#reset_button").removeClass('disabled')
 	})
 	// console.log()
@@ -367,6 +374,10 @@ $(function(){
 			// sars.reset = true
 		}
 	})	
+	$("#erase_button").on('click',function(){
+		// console.log("erase")
+		game.model.cleanModel()
+	})
 	$("#stop_button").on('click',function(){
 		if (!$(this).hasClass('disabled')){
 			game.stop_training()
@@ -379,12 +390,19 @@ $(function(){
 			if ($(this).hasClass('active')){
 				game.isplay = false;
 				$(this).removeClass('active')
+				$("#train_button").removeClass('disabled')
+				$("#reset_button").removeClass('disabled')
+				$("#stop_button").removeClass('disabled')
 			}else{
 				$(this).addClass('disabled')
 				game.isplay = true
+				console.log(game)
 				game.play()
 				$(this).addClass('active')
 				$(this).removeClass('disabled')
+				$("#train_button").addClass('disabled')
+				$("#reset_button").addClass('disabled')
+				$("#stop_button").addClass('disabled')
 			}
 
 		}

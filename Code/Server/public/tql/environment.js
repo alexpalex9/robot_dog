@@ -155,13 +155,11 @@ class Environment
 		this.initial_distance = this.sonic_state 
 		this.last_distance = this.sonic_state
 
-		$("#reset_button").removeClass('active')
+		
 		// console.log("init state",this.states)
 		// console.log("init state",this.states_scaled)
 
 		this.reward = 0
-		// this.initial_distance_state = await this.get_sonic();
-		this.initial_distance_state = await this.Sonic();
 		
 	}
 

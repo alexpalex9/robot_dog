@@ -26,7 +26,8 @@
 			<a id="stop_button" class="button disabled">Stop</a>
 			<a id="reset_button" class="button disabled">Reset</a>
 			<a id="sonar_button" class="button">Sonic</a>
-			<a id="play_button" class="button">play</a>
+			<a id="play_button" class="button">Play</a>
+			<a id="erase_button" class="button">Erase</a>
 		</div>
 
 	</div>
@@ -54,25 +55,9 @@
 		
 	</div>
 	<div style="100%">
-		<div id="actions_container0" style="height:250px;width:24%;display:inline-block">
-			<canvas id="actions0" style="display:inline" ></canvas>
-		</div>
-		<div id="actions_container1" style="height:250px;width:24%;display:inline-block">
-			<canvas id="actions1" style="display:inline" ></canvas>
-		</div>
-		<div id="actions_container2" style="height:250px;width:24%;display:inline-block">
-			<canvas id="actions2" style="display:inline" ></canvas>
-		</div>
-		<div id="actions_container3" style="height:250px;width:24%;display:inline-block">
-			<canvas id="actions3" style="display:inline" ></canvas>
-		</div>
 		<div id="step_reward_container" style="height:250px;width:100%;display:inline-block">
 			<canvas id="step_reward" style="display:inline" ></canvas>
-		</div>		
-		<div id="episode_loss_container" style="height:250px;width:100%;display:inline-block">
-			<canvas id="episode_loss" style="display:inline" ></canvas>
 		</div>
-		
 	</div>
 	<div id="log">
 	</div>
@@ -90,7 +75,7 @@
 	
 	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.0/socket.io.min.js"></script>
 	<script src="main.js"></script>
-	<script type="text/javascript" src="dqn/charts.js"></script>
+	<script src="tql/charts.js"></script>
 	<script src="tql/environment.js"></script>
 	<!-- <script src="tql/lodash.js" ></script> -->
 	<!-- <script src="tql/memory.js"></script> -->
