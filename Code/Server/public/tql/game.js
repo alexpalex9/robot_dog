@@ -38,7 +38,9 @@ class Orchestrator {
 		
 		
     }
-
+	resetModel(){
+		this.model = new Model(this.environment.get_actions_index(),this.environment.get_states_index())	
+	}
 	async init(){
 		console.log("Creating game")
 		await this.environment.init();
@@ -64,50 +66,47 @@ class Orchestrator {
         
 			this.state = this.environment.getState();
 
-            // Interaction with the environment
             const { actions,actions_index} = this.model.chooseAction(this.state, this.eps);
-            // var a = this.model.chooseAction(this.state, this.eps);
-			// console.log("chosen",a)
-			
-			// console.log("action",actions)
-			// console.log("action_index",actions_index)
             await this.environment.step(actions);
             const reward = this.environment.getReward();
-			this.chart.addData('step_reward',{
-				label : this.steps,
-				reward : reward,
-				epsilon : this.eps
-			})
+			
 			var done = this.environment.isDone()
 			// await this.environment.step(action)
-			
-            let nextState =  this.environment.getState();
-            // let nextState_tensor =  tf.tensor2d(nextState, [1, nextState.length])
+			if (!done){
+				this.chart.addData('step_reward',{
+					label : this.steps,
+					reward : reward,
+					epsilon : this.eps
+				})
+				let nextState =  this.environment.getState();
+				// let nextState_tensor =  tf.tensor2d(nextState, [1, nextState.length])
 
-            // Keep the car on max position if reached
-            // if (this.mountainCar.position > maxPosition) maxPosition = this.mountainCar.position;
-            if (done) nextState = null;
-			await this.model.train(this.state,reward,actions_index,nextState)
-			
-			 // this.memory.addSample([this.state_tensor, action, reward, nextState_tensor]);
-			 // console.log('memory',this.memory)
-			// }
-			this.steps += 1;
-			// Exponentially decay the exploration parameter
-			this.eps = MIN_EPSILON + (MAX_EPSILON - MIN_EPSILON) * Math.exp(-LAMBDA * this.steps);
-			// if(this.eps > 0.1)
-			// epsilon -= ( 1.0 / epochs );
-	
-			// this.state = nextState;
-			this.totalReward += reward;
-			this.steps += 1;
-			
-			if (done){
-				this.reset_training(true,"out of boundaries")
-			}
-			
-			if (this.steps % 20 ==0){
-				this.model.saveModel()
+				// Keep the car on max position if reached
+				// if (this.mountainCar.position > maxPosition) maxPosition = this.mountainCar.position;
+				if (done) nextState = null;
+				await this.model.train(this.state,reward,actions_index,nextState)
+				
+				 // this.memory.addSample([this.state_tensor, action, reward, nextState_tensor]);
+				 // console.log('memory',this.memory)
+				// }
+				this.steps += 1;
+				// Exponentially decay the exploration parameter
+				this.eps = MIN_EPSILON + (MAX_EPSILON - MIN_EPSILON) * Math.exp(-LAMBDA * this.steps);
+				// if(this.eps > 0.1)
+				// epsilon -= ( 1.0 / epochs );
+		
+				// this.state = nextState;
+				this.totalReward += reward;
+				this.steps += 1;
+				
+				
+					
+				
+				if (this.steps % 20 ==0){
+					this.model.saveModel()
+				}
+			}else{
+				this.reset_training(true,"out of boundaries : " + this.environment.sonic_state + 'cm')	
 			}
 			// Keep track of the max position reached and store the total reward
 			// if (done || step == this.maxStepsPerGame) {
@@ -376,7 +375,7 @@ $(function(){
 	})	
 	$("#erase_button").on('click',function(){
 		// console.log("erase")
-		game.model.cleanModel()
+		game.resetModel()
 	})
 	$("#stop_button").on('click',function(){
 		if (!$(this).hasClass('disabled')){

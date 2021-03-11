@@ -61,10 +61,6 @@ class Model {
 		$('#table_container').html(html)
     }
 
-	cleanModel(){
-		this.table = {}
-		// this.saveModel()
-	}
     predict(states) {
         return tf.tidy(() => this.network.predict(states));
     }
