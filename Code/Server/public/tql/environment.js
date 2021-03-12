@@ -151,7 +151,7 @@ class Environment
 		// console.log("STATES  INIT",this.states)
 		// console.log("STATES SCALED INIT",this.states_scaled)
 		
-		this.sonic_state  = await this.Sonic();
+		this.sonic_state  = await this.get_sonic();
 		this.initial_distance = this.sonic_state 
 		this.last_distance = this.sonic_state
 
@@ -249,7 +249,7 @@ class Environment
 	async get_sonic(){
 		var sum = 0
 		var item = 0
-		for (var s = 0;s<1;s++){
+		for (var s = 0;s<3;s++){
 			var son = await this.Sonic()
 			if (son>3 && son <70){
 				sum = son + sum
@@ -282,21 +282,10 @@ class Environment
 		await this.SetServosAngles(actions_angle)
 
 		// this.sonic_state = await this.get_sonic();
-		this.sonic_state = await this.Sonic();
+		this.sonic_state = await this.get_sonic();
 		var improvement = this.last_distance - this.sonic_state
 		this.reward = improvement / 5
 		this.last_distance = this.sonic_state
-		
-        // let done = this.isDone();
-
-        // if (!done)
-        // {
-            // this.m_reward = 1.0;
-        // }
-        // else
-        // {
-            // this.m_reward = 0.0;
-        // }
 
 	}
 }
