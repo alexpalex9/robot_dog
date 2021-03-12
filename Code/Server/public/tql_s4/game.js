@@ -44,7 +44,7 @@ class Orchestrator {
     }
 	resetModel(){
 		for (var m in this.model){
-			this.model[m] = new Model(this.environment.get_actions_index(),this.environment.get_states_index())	
+			this.model[m] = new Model(this.environment.get_actions_index(),this.environment.get_states_index(),m)	
 		}
 	}
 	async init(){
