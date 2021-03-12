@@ -57,8 +57,8 @@ class Model {
 
     saveModel(){
 		try{
-			var fake = localStorage.getItem('table');
-			localStorage.setItem('table', JSON.stringify(this.table));
+			var fake = localStorage.getItem('table_' + this.model_index);
+			localStorage.setItem('table_' + this.model_index, JSON.stringify(this.table));
 		}
 		catch(e)
 		{
@@ -67,7 +67,7 @@ class Model {
 	}
 	loadModel(){
 		try{
-			this.table = JSON.parse(localStorage.getItem('table'));
+			this.table = JSON.parse(localStorage.getItem('table_' + this.model_index));
 			if (this.table==null){
 				this.table = {}
 			}
