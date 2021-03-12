@@ -172,6 +172,10 @@ class Server():
         def tql():
             return render_template('learn_tql.html')
                 
+        @app.route('/tql_s4')
+        def tql_s4():
+            return render_template('learn_tql_s4.html')
+                
         def gen(camera=None):
             while True:
                 if DEV==False:
