@@ -106,7 +106,7 @@ class Orchestrator {
 					this.model.saveModel()
 				}
 			}else{
-				this.reset_training(true,"out of boundaries : " + this.environment.sonic_state + 'cm')	
+				this.pause_training("out of boundaries : " + this.environment.sonic_state + 'cm')	
 			}
 			// Keep track of the max position reached and store the total reward
 			// if (done || step == this.maxStepsPerGame) {
