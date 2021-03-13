@@ -5,7 +5,7 @@ const MIN_EPSILON = 0.01;
 // const MAX_EPSILON = 0.2;
 const MAX_EPSILON = 1;
 // const LAMBDA = 0.01;
-const LAMBDA = 0.002;
+const LAMBDA = 0.001;
 
 class Orchestrator {
    
@@ -111,7 +111,7 @@ class Orchestrator {
 				
 					
 				
-				if (this.steps % 20 ==0){
+				if (this.steps % 10 ==0){
 					for(var m in this.model){
 						this.model[m].saveModel()
 					}
@@ -298,7 +298,7 @@ let g_settings = {
 		depth :1,
 		hiddenLayerSizes:[24,24],
 		// maxStepsPerGame : 200,
-		maxStepsPerGame : 1000,
+		maxStepsPerGame : 1400,
 		// maxStepsPerGame : 5,
 		// maxStepsPerGame : 2,
 		discountRate : 0.99,
