@@ -63,25 +63,15 @@ class Orchestrator {
    
     async handleReinforcementLearning() {
 		console.log('------------- handleReinforcementLearning ---------------')
-        // this.environment.init();
-        // let state = this.environment.getState();
-        // let state_tensor = tf.tensor2d(state, [1, state.length])
-        // let totalReward = 0;
-        // let step = 0;
-		// this.eps = MAX_EPSILON;
         
 			this.state = this.environment.getState();
 			var actions = []
 			var rnd = Math.random()
 			
 			// var actions_index = []
-			for(var m in this.model){
-				 //{ actions,actions_index} = 
-				// var chosen_action = this.model[m].chooseAction(this.state, this.eps)
-				// actions.push(chosen_action.actions)
-				
-				actions.push(this.model[m].chooseAction(this.state, this.eps),rnd)
-				// actions_index.push(chosen_action.angle_scaled)
+			for(var m in this.model){				
+				actions.push(this.model[m].chooseAction(this.state, this.eps,rnd)
+
 			}
 			// console.log("chosen actions",actions,actions_index)
             await this.environment.step(actions);
@@ -129,15 +119,6 @@ class Orchestrator {
 			}else{
 				this.pause_training("out of boundaries : " + this.environment.sonic_state + 'cm')	
 			}
-			// Keep track of the max position reached and store the total reward
-			// if (done || step == this.maxStepsPerGame) {
-				// this.rewardStore.push(totalReward);
-				// this.rewardStore.push(totalReward);
-				// this.maxPositionStore.push(maxPosition);
-				// break;
-			// }
-        // }
-        // await this.replay()
     }
 	
 	async play(){
@@ -149,7 +130,7 @@ class Orchestrator {
 			var state = this.environment.getState();
 			var actions = []
 			for (var m in this.model){
-				actions.push(this.model[m].chooseAction(state, -1))
+				actions.push(this.model[m].chooseAction(state, -1,0))
 			}
             await this.environment.step(actions);
             const reward = this.environment.getReward();
@@ -216,22 +197,9 @@ class Orchestrator {
 			this.active = false
 		}
 		$("#train_button").addClass('disabled')
-		
-		// console.log("CHECK REWARD EPISODE SUM",this.m_dogInfo)
-
 		await this.environment.init()
 		$("#reset_button").removeClass('active')
-		// for (var i=0; i<this.m_cartPoleInfo.length;i++){
-			// this.m_cartPoleInfo[i].reset(false)
-		// }
-		// window.reinforcement_info.episode++;
-		// window.reinforcement_model.loss = {
-			// policy : [],
-			// value : [],
-			// entropy : [],
-			// total:[]
-			
-		// }
+
 		$("#train_button").removeClass('disabled')
 		if (msg==undefined){
 			this.log("training reseted : end of episode")
