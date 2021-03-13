@@ -70,7 +70,7 @@ class Orchestrator {
 			
 			// var actions_index = []
 			for(var m in this.model){				
-				actions.push(this.model[m].chooseAction(this.state, this.eps,rnd)
+				actions.push(this.model[m].chooseAction(this.state, this.eps,rnd))
 
 			}
 			// console.log("chosen actions",actions,actions_index)
