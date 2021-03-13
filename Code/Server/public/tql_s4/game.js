@@ -5,7 +5,7 @@ const MIN_EPSILON = 0.01;
 // const MAX_EPSILON = 0.2;
 const MAX_EPSILON = 1;
 // const LAMBDA = 0.01;
-const LAMBDA = 0.001;
+const LAMBDA = 0.002;
 
 class Orchestrator {
    
