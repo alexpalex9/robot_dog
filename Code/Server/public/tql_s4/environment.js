@@ -41,8 +41,8 @@ class Environment
 					this_state_index.push(1.0 * act)
 				}
 				for (var d=0;d<this.depth;d++){
-						this.states_index.push(this_state_index)
-					}
+					this.states_index.push(this_state_index)
+				}
 					
 				this.SERVOS[i]['state'] = this.SERVOS[i]['init']
 				this.servos_walk.push(this.SERVOS[i])
@@ -54,15 +54,6 @@ class Environment
 	}		
 	get_states_index(){
 		return this.states_index
-		// var states_index = []
-		// for (var s in this.servos_walk){
-			// states_index.push([])
-			// for (var a in this.servos_walk[s].states_index){
-				// states_index[s].push( this.servos_walk[s].states_index[a] * 1.0)
-			// }
-		// }
-		
-		return states_index
 	}
 	get_actions_servos_index(s){
 		return this.servos_walk[s].actions_index

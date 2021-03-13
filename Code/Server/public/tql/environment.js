@@ -26,22 +26,23 @@ class Environment
 		this.AMOUNT_INPUTS = 0
 		this.actions_index = []
 		this.servos_walk = [];
-		// this.actions_labels = []
+		this.states_index = []
 		for (var i in this.SERVOS){
 			if (this.SERVOS[i].used==true){
 				
 				this.SERVOS[i]['actions_labels'] = []
 				this.SERVOS[i]['actions_index']= []
-				this.SERVOS[i]['states_index'] = []
+				var this_state_index = []
 				this.AMOUNT_INPUTS = this.AMOUNT_INPUTS + 1
 				for (var act in this.SERVOS[i].actions){
 					this.SERVOS[i].actions_index.push({'servo':this.SERVOS[i].name,'angle':this.SERVOS[i].actions[act],'angle_scaled':(this.SERVOS[i].actions[act]-this.SERVOS[i].actions[0])/(this.SERVOS[i].actions[this.SERVOS[i].actions.length-1]-this.SERVOS[i].actions[0])})
 					this.SERVOS[i].actions_labels.push(this.SERVOS[i].name + '-'+ this.SERVOS[i].actions[act])
-					for (var d=0;d<this.depth;d++){
-						this.SERVOS[i].states_index.push(act)
-					}
-					// this.SERVOS[i].actions_index_scaled.push(this.SERVOS[i].name + '-'+ this.SERVOS[i].actions[act])
+					this_state_index.push(1.0 * act)
 				}
+				for (var d=0;d<this.depth;d++){
+					this.states_index.push(this_state_index)
+				}
+					
 				this.SERVOS[i]['state'] = this.SERVOS[i]['init']
 				this.servos_walk.push(this.SERVOS[i])
 			}
@@ -51,15 +52,7 @@ class Environment
 		return this.servos_walk.length
 	}		
 	get_states_index(){
-		var states_index = []
-		for (var s in this.servos_walk){
-			states_index.push([])
-			for (var a in this.servos_walk[s].states_index){
-				states_index[s].push( this.servos_walk[s].states_index[a] * 1.0)
-			}
-		}
-		
-		return states_index
+		return this.states_index
 	}
 	get_actions_index(){
 		var actions_index = []

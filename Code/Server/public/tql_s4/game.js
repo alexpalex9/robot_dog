@@ -54,9 +54,9 @@ class Orchestrator {
 		this.totalReward = 0
 		this.episode = 0
 		this.chart = new myCharts()
-		this.rewardStore = new Array();
-		 this.eps = MAX_EPSILON;
-		  this.steps = 0;
+		// this.rewardStore = new Array();
+		this.eps = MAX_EPSILON;
+		this.steps = 0;
        
 		
 	}
@@ -112,7 +112,7 @@ class Orchestrator {
 				// epsilon -= ( 1.0 / epochs );
 		
 				// this.state = nextState;
-				this.totalReward += reward;
+				// this.totalReward += reward;
 				this.steps += 1;
 				
 				
@@ -327,7 +327,7 @@ let g_settings = {
 		depth :1,
 		hiddenLayerSizes:[24,24],
 		// maxStepsPerGame : 200,
-		maxStepsPerGame : 1200,
+		maxStepsPerGame : 700,
 		// maxStepsPerGame : 5,
 		// maxStepsPerGame : 2,
 		discountRate : 0.99,
@@ -335,11 +335,11 @@ let g_settings = {
 			{'name':2,'init':0,'used':false},
 			// {'name':3,'init':80,'used':true,'min':70,'max':90,'step':10,'actions':[70,80,90]},
 			{'name':3,'init':70,'used':true,'min':70,'max':90,'step':10,'actions':[70,90]},
-			{'name':4,'init':105,'used':false},
+			{'name':4,'init':107,'used':false},
 			{'name':5,'init':0,'used':false},
 			// {'name':6,'init':87,'used':true,'min':90,'max':110,'step':10,'actions':[77,87,97]},
 			{'name':6,'init':77,'used':true,'min':90,'max':110,'step':10,'actions':[77,97]},
-			{'name':7,'init':105,'used':false},
+			{'name':7,'init':107,'used':false},
 			{'name':8,'init':75,'used':false},
 			// {'name':9,'init':87,'used':true,'min':77,'max':97,'step':10,'actions':[77,87,97]},
 			{'name':9,'init':77,'used':true,'min':77,'max':97,'step':10,'actions':[77,97]},
