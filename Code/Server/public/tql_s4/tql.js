@@ -160,12 +160,12 @@ class Model {
 		// $(actionId).fadeOut('fast').delay('fast').fadeIn('fast')
 		// $(id).fadeOut('fast').delay('fast').fadeIn('fast')
 	}
-    chooseAction(state, eps) {
+    chooseAction(state, eps, rnd) {
 		// console.log("ACTION ? ",state,eps)
 		// state = [0,0,0,1]
 		var state_join = state.join('-')
 		// eps = -1 
-        if (Math.random() < eps || this.table[state_join]==undefined) {
+        if (rnd < eps || this.table[state_join]==undefined) {
         // if (Math.random() < 2 ) {
 			// console.log("Random action")
 			// var actions = []

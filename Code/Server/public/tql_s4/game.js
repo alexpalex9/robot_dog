@@ -72,12 +72,15 @@ class Orchestrator {
         
 			this.state = this.environment.getState();
 			var actions = []
+			var rnd = Math.random()
+			
 			// var actions_index = []
 			for(var m in this.model){
 				 //{ actions,actions_index} = 
 				// var chosen_action = this.model[m].chooseAction(this.state, this.eps)
 				// actions.push(chosen_action.actions)
-				actions.push(this.model[m].chooseAction(this.state, this.eps))
+				
+				actions.push(this.model[m].chooseAction(this.state, this.eps),rnd)
 				// actions_index.push(chosen_action.angle_scaled)
 			}
 			// console.log("chosen actions",actions,actions_index)
@@ -327,7 +330,7 @@ let g_settings = {
 		depth :1,
 		hiddenLayerSizes:[24,24],
 		// maxStepsPerGame : 200,
-		maxStepsPerGame : 700,
+		maxStepsPerGame : 1000,
 		// maxStepsPerGame : 5,
 		// maxStepsPerGame : 2,
 		discountRate : 0.99,
