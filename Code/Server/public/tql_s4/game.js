@@ -100,7 +100,8 @@ class Orchestrator {
 				// }
 				this.steps += 1;
 				// Exponentially decay the exploration parameter
-				this.eps = MIN_EPSILON + (MAX_EPSILON - MIN_EPSILON) * Math.exp(-LAMBDA * this.steps);
+				// this.eps = MIN_EPSILON + (MAX_EPSILON - MIN_EPSILON) * Math.exp(-LAMBDA * this.steps);
+				this.eps = g_settings.min_epsilon + (g_settings.max_epsilon - g_settings.min_epsilon) * Math.exp(-g_settings.lambda * this.steps);
 				// if(this.eps > 0.1)
 				// epsilon -= ( 1.0 / epochs );
 		
@@ -299,9 +300,12 @@ let g_settings = {
 		hiddenLayerSizes:[24,24],
 		// maxStepsPerGame : 200,
 		maxStepsPerGame : 1400,
-		// maxStepsPerGame : 5,
-		// maxStepsPerGame : 2,
 		discountRate : 0.99,
+		learning_rate : 0.95,
+		max_epsilon : 1,
+		min_epsilon : 0.1,
+		lambda : 0.01,
+		gamma : 0.8,
 		servos : [
 			{'name':2,'init':0,'used':false},
 			// {'name':3,'init':80,'used':true,'min':70,'max':90,'step':10,'actions':[70,80,90]},
