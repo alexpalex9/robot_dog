@@ -95,8 +95,10 @@ class Model {
 		// state = [0,0,0,1]
 		// var lr  = 0.95; // or alpha, learning rate
 		var lr  = g_settings.learning_rate; // or alpha, learning rate
+		// console.log(lr)
 		// var gamma  = 0.8 // actualisation factor  0.8 to 0.99.
 		var gamma  = g_settings.gamma; // actualisation factor  0.8 to 0.99.
+		// console.log(gamma)
 		// nextState = [0,0,1,1]
 		
 		// reward = 1
