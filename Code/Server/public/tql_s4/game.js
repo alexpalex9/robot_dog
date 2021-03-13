@@ -1,11 +1,11 @@
 // dqn js = https://github.com/prouhard/tfjs-mountaincar/blob/master/src/js/
 // robot 4 leg C = https://github.com/Counterfeiter/Q-LearningRobot/blob/master/Src/ann.c
 
-const MIN_EPSILON = 0.01;
+// const MIN_EPSILON = 0.01;
 // const MAX_EPSILON = 0.2;
-const MAX_EPSILON = 1;
+// const MAX_EPSILON = 1;
 // const LAMBDA = 0.01;
-const LAMBDA = 0.001;
+// const LAMBDA = 0.001;
 
 class Orchestrator {
    
@@ -14,7 +14,7 @@ class Orchestrator {
 		this.batchSize = 1
 		
         // The main components of the environment
-        this.environment = new Environment(g_settings.agent.depth,g_settings.agent.servos);;
+        this.environment = new Environment(g_settings.depth,g_settings.servos);;
 		// var numActions = this.environment.get_actions_count()
 		var numInputs = this.environment.get_inputs_count()
 		var numServos = this.environment.get_servos_count()
@@ -25,21 +25,8 @@ class Orchestrator {
 			this.model[s].loadModel()
 		}
 		
-     // hiddenLayerSizes, numStates, numActions)
-		// this.memory = new Memory(100)
-        // The exploration parameter
-        this.maxStepsPerGame = g_settings.agent.maxStepsPerGame;
-        // this.discountRate = g_settings.agent.discountRate;
-
-        // Keep tracking of the elapsed steps
-       
-
-        // Initialization of the rewards and max positions containers
-		
+        this.maxStepsPerGame = g_settings.maxStepsPerGame;
         
-        // this.maxPositionStore = new Array();
-		// this.episode = 0
-		
 		
     }
 	resetModel(){
@@ -55,7 +42,7 @@ class Orchestrator {
 		this.episode = 0
 		this.chart = new myCharts()
 		// this.rewardStore = new Array();
-		this.eps = MAX_EPSILON;
+		this.eps = g_settings.max_epsilon;
 		this.steps = 0;
        
 		
@@ -294,7 +281,7 @@ class Orchestrator {
 // #define DISTANCE_MEASURE_MEDIAN		5
 let g_settings = {
 	// mode :"RL_TRAIN",
-	agent:{
+	// agent:{
 		// nSteps : 200,
 		depth :1,
 		hiddenLayerSizes:[24,24],
@@ -325,7 +312,7 @@ let g_settings = {
 			{'name':13,'init':180,'used':false},
 			{'name':15,'init':90,'used':false,'label':'head'},
 		]	
-	}
+	// }
 
 };
 
