@@ -145,7 +145,7 @@ class Model {
 	updateHtmlTable(state,action_index){
 		// console.log(state,action_index)
 		var id = '#model_' +this.model_index + '_' + state.join('-') + '¤' + action_index
-		console.log("id to fill",id,this.table[state.join('-')][action_index])
+		// console.log("id to fill",id,this.table[state.join('-')][action_index])
 		$(id).html(parseInt(this.table[state.join('-')][action_index]*10)/10)
 		$(id).css('backgroundColor',getColorForPercentage(this.table[state.join('-')][action_index]/2))
 	}

@@ -138,7 +138,7 @@ class Environment
 		for (var s in this.servos_walk){
 			this.states.push([])
 			this.states_scaled.push([])
-			console.log("doing servo",s)
+			// console.log("doing servo",s)
 			
 			for (var d=0;d<this.depth;d++){
 				this.states[s].push(this.servos_walk[s]['state'])
@@ -262,7 +262,7 @@ class Environment
 				item = item + 1
 			}
 		}
-		return sum/item
+		return parseInt(sum/item*10)/10
 		
 	}
 	step = async function(actions_index) {//,state,state_scaled,incremental){
