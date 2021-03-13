@@ -127,11 +127,7 @@ class Orchestrator {
 				reward : reward,
 				epsilon : this.eps
 			})
-
-		
-			this.steps += 1;
-
-			
+			step += 1;
         }		
 	}
 	
@@ -286,13 +282,16 @@ let g_settings = {
 		depth :1,
 		hiddenLayerSizes:[24,24],
 		// maxStepsPerGame : 200,
-		maxStepsPerGame : 300,
+		maxStepsPerGame : 500,
+		
 		discountRate : 0.99,
 		learning_rate : 0.95,
-		max_epsilon : 1,
-		min_epsilon : 0.1,
-		lambda : 0.005,
 		gamma : 0.8,
+		
+		max_epsilon : 1,
+		min_epsilon : 0.05,
+		lambda : 0.005,
+		
 		servos : [
 			{'name':2,'init':0,'used':false},
 			// {'name':3,'init':80,'used':true,'min':70,'max':90,'step':10,'actions':[70,80,90]},
