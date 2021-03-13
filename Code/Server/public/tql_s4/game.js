@@ -44,7 +44,7 @@ class Orchestrator {
     }
 	resetModel(){
 		for (var m in this.model){
-			this.model[m] = new Model(this.environment.get_actions_index(),this.environment.get_states_index(),m)	
+			this.model[m] = new Model(this.environment.get_actions_servos_index(),this.environment.get_states_index(),m)	
 		}
 	}
 	async init(){
@@ -324,7 +324,7 @@ let g_settings = {
 	// mode :"RL_TRAIN",
 	agent:{
 		// nSteps : 200,
-		depth : 1,
+		depth :1,
 		hiddenLayerSizes:[24,24],
 		// maxStepsPerGame : 200,
 		maxStepsPerGame : 1200,

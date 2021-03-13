@@ -19,7 +19,14 @@ class Model {
 		
 		this.model_index = model_index
 		this.actions_index = servoActions_index
+		// this.depth = 2
 		this.states_index = combineArrays(servoStates_index)
+		// var arr_comb = []
+		// for (var si in servoStates_index){
+			
+		// }
+		// console.log("comb",combineArrays([[0,1],[0,1],[0,1],[0,1],[0,1],[0,1],[0,1],[0,1]]))
+		// this.states_index = combineArrays([[0,1],[0,1]])
 		console.log("ACTIONS INdEX = ",this.actions_index)
 		console.log("STATE INdEX = ",this.states_index)
 	
@@ -84,7 +91,7 @@ class Model {
 		}
 	}
     async train(state, reward,action_index, nextState) {
-		console.log("TRAIN",action_index)
+		// console.log("TRAIN",action_index)
 		// state = [0,0,0,1]
 		var lr  = 0.95; // or alpha, learning rate
 		var gamma  = 0.9 // actualisation factor  0.8 to 0.99.
@@ -138,7 +145,7 @@ class Model {
 	updateHtmlTable(state,action_index){
 		// console.log(state,action_index)
 		var id = '#model_' +this.model_index + '_' + state.join('-') + '¤' + action_index
-		// console.log("id to fill",id)
+		console.log("id to fill",id,this.table[state.join('-')][action_index])
 		$(id).html(parseInt(this.table[state.join('-')][action_index]*10)/10)
 		$(id).css('backgroundColor',getColorForPercentage(this.table[state.join('-')][action_index]/2))
 	}
