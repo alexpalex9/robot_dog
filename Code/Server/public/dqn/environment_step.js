@@ -86,9 +86,12 @@ class Environment
 		var data = {}
 		this.states = []
 		this.states_scaled = []
+		for (var s in this.SERVOS){
+			data[this.SERVOS[s].name] = this.SERVOS[s]['init']
+		}
 		for (var s in this.servos_walk){
 			
-			data[this.servos_walk[s].name] = this.servos_walk[s]['init']
+			// data[this.servos_walk[s].name] = this.servos_walk[s]['init']
 			this.servos_walk[s]['state'] = this.servos_walk[s]['init']			
 			this.states.push([])
 			this.states_scaled.push([])			
