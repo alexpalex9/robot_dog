@@ -452,7 +452,7 @@ let g_settings = {
 			// {'name':9,'init':87,'used':true,'min':77,'max':97,'step':10,'actions':[77,87,97]},
 			{'name':9,'init':87,'used':true,'min':67,'max':107,'step':25,'actions':[67,107]},
 			{'name':10,'init':180,'used':false},
-			{'name':11,'init':86,'used':false},
+			{'name':11,'init':75,'used':false},
 			// {'name':12,'init':90,'used':true,'min':80,'max':100,'step':10,'actions':[80,90,100]},
 			{'name':12,'init':90,'used':true,'min':70,'max':110,'step':25,'actions':[70,110]},
 			{'name':13,'init':180,'used':false},
