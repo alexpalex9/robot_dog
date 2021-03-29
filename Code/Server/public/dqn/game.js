@@ -1,10 +1,6 @@
 // dqn js = https://github.com/prouhard/tfjs-mountaincar/blob/master/src/js/
 // robot 4 leg C = https://github.com/Counterfeiter/Q-LearningRobot/blob/master/Src/ann.c
 
-const MIN_EPSILON = 0.01;
-// const MAX_EPSILON = 0.2;
-const MAX_EPSILON = 1;
-const LAMBDA = 0.01;
 
 class Orchestrator {
    
@@ -13,38 +9,41 @@ class Orchestrator {
 		this.batchSize = 1
 		
         // The main components of the environment
-        this.environment = new Environment(g_settings.agent.depth,g_settings.agent.servos);;
+        this.environment = new Environment(g_settings.depth,g_settings.servos);
 		// var numActions = this.environment.get_actions_count()
-		var numInputs = this.environment.get_inputs_count()
-		// TODO: dyn actions count
-		console.log("numInputs",numInputs)
-        this.model = new Model(g_settings.agent.hiddenLayerSizes,numInputs,8)
-     // hiddenLayerSizes, numStates, numActions)
-		this.memory = new Memory(100)
-        // The exploration parameter
-        this.eps = MAX_EPSILON;
+		this.numInputs = this.environment.get_inputs_count()
+		this.numActions = this.environment.get_actions_count()
+		this.numServos = this.environment.servos_walk.length
+		console.log("this.environment.get_actions_index()",this.environment.get_actions_count())
+		console.log("numInputs",this.numInputs)
+		console.log("numActions",this.numActions)
+        this.model = new Model(g_settings.hiddenLayerSizes,this.numInputs,this.numActions,this.environment.servos_walk.length)
 
-        // Keep tracking of the elapsed steps
-        this.steps = 0;
-        this.maxStepsPerGame = g_settings.agent.maxStepsPerGame;
-        this.discountRate = g_settings.agent.discountRate;
+		// this.memory = new Memory(200)
+		this.batch_mem  = {
+			state : [],
+			next_state : [],
+			reward : [],
+			actions : []
+		}
+		this.train_data = {
+			input : [],
+			output : []
+		}
+		this.maxStepsPerGame = g_settings.maxStepsPerGame;
 
-        // Initialization of the rewards and max positions containers
-		
-        this.rewardStore = new Array();
-        // this.maxPositionStore = new Array();
-		this.episode = 0
-		
-		this.chart = new myCharts()
     }
-
-	async create(){
+	resetModel(){
+		this.model = new Model(g_settings.hiddenLayerSizes,this.numInputs,this.numActions)
+	}
+	async init(){
 		console.log("Creating game")
 		await this.environment.init();
-		var state = this.environment.getState();
-		this.state_tensor = tf.tensor2d(state, [1, state.length])
-		this.totalReward = 0
-		
+		this.state = this.environment.getState();
+		this.chart = new myCharts()
+		this.eps = 1;
+		this.steps = 0;
+		this.batch_pos = 0;
 	}
    
     async handleReinforcementLearning() {
@@ -55,141 +54,210 @@ class Orchestrator {
         // let totalReward = 0;
         // let step = 0;
 		// this.eps = MAX_EPSILON;
-        
-			
+		// console.log("STATE (check if changing properly, not pointer",this.state)
+		// let state_tensor = tf.tensor2d(this.state, [1, this.state.length])
+		var qval = this.model.predict(this.state)
 
-            // Interaction with the environment
-            const action = this.model.chooseAction(this.state_tensor, this.eps);
-			console.log("action",action)
-            await this.environment.step(action);
-            const reward = this.environment.getReward();
-			this.chart.addData('step_reward',{
-				label : this.steps,
-				reward : reward,
-				epsilon : this.eps
-			})
-			var done = this.environment.isDone()
-			await this.environment.step(action)
+		// for (var a=0; a<this.numActions;s++ ){
+			// qval[a] = qvql_p[a]
+		// }
+		// Interaction with the environment
+		// const action = this.model.chooseAction(this.state_tensor, this.eps);
+		var actions = []
+		 if (Math.random() < this.eps) {
+		// if (Math.random() < 2 ) {
+			// console.log("Random action")
 			
-            let nextState =  this.environment.getState();
-            let nextState_tensor =  tf.tensor2d(nextState, [1, nextState.length])
-
-            // Keep the car on max position if reached
-            // if (this.mountainCar.position > maxPosition) maxPosition = this.mountainCar.position;
-            if (done) nextState = null;
-
-       
-			 this.memory.addSample([this.state_tensor, action, reward, nextState_tensor]);
-			 // console.log('memory',this.memory)
-			// }
-			this.steps += 1;
-			// Exponentially decay the exploration parameter
-			this.eps = MIN_EPSILON + (MAX_EPSILON - MIN_EPSILON) * Math.exp(-LAMBDA * this.steps);
-			// if(this.eps > 0.1)
-			// epsilon -= ( 1.0 / epochs );
-	
-			this.state_tensor = nextState_tensor;
-			this.totalReward += reward;
-			this.steps += 1;
-			
-			if (done){
-				this.reset_training(true,"out of boundaries")
+			for (var s = 0 ; s<this.numServos;s++){
+				actions.push(Math.floor(Math.random() * this.numActions/this.numServos) )
 			}
-			// Keep track of the max position reached and store the total reward
-			// if (done || step == this.maxStepsPerGame) {
-				// this.rewardStore.push(totalReward);
-				// this.rewardStore.push(totalReward);
-				// this.maxPositionStore.push(maxPosition);
-				// break;
-			// }
-        // }
-        // await this.replay()
-    }
-
-    async replay() {
-		// Sample from memory
-        const batch = this.memory.sample(this.batchSize);
-		// var batch = this.memory.samples
 		
-        const states = batch.map(([state, , , ]) => state);
-        const nextStates = batch.map(
-            ([, , , nextState]) => nextState ? nextState : tf.zeros([this.model.numInputs])
-        );
-        // Predict the values of each action at each state
-        const qsa = states.map((state) => this.model.predict(state));
-        // Predict the values of each action at each next state
-        const qsad = nextStates.map((nextState) => this.model.predict(nextState));
-
-        let x = new Array();
-        let y = new Array();
-
-        // Update the states rewards with the discounted next states rewards
-        batch.forEach(
-            ([state, action, reward, nextState], index) => {
-                const currentQ = qsa[index];
-                currentQ[action] = nextState ? reward + this.discountRate * qsad[index].max().dataSync() : reward;
-                x.push(state.dataSync());
-                y.push(currentQ.dataSync());
-            }
-        );
-			// for(int x = 0; x < NUM_SERVO_MOT; x++)
-				// {
-					// oldQ[batch_mem[mini_pos].servo_actions[x] * NUM_SERVO_MOT + x] = (batch_mem[mini_pos].reward[x] < 0.1) ? \
-							// (batch_mem[mini_pos].reward[x] + (gamma * maxQ[x])) : batch_mem[mini_pos].reward[x];
-				// }
-							
-							
-        // Clean unused tensors
-        qsa.forEach((state) => state.dispose());
-        qsad.forEach((state) => state.dispose());
-
-		// console.log("x,y",x,y)
-        // Reshape the batches to be fed to the network
-        x = tf.tensor2d(x, [x.length, this.model.numInputs])
-        y = tf.tensor2d(y, [y.length, this.model.numActions])
-
-        // Learn the Q(s, a) values given associated discounted rewards
-        var loss = await this.model.train(x, y);
-		this.chart.addData('episode_loss',{
-			label : this.episode,
-			loss : loss,
+		} else {
+			for (var s = 0 ; s<this.numServos;s++){
+				actions.push(this.model.getMaxQandAction(s,qval).action)
+			}
+		
+		}
+		// console.log("action",actions)
+		await this.environment.step(actions)
+		
+		var next_state = this.environment.getState()
+		var reward = this.environment.getReward();
+		var all_reward = Array.from(new Array(this.numServos), x => reward)
+		this.chart.addData('step_reward',{
+			label : this.batch_pos,
+			reward : reward,
 			epsilon : this.eps
-			
 		})
-		this.chart.cleanData('step_reward')
-		this.episode = this.episode + 1
-        x.dispose();
-        y.dispose();
+		
+		//check if batch mem is filled the first time
+		// console.log(this.batch_pos,g_settings.max_batch_memory)
+		// for tEST
+		// g_settings.max_batch_memory = 5
+		if(this.batch_pos >= g_settings.max_batch_memory)
+		
+		
+		{
+			//if the list is filled once a time completely
+			//we start to set new data at random positions
+			//save outputs and inputs
+			var batch_rand_pos = Math.floor(Math.random() * g_settings.max_batch_memory)
+			this.batch_mem['state'][batch_rand_pos] =  this.state;
+			this.batch_mem['next_state'][batch_rand_pos] = next_state;
+			this.batch_mem['reward'][batch_rand_pos] =  all_reward;
+			this.batch_mem['actions'][batch_rand_pos] =  actions;
+			
+			// console.log("REWARD",this.batch_mem['reward'][batch_rand_pos])
+			/////////////////// experience reply //////////////////////
+			//sample a random set of MAX_BATCH_MEM to MIN_BATCH_MEM
+			for(var y = 0; y < g_settings.mini_batch_memory; y++)
+			{
+				var mini_pos = Math.floor(Math.random() * g_settings.max_batch_memory);
+
+				//run the old copy of the ann with new inputs
+				// fann_type *newQ = fann_run(ann, batch_mem[mini_pos].inputs_tp1);
+				// console.log("PREDICT Q VALUE",this.batch_mem.next_state[mini_pos])
+				
+				var newQ = this.model.predict(this.state).dataSync();
+				// var newQ = this.model.predict(tensor_state).dataSync();
+
+				//search the maximum in newQ
+				
+				// fann_type maxQ[NUM_SERVO_MOT];
+				// var actions = [];
+				var maxQ = []
+				for(var x = 0; x < this.numServos; x++){
+					// ann_getMaxQandAction(x, newQ, &maxQ[x]);
+					var maxQandAction = this.model.getMaxQandAction(x,newQ)
+					// actions.push(maxQandAction.action)
+					// console.log("maxQandAction",x,maxQandAction)
+					maxQ.push(maxQandAction.maxQ)
+				}
+				// var oldQ = []
+				// for (var m in this.batch_mem[mini_pos]{
+				// console.log("this.batch_mem.state[mini_pos].state",mini_pos,this.batch_mem.state[mini_pos])
+				var oldQ = this.model.predict(this.batch_mem.state[mini_pos]).dataSync()
+				// console.log("oldQ",oldQ)
+				// }
+
+				//set the old values as train data (output) - use new max in equation
+				for(var x = 0; x < this.numServos; x++)
+				{
+					// console.log("---> X",x)
+					// console.log("   pos",this.batch_mem.actions[mini_pos][x] * this.numServos + x)
+					// console.log("   rew",this.batch_mem.reward[mini_pos][x])
+					// console.log("   gamma",g_settings.gamma)
+					// console.log("   maxQ",maxQ[x])
+					oldQ[this.batch_mem.actions[mini_pos][x] * this.numServos + x] = (this.batch_mem.reward[mini_pos][x] < 0.1) ? (this.batch_mem.reward[mini_pos][x] + (g_settings.gamma * maxQ[x])) : this.batch_mem.reward[mini_pos][x];
+				}
+				// console.log("New oldQ",oldQ)
+				//ann_displayVector("Desired Outputs", oldQ, num_outputs);
+
+				//store the data in mini batch fann train file
+				// Alex not done here, to be done
+				
+				
+				// memcpy(train_data->input[y], batch_mem[mini_pos].inputs, NUM_INPUTS * sizeof(fann_type));
+				// memcpy(train_data->output[y], oldQ, NUM_OUTPUTS * sizeof(fann_type));
+				this.train_data.input.push(this.batch_mem.state[mini_pos])
+				this.train_data.output.push(oldQ)
+			}
+
+			//train the data sets
+			// ALEX : wrong here
+			// console.log("train_data",this.train_data)
+			var history = await this.model.train(this.train_data,qval)
+			// console.log("HISTORY FIT",history)
+			this.chart.addData('episode_loss',{
+				label : this.batch_pos,
+				loss : history.history.loss[0],
+				epsilon : 0
+			})
+			// fann_train_on_data(ann, train_data, NUM_TRAIN_EPOCHS, NUM_TRAIN_EPOCHS, 0.001);
+		
+		
+		}else{
+			
+			// Alex here to continue 
+			// memcpy(batch_mem[batch_pos].inputs, old_in_p, NUM_INPUTS * sizeof(fann_type));
+			// memcpy(batch_mem[batch_pos].inputs_tp1, new_in_p, NUM_INPUTS * sizeof(fann_type));
+			// memcpy(batch_mem[batch_pos].reward, reward, NUM_SERVO_MOT * sizeof(fann_type));
+			// memcpy(batch_mem[batch_pos].servo_actions, actions, NUM_SERVO_MOT * sizeof(uint8_t));
+			this.batch_mem.state.push(this.state);
+			this.batch_mem.next_state.push(next_state);
+			this.batch_mem.reward.push(all_reward);
+			this.batch_mem.actions.push(actions);
+
+			// this.batch_mem.push({
+				// 'state' :  this.state,
+				// 'next_state': next_state,
+				// 'reward':  reward,
+				// 'actions':  actions
+			// })
+
+			//this function use always backpropagation algorithm!
+			//fann_set_training_algorithm has no effect!
+			//or same as fann_set_training_algorithm = incremental and train epoch
+			//train ann   , input, desired outputs
+			//train only single data -> catastrophic forgetting could happen in the first MAX_BATCH_MEM moves
+			var xtensor = tf.tensor(this.state).reshape([1,8])
+			// var ytensor = tf.tensor(qval).reshape([1,12])	
+			var history = await this.model.network.fit(xtensor,qval)
+			
+		}
+		this.batch_pos++;
+		// Exponentially decay the exploration parameter
+		if(this.eps > g_settings.min_epsilon) {
+			this.eps -= ( 1.0 / g_settings.maxStepsPerGame );
+		}
+		
+		var done = this.environment.isDone()
+		if (done){
+			this.pause_training("out of boundaries")
+		}
+		this.state = next_state
+		// this.log("Training complete")
     }
+
 	
 	async play(){
+		// console.log("PLAYING")
         // this.environment.init();
         
         // let totalReward = 0;
-        let step = 0;
-        while (step < this.maxStepsPerGame) {
+        // let step = 0;
+		// var cnt_rnd_moves  = 0
+        // while (step < this.maxStepsPerGame) {
 			var state = this.environment.getState();
-        
-			var state_tensor = tf.tensor2d(state, [1, state.length])
-            // Interaction with the environment
-            const action = this.model.chooseAction(state_tensor, this.eps);
-			// console.log("action",action)
-            await this.environment.step(action);
-            const reward = this.environment.getReward();
-			this.chart.addData('step_reward',{
-				label : step,
-				reward : reward,
-				epsilon : this.eps
-			})
-			var done = this.environment.isDone()
-			await this.environment.step(action)
+			var qval = this.model.predict(state)
+			var actions = []
+			for (var s = 0 ; s<this.numServos;s++){
+				actions.push(this.model.getMaxQandAction(s,qval).action)
+				// move_dist += fabsf(new_inputs[x] - new_inputs[x + NUM_SERVO_MOT]);
+			}
+			// console.log("actions",actions)
+			var hasmoved = await this.environment.step(actions)
+			// console.log("hasMoved?",hasmoved,this.cnt_rnd_moves)
 		
-			this.steps += 1;
-			// state_tensor = nextState_tensor;
-			// totalReward += reward;
-			step += 1;
-			
-        }		
+			// alex to continuer here
+			//push the network to move in a loop
+			if(hasmoved==false)
+			{
+
+				if(this.cnt_rnd_moves++ > 3)
+				{
+					this.cnt_rnd_moves = 0;
+					
+					var actions = []
+					for(var x = 0; x < this.numServos; x++)
+					{
+						actions.push(Math.floor(Math.random()  * this.numActions/this.numServos))
+					}
+					this.log("Robot stopping! Use random move! " + actions);
+					await this.environment.step(actions)
+				}
+			}
+		// }
 	}
 	
 	log(text){
@@ -221,18 +289,32 @@ class Orchestrator {
 			// console.log(_this_game.active)
 			// while (step < this.maxStepsPerGame) {
 			if (_this_game.active==true){
-				if (this.steps < this.maxStepsPerGame) {
+				if (this.steps <= this.maxStepsPerGame) {
 					await _this_game.handleReinforcementLearning(new Date(),false)
 					await _this_game.training(_this_game)
 				}else{
-					await this.replay()
+					// await this.replay()
 				}
 			}
 		}
 		
 	}
 	
-	
+	async play_job(_this_game){
+		if (!_this_game){
+			_this_game = this;
+		}
+		
+		if (this.cnt_rnd_moves==undefined){
+			this.cnt_rnd_moves  = 0	
+		}
+		if (_this_game.isplay==true){
+			await _this_game.play()
+			await _this_game.play_job(_this_game)
+			
+			}
+		
+	}	
 	async reset_training(pause,msg) {
 		
 		if (pause==true){
@@ -242,21 +324,9 @@ class Orchestrator {
 			this.active = false
 		}
 		$("#train_button").addClass('disabled')
-		
-		// console.log("CHECK REWARD EPISODE SUM",this.m_dogInfo)
+		await this.environment.init()
+		$("#reset_button").removeClass('active')
 
-		await this.m_reinforcementEnvironment.init()
-		// for (var i=0; i<this.m_cartPoleInfo.length;i++){
-			// this.m_cartPoleInfo[i].reset(false)
-		// }
-		// window.reinforcement_info.episode++;
-		// window.reinforcement_model.loss = {
-			// policy : [],
-			// value : [],
-			// entropy : [],
-			// total:[]
-			
-		// }
 		$("#train_button").removeClass('disabled')
 		if (msg==undefined){
 			this.log("training reseted : end of episode")
@@ -296,6 +366,7 @@ class Orchestrator {
 		$("#reset_button").removeClass('disabled')
 		$("#sonar_button").addClass('disabled')
 		$("#stop_button").removeClass('disabled')
+		$("#play_button").addClass('disabled')
 		await this.training()
 	}
 	async pause_training(msg) {
@@ -308,20 +379,34 @@ class Orchestrator {
 		$("#train_button").removeClass('active')
 		this.active = false
 	}
+
 	async stop_training() {
-		this.log("training stopped")
-		$("#train_button").removeClass('active')
-		$("#reset_button").addClass('disabled')
-		$("#stop_button").addClass('disabled')
-		this.active = false
-		this.started = false
-		let game = new PlayGame();
-		game.create().then(function(){
-			// game.handleReinforcementLearning()
-			$("#train_button").removeClass('disabled')
-			$("#stop_button").removeClass('disabled')
-		})
+		// if (this.active==true){
+			this.log("training stopped")
+			$("#train_button").removeClass('active')
+			$("#train_button").addClass('disabled')
+			$("#reset_button").addClass('disabled')
+			$("#stop_button").addClass('disabled')
+			// $("#play_button").removeClass('active')
+			// $("#play_button").removeClass('disabled')
+			this.active = false
+			this.isplay = false
+			// let training finish
+			this.started = false
+			setTimeout(function(){
+				// game = new Orchestrator();
+				game.init().then(function(){
+					// game.handleReinforcementLearning()
+					$("#train_button").removeClass('disabled')
+					$("#stop_button").removeClass('disabled')
+					$("#play_button").removeClass('disabled')
+					// game.play()
+				})
+			},2000)
+		// }
 	}
+	
+
 	
 }
 //used for experience reply
@@ -337,39 +422,48 @@ class Orchestrator {
 // #define DISTANCE_MEASURE_MEDIAN		5
 let g_settings = {
 	// mode :"RL_TRAIN",
-	agent:{
+	// agent:{
 		// nSteps : 200,
 		depth : 2,
 		hiddenLayerSizes:[24,24],
 		// maxStepsPerGame : 200,
 		maxStepsPerGame : 700,
+		max_batch_memory : 200,
+		mini_batch_memory : 10,
 		// maxStepsPerGame : 5,
 		// maxStepsPerGame : 2,
 		discountRate : 0.99,
+		learning_rate : 0.95,
+		gamma : 0.8,
+		
+		// max_epsilon : 1,
+		min_epsilon : 0.1,
+		
 		servos : [
 			{'name':2,'init':0,'used':false},
 			// {'name':3,'init':80,'used':true,'min':70,'max':90,'step':10,'actions':[70,80,90]},
-			{'name':3,'init':70,'used':true,'min':70,'max':90,'step':10,'actions':[70,90]},
+			{'name':3,'init':80,'used':true,'min':55,'max':105,'step':25,'actions':[60,100]},
 			{'name':4,'init':97,'used':false},
 			{'name':5,'init':0,'used':false},
 			// {'name':6,'init':87,'used':true,'min':90,'max':110,'step':10,'actions':[77,87,97]},
-			{'name':6,'init':77,'used':true,'min':90,'max':110,'step':10,'actions':[77,97]},
+			{'name':6,'init':87,'used':true,'min':62,'max':112,'step':25,'actions':[67,107]},
 			{'name':7,'init':97,'used':false},
 			{'name':8,'init':85,'used':false},
 			// {'name':9,'init':87,'used':true,'min':77,'max':97,'step':10,'actions':[77,87,97]},
-			{'name':9,'init':77,'used':true,'min':77,'max':97,'step':10,'actions':[77,97]},
+			{'name':9,'init':87,'used':true,'min':62,'max':112,'step':25,'actions':[67,107]},
 			{'name':10,'init':180,'used':false},
 			{'name':11,'init':86,'used':false},
 			// {'name':12,'init':90,'used':true,'min':80,'max':100,'step':10,'actions':[80,90,100]},
-			{'name':12,'init':80,'used':true,'min':80,'max':100,'step':10,'actions':[80,100]},
+			{'name':12,'init':90,'used':true,'min':65,'max':115,'step':25,'actions':[70,110]},
 			{'name':13,'init':180,'used':false},
 			{'name':15,'init':90,'used':false,'label':'head'},
 		]	
-	}
+	// }
 
 };
 
 
+var game;
 
 $(function(){
 	// (async() => {
@@ -377,10 +471,13 @@ $(function(){
 		// console.log("starting a2c main")
 		// sars.train();
 	// })();
-	let game = new Orchestrator();
-	game.create().then(function(){
+	game = new Orchestrator();
+	game.init().then(function(){
 		// game.handleReinforcementLearning()
 		$("#train_button").removeClass('disabled')
+		$("#reset_button").removeClass('disabled')
+		$("#play_button").removeClass('disabled')
+		$("#reset_button").removeClass('active')
 		// $("#reset_button").removeClass('disabled')
 	})
 	// console.log()
@@ -406,6 +503,10 @@ $(function(){
 			// sars.reset = true
 		}
 	})	
+	$("#erase_button").on('click',function(){
+		// console.log("erase")
+		game.resetModel()
+	})
 	$("#stop_button").on('click',function(){
 		if (!$(this).hasClass('disabled')){
 			game.stop_training()
@@ -415,9 +516,23 @@ $(function(){
 	})	
 	$("#play_button").on('click',function(){
 		if (!$(this).hasClass('disabled')){
-			$(this).addClass('disabled')
-			game.play()
-			$(this).removeClass('disabled')
+			if ($(this).hasClass('active')){
+				game.isplay = false;
+				$(this).removeClass('active')
+				$("#train_button").removeClass('disabled')
+				$("#reset_button").removeClass('disabled')
+				$("#stop_button").removeClass('disabled')
+			}else{
+				$(this).addClass('disabled')
+				game.isplay = true
+				// console.log(game)
+				game.play_job()
+				$(this).addClass('active')
+				$(this).removeClass('disabled')
+				$("#train_button").addClass('disabled')
+				$("#reset_button").addClass('disabled')
+				$("#stop_button").addClass('disabled')
+			}
 
 		}
 		

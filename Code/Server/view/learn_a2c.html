@@ -26,7 +26,7 @@
 			<a id="stop_button" class="button disabled">Stop</a>
 			<a id="reset_button" class="button disabled">Reset</a>
 			<a id="sonar_button" class="button">Sonic</a>
-			<a id="play_button" class="button">play</a>
+			<a id="git_pull" class="button">git pull</a>
 		</div>
 
 	</div>
@@ -63,13 +63,61 @@
 		<div id="actions_container3" style="height:250px;width:24%;display:inline-block">
 			<canvas id="actions3" style="display:inline" ></canvas>
 		</div>
-		<div id="step_reward_container" style="height:250px;width:100%;display:inline-block">
-			<canvas id="step_reward" style="display:inline" ></canvas>
+		<div id="reward_container" style="height:250px;width:100%;display:inline-block">
+			<canvas id="reward" style="display:inline" ></canvas>
 		</div>		
-		<div id="episode_loss_container" style="height:250px;width:100%;display:inline-block">
-			<canvas id="episode_loss" style="display:inline" ></canvas>
+		<div id="reward_episodes_container0" style="height:250px;width:24%;display:inline-block">
+			<canvas id="reward_episodes0" style="display:inline" ></canvas>
+		</div>
+		<div id="reward_episodes_container1" style="height:250px;width:24%;display:inline-block">
+			<canvas id="reward_episodes1" style="display:inline" ></canvas>
+		</div>
+		<div id="reward_episodes_container2" style="height:250px;width:24%;display:inline-block">
+			<canvas id="reward_episodes2" style="display:inline" ></canvas>
+		</div>
+		<div id="reward_episodes_container3" style="height:250px;width:24%;display:inline-block">
+			<canvas id="reward_episodes3" style="display:inline" ></canvas>
 		</div>
 		
+		<div id="PolicyEntropy_container0" style="height:250px;width:24%;display:inline-block">
+			<canvas id="PolicyEntropy0" style="display:inline" ></canvas>
+		</div>
+		<div id="PolicyEntropy_container1" style="height:250px;width:24%;display:inline-block">
+			<canvas id="PolicyEntropy1" style="display:inline" ></canvas>
+		</div>
+		<div id="PolicyEntropy_container2" style="height:250px;width:24%;display:inline-block">
+			<canvas id="PolicyEntropy2" style="display:inline" ></canvas>
+		</div>
+		<div id="PolicyEntropy_container3" style="height:250px;width:24%;display:inline-block">
+			<canvas id="PolicyEntropy3" style="display:inline" ></canvas>
+		</div>		
+		
+		<div id="policy_loss_container0" style="height:250px;width:24%;display:inline-block">
+			<canvas id="policy_loss0" style="display:inline" ></canvas>
+		</div>
+		<div id="policy_loss_container1" style="height:250px;width:24%;display:inline-block">
+			<canvas id="policy_loss1" style="display:inline" ></canvas>
+		</div>
+		<div id="policy_loss_container2" style="height:250px;width:24%;display:inline-block">
+			<canvas id="policy_loss2" style="display:inline" ></canvas>
+		</div>	
+		<div id="policy_loss_container3" style="height:250px;width:24%;display:inline-block">
+			<canvas id="policy_loss3" style="display:inline" ></canvas>
+		</div>		
+		
+		<div id="loss_value_container0" style="height:250px;width:24%;display:inline-block">
+			<canvas id="value_loss0" style="display:inline" ></canvas>
+		</div>
+		<div id="loss_value_container1" style="height:250px;width:24%;display:inline-block">
+			<canvas id="value_loss1" style="display:inline" ></canvas>
+		</div>		
+		<div id="loss_value_container2" style="height:250px;width:24%;display:inline-block">
+			<canvas id="value_loss2" style="display:inline" ></canvas>
+		</div>		
+		<div id="loss_value_container3" style="height:250px;width:24%;display:inline-block">
+			<canvas id="value_loss3" style="display:inline" ></canvas>
+		</div>
+
 	</div>
 	<div id="log">
 	</div>
@@ -86,13 +134,12 @@
 	<script type="text/javascript" src="jquery.knob.min.js" ></script>
 	
 	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.0/socket.io.min.js"></script>
+	<script src="a2c_A/charts.js"></script>
 	<script src="main.js"></script>
-	<script type="text/javascript" src="dqn/charts.js"></script>
-	<script src="dqn/environment_step.js"></script>
-	<script src="dqn/lodash.js" ></script>
-	<script src="dqn/memory.js"></script>
-	<script src="dqn/dqn.js"></script>
-	<script src="dqn/game.js"></script>
+	<script src="a2c_A/environment.js"></script>
+	<script src="a2c_A/a2c.js"></script>
+	<script src="a2c_A/vectorutils.js"></script>
+	<script src="a2c_A/game.js"></script>
 	<!-- <script src="a2c/game.js"></script> -->
 	<!-- <script src="a2c_seq.js"></script> -->
 </html>

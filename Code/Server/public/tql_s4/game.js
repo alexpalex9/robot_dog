@@ -7,6 +7,14 @@
 // const LAMBDA = 0.01;
 // const LAMBDA = 0.001;
 
+
+// ann_start_qlearning(700, 0.8, 1.0, 50);
+// epoch = 700
+// gamma = 0.8
+// epsilon = 1.0
+// step = 50
+
+
 class Orchestrator {
    
     constructor() {
@@ -38,11 +46,11 @@ class Orchestrator {
 		console.log("Creating game")
 		await this.environment.init();
 		this.state = this.environment.getState();
-		this.totalReward = 0
-		this.episode = 0
+
 		this.chart = new myCharts()
 		// this.rewardStore = new Array();
-		this.eps = g_settings.max_epsilon;
+		// this.eps = g_settings.max_epsilon;
+		this.eps = 1;
 		this.steps = 0;
        
 		
@@ -88,12 +96,15 @@ class Orchestrator {
 				this.steps += 1;
 				// Exponentially decay the exploration parameter
 				// this.eps = MIN_EPSILON + (MAX_EPSILON - MIN_EPSILON) * Math.exp(-LAMBDA * this.steps);
-				this.eps = g_settings.min_epsilon + (g_settings.max_epsilon - g_settings.min_epsilon) * Math.exp(-g_settings.lambda * this.steps);
+				// this.eps = g_settings.min_epsilon + (g_settings.max_epsilon - g_settings.min_epsilon) * Math.exp(-g_settings.lambda * this.steps);
+				if(this.eps > g_settings.min_epsilon) {
+					this.eps -= ( 1.0 / g_settings.maxStepsPerGame );
+				}
 				// if(this.eps > 0.1)
 				// epsilon -= ( 1.0 / epochs );
 		
 				// this.state = nextState;
-				// this.totalReward += reward;
+
 				this.steps += 1;
 				
 				
@@ -110,9 +121,6 @@ class Orchestrator {
     }
 	
 	async play(){
-        // this.environment.init();
-        
-        // let totalReward = 0;
         let step = 0;
         while (this.isplay!=false) {// && this.environment.isDone()!=true) {
 			var state = this.environment.getState();
@@ -160,7 +168,7 @@ class Orchestrator {
 			// console.log(_this_game.active)
 			// while (step < this.maxStepsPerGame) {
 			if (_this_game.active==true){
-				if (this.steps < this.maxStepsPerGame) {
+				if (this.steps <= this.maxStepsPerGame) {
 					await _this_game.handleReinforcementLearning(new Date(),false)
 					await _this_game.training(_this_game)
 				}else{
@@ -288,26 +296,26 @@ let g_settings = {
 		learning_rate : 0.95,
 		gamma : 0.8,
 		
-		max_epsilon : 1,
-		min_epsilon : 0.05,
-		lambda : 0.005,
+		// max_epsilon : 1,
+		min_epsilon : 0.1,
+		// lambda : 0.005,
 		
 		servos : [
 			{'name':2,'init':0,'used':false},
-			// {'name':3,'init':80,'used':true,'min':70,'max':90,'step':10,'actions':[70,80,90]},
-			{'name':3,'init':70,'used':true,'min':70,'max':90,'step':10,'actions':[70,90]},
+			// {'name':3,'init':70,'used':true,'min':70,'max':90,'step':10,'actions':[70,80,90]},
+			{'name':3,'init':70,'used':true,'min':70,'max':90,'step':10,'actions':[65,95]},
 			{'name':4,'init':107,'used':false},
 			{'name':5,'init':0,'used':false},
-			// {'name':6,'init':87,'used':true,'min':90,'max':110,'step':10,'actions':[77,87,97]},
-			{'name':6,'init':77,'used':true,'min':90,'max':110,'step':10,'actions':[77,97]},
+			// {'name':6,'init':77,'used':true,'min':90,'max':110,'step':10,'actions':[77,87,97]},
+			{'name':6,'init':77,'used':true,'min':90,'max':110,'step':10,'actions':[72,102]},
 			{'name':7,'init':107,'used':false},
 			{'name':8,'init':75,'used':false},
-			// {'name':9,'init':87,'used':true,'min':77,'max':97,'step':10,'actions':[77,87,97]},
-			{'name':9,'init':77,'used':true,'min':77,'max':97,'step':10,'actions':[77,97]},
+			// {'name':9,'init':77,'used':true,'min':77,'max':97,'step':10,'actions':[77,87,97]},
+			{'name':9,'init':77,'used':true,'min':77,'max':97,'step':10,'actions':[72,102]},
 			{'name':10,'init':180,'used':false},
 			{'name':11,'init':75,'used':false},
-			// {'name':12,'init':90,'used':true,'min':80,'max':100,'step':10,'actions':[80,90,100]},
-			{'name':12,'init':80,'used':true,'min':80,'max':100,'step':10,'actions':[80,100]},
+			// {'name':12,'init':80,'used':true,'min':80,'max':100,'step':10,'actions':[80,90,100]},
+			{'name':12,'init':80,'used':true,'min':80,'max':100,'step':10,'actions':[75,115]},
 			{'name':13,'init':180,'used':false},
 			{'name':15,'init':90,'used':false,'label':'head'},
 		]	

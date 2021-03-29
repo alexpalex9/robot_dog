@@ -16,7 +16,8 @@ class Model {
     constructor(hiddenLayerSizes, numInputs, numActions, numServos) {
       this.numInputs = numInputs;
       this.numActions = numActions;
-	  this.numServos = 4
+	  this.numServos = numServos
+	  this.hiddenLayerSizes = hiddenLayerSizes
       // this.batchSize = batchSize;
 
       // if (hiddenLayerSizesOrModel instanceof tf.LayersModel) {
@@ -24,27 +25,32 @@ class Model {
         // this.network.summary();
         // this.network.compile({optimizer: 'adam', loss: 'meanSquaredError'});
      // } else {
-        this.defineModel(numInputs,hiddenLayerSizes);
+		if (this.loadModels()!=true){
+			console.warn("no models loaded, creating one")
+			this.defineModel(numInputs,hiddenLayerSizes);
+		}
+		
       // }
     }
 
-    defineModel(numInputs,hiddenLayerSizes) {
+    defineModel() {
 		console.log("Building network")
 		
-        if (!Array.isArray(hiddenLayerSizes)) {
-            hiddenLayerSizes = [hiddenLayerSizes];
+        if (!Array.isArray(this.hiddenLayerSizes)) {
+            this.hiddenLayerSizes = [this.hiddenLayerSizes];
         }
         this.network = tf.sequential();
-        hiddenLayerSizes.forEach((hiddenLayerSize, i) => {
-			console.log("hiddenLayerSizes",hiddenLayerSizes,hiddenLayerSize, i)
+        this.hiddenLayerSizes.forEach((hiddenLayerSize, i) => {
+			// console.log("hiddenLayerSizes",this.hiddenLayerSizes,hiddenLayerSize, i)
         this.network.add(tf.layers.dense({
             units: hiddenLayerSize,
             activation: 'relu',
             // `inputShape` is required only for the first layer.
             // inputShape: i === 0 ? [this.numStates] : undefined
-            inputShape: i === 0 ? [numInputs] : undefined
+            inputShape: i === 0 ? [this.numInputs] : undefined
             }));
         });
+		console.log(this.numActions)
         this.network.add(tf.layers.dense({units: this.numActions}));
 
         this.network.summary();
@@ -53,58 +59,77 @@ class Model {
 
   
     predict(states) {
-        return tf.tidy(() => this.network.predict(states));
+		var tensor_state = tf.tensor(states).reshape([1,this.numInputs])
+        return tf.tidy(() => this.network.predict(tensor_state));
     }
 
-    
-    async train(xBatch, yBatch) {
-        var history = await this.network.fit(xBatch, yBatch);
-		return history.history.loss[0];
-    }
-
-    chooseAction(state, eps) {
-		// console.log("ACTION ? ",eps)
-        if (Math.random() < eps) {
-        // if (Math.random() < 2 ) {
-			// console.log("Random action")
-			var actions = []
-			for (var s = 0 ; s<this.numServos;s++){
-				actions.push(Math.floor(Math.random() * this.numActions/this.numServos) )
-			}
-			// console.log("actions",actions,this.numActions/this.numServos)
-			return actions
-		
-        } else {
-			// console.log("policy action")
-            return tf.tidy(() => {
-                const logits = this.network.predict(state).dataSync();
-				console.log("logits",logits)
-				// var logits = [1, 2, 3, 4, 5, 6, 7, 8]
-				var actions = []
-				for (var s = 0 ; s<this.numServos;s++){
-					var start = s*this.numActions/this.numServos
-					var end  = s*this.numActions/this.numServos + this.numActions/this.numServos
-					// console.log("slice",start,end)
-					var slicedLogits = logits.slice(start,end)
-					// console.log("slicedLogits",slicedLogits)
-					var action = this.indexOfMax(slicedLogits)
-					// console.log('action',action)
-					actions.push(action)
-					
-				}
-				// console.log("logits",logits.dataSync())
-                // const sigmoid = tf.sigmoid(logits);
-				// console.log("sigmoid",sigmoid.dataSync())
-                // const probs = tf.div(sigmoid, tf.sum(sigmoid));
-				// console.log("probs",probs.dataSync())
-                // return tf.multinomial(probs, 4).dataSync()[0] - 1;
-				// console.log(actions)
-				return actions
-            });
-			
-        }
-    }
+    async train(train_data){
+		var xtensor = tf.tensor(train_data.input).reshape([train_data.input.length,this.numInputs])
+		var ytensor = tf.tensor(train_data.output).reshape([train_data.output.length,this.numActions])	
+		return await this.network.fit(xtensor,ytensor,{
+			batchSize: 30,
+			epochs: 30
+		})
+		if (train_data.input.length>200 && train_data.input.length % 10==0){
+			this.saveModels()
+		}
+		// return this.network.trainOnBatch(xtensor,ytensor)
+	}
 	
+   	async saveModels(){
+		// console.log("SAVING models")
+		this.network.save("localstorage://network" + this.index)
+	
+	}
+	
+	async loadModels(){
+		try{
+			this.network = await tf.loadLayersModel('localstorage://network' + this.index);	
+			// this.m_valueModel = await tf.loadLayersModel('localstorage://critic' + this.index);	
+			this.network.compile({optimizer: 'adam', loss: 'meanSquaredError'});
+			// this.m_valueModel.compile({loss: 'meanSquaredError', optimizer: this.valueOptimizer});
+			return true
+		}catch(e){
+			console.log(e)
+			return e
+		}
+		
+	}
+
+	getMaxQandAction(servo_mot, Qvalue_vector){
+		var forward = servo_mot;
+		var backward = servo_mot + this.numServos;
+		var stop = servo_mot + 2 * this.numServos;
+
+		var action;
+		var maxQ;
+		//printf("Servo decision: F: %f   B: %f   S: %f\n", Qvalue_vector[forward], Qvalue_vector[backward], ann_output_vec[stop]);
+
+		if(Qvalue_vector[forward] > Qvalue_vector[backward] && Qvalue_vector[forward] > Qvalue_vector[stop])
+		{
+			// if(maxQ != undefined){
+				maxQ =  Qvalue_vector[forward];
+			// }
+			// forward
+			action = 0;
+		} else if(Qvalue_vector[stop] > Qvalue_vector[backward] && Qvalue_vector[stop] > Qvalue_vector[forward]){
+			// if(maxQ!=undefined) {
+				maxQ =  Qvalue_vector[stop];
+			// }
+			//stop
+			action = 2 ;
+		} else{
+			//backward
+			maxQ =  Qvalue_vector[backward];
+			action = 1
+		}
+		
+		return {
+			action : action,
+			maxQ: maxQ
+		}
+	}
+
 	
 	indexOfMax(arr) {
 		if (arr.length === 0) {

@@ -27,7 +27,6 @@ class Environment
 		this.actions_index = []
 		this.servos_walk = [];
 		this.states_index = []
-		// this.actions_labels = []
 		for (var i in this.SERVOS){
 			if (this.SERVOS[i].used==true){
 				
@@ -36,9 +35,10 @@ class Environment
 				var this_state_index = []
 				this.AMOUNT_INPUTS = this.AMOUNT_INPUTS + 1
 				for (var act in this.SERVOS[i].actions){
-					this.SERVOS[i].actions_index.push({'servo':this.SERVOS[i].name,'angle':this.SERVOS[i].actions[act],'angle_scaled':(this.SERVOS[i].actions[act]-this.SERVOS[i].actions[0])/(this.SERVOS[i].actions[this.SERVOS[i].actions.length-1]-this.SERVOS[i].actions[0])})
+					var angle_scaled = (this.SERVOS[i].actions[act]-this.SERVOS[i].actions[0])/(this.SERVOS[i].actions[this.SERVOS[i].actions.length-1]-this.SERVOS[i].actions[0])
+					this.SERVOS[i].actions_index.push({'servo':this.SERVOS[i].name,'angle':this.SERVOS[i].actions[act],'angle_scaled':angle_scaled})
 					this.SERVOS[i].actions_labels.push(this.SERVOS[i].name + '-'+ this.SERVOS[i].actions[act])
-					this_state_index.push(1.0 * act)
+					this_state_index.push(1.0 * angle_scaled)
 				}
 				for (var d=0;d<this.depth;d++){
 					this.states_index.push(this_state_index)
