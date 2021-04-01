@@ -110,6 +110,11 @@ class Orchestrator {
 			// console.log("REWARD",this.batch_mem['reward'][batch_rand_pos])
 			/////////////////// experience reply //////////////////////
 			//sample a random set of MAX_BATCH_MEM to MIN_BATCH_MEM
+			this.train_data = {
+				input : [],
+				output : []
+			}
+		
 			for(var y = 0; y < g_settings.mini_batch_memory; y++)
 			{
 				var mini_pos = Math.floor(Math.random() * g_settings.max_batch_memory);
