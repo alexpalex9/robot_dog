@@ -78,13 +78,13 @@ class Model {
 	
    	async saveModels(){
 		// console.log("SAVING models")
-		this.network.save("localstorage://network" + this.index)
+		this.network.save("localstorage://network")
 	
 	}
 	
 	async loadModels(){
 		try{
-			this.network = await tf.loadLayersModel('localstorage://network' + this.index);	
+			this.network = await tf.loadLayersModel('localstorage://network');	
 			// this.m_valueModel = await tf.loadLayersModel('localstorage://critic' + this.index);	
 			this.network.compile({optimizer: 'adam', loss: 'meanSquaredError'});
 			// this.m_valueModel.compile({loss: 'meanSquaredError', optimizer: this.valueOptimizer});
