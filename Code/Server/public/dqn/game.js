@@ -57,11 +57,11 @@ class Orchestrator {
 		// console.log("STATE (check if changing properly, not pointer",this.state)
 		// let state_tensor = tf.tensor2d(this.state, [1, this.state.length])
 		var qval = this.model.predict(this.state)
-		console.log("qval",qval.dataSync())
+		// console.log("qval",qval.dataSync())
 		this.chart.updateData('actions',{
-				labels : [1,2,3,4,5,6,7,8,9,10,11,12],
-				actions : qval.dataSync()
-			})
+			labels : ['1-forward','1-back','1-stop','2-forward','2-back','2-stop','3-forward','3-back','3-stop','4-forward','4-back','4-stop',],
+			actions : qval.dataSync()
+		})
 		// for (var a=0; a<this.numActions;s++ ){
 			// qval[a] = qvql_p[a]
 		// }
@@ -98,6 +98,7 @@ class Orchestrator {
 		// console.log(this.batch_pos,g_settings.max_batch_memory)
 		// for tEST
 		// g_settings.max_batch_memory = 5
+		// console.log(this.batch_pos)
 		if(this.batch_pos >= g_settings.max_batch_memory)
 		
 		
@@ -128,6 +129,7 @@ class Orchestrator {
 				// console.log("PREDICT Q VALUE",this.batch_mem.next_state[mini_pos])
 				
 				var newQ = this.model.predict(this.state).dataSync();
+				// console.log("newQ",newQ)
 				// var newQ = this.model.predict(tensor_state).dataSync();
 
 				//search the maximum in newQ
@@ -178,7 +180,7 @@ class Orchestrator {
 			// var history = await this.model.train(this.train_data,qval)
 			var loss = await this.model.train(this.train_data)
 
-			console.log("HISTORY FIT",history)
+			// console.log("HISTORY FIT",loss)
 			this.chart.addData('episode_loss',{
 				label : this.batch_pos,
 				// loss : history.history.loss[0],
@@ -245,9 +247,13 @@ class Orchestrator {
         // while (step < this.maxStepsPerGame) {
 			var state = this.environment.getState();
 			var qval = this.model.predict(state)
+			this.chart.updateData('actions',{
+				labels : ['1-forward','1-back','1-stop','2-forward','2-back','2-stop','3-forward','3-back','3-stop','4-forward','4-back','4-stop',],
+				actions : qval.dataSync()
+			})
 			var actions = []
 			for (var s = 0 ; s<this.numServos;s++){
-				actions.push(this.model.getMaxQandAction(s,qval).action)
+				actions.push(this.model.getMaxQandAction(s,qval.dataSync()).action)
 				// move_dist += fabsf(new_inputs[x] - new_inputs[x + NUM_SERVO_MOT]);
 			}
 			// console.log("actions",actions)
