@@ -172,6 +172,9 @@ class Orchestrator {
 			// ALEX : wrong here
 			// console.log("train_data",this.train_data)
 			var history = await this.model.train(this.train_data,qval)
+			if (this.batch_pos > 100 && this.batch_pos % 10==0){
+				this.model.saveModels()
+			}
 			// console.log("HISTORY FIT",history)
 			this.chart.addData('episode_loss',{
 				label : this.batch_pos,
