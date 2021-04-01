@@ -57,7 +57,11 @@ class Orchestrator {
 		// console.log("STATE (check if changing properly, not pointer",this.state)
 		// let state_tensor = tf.tensor2d(this.state, [1, this.state.length])
 		var qval = this.model.predict(this.state)
-
+		console.log("qval",qval.dataSync())
+		this.chart.updateData('actions',{
+				labels : [1,2,3,4,5,6,7,8,9,10,11,12],
+				actions : qval.dataSync()
+			})
 		// for (var a=0; a<this.numActions;s++ ){
 			// qval[a] = qvql_p[a]
 		// }
@@ -74,7 +78,7 @@ class Orchestrator {
 		
 		} else {
 			for (var s = 0 ; s<this.numServos;s++){
-				actions.push(this.model.getMaxQandAction(s,qval).action)
+				actions.push(this.model.getMaxQandAction(s,qval.dataSync()).action)
 			}
 		
 		}
@@ -171,14 +175,16 @@ class Orchestrator {
 			//train the data sets
 			// ALEX : wrong here
 			// console.log("train_data",this.train_data)
-			var history = await this.model.train(this.train_data,qval)
+			// var history = await this.model.train(this.train_data,qval)
+			var loss = await this.model.train(this.train_data)
 
 			console.log("HISTORY FIT",history)
-			// this.chart.addData('episode_loss',{
-				// label : this.batch_pos,
+			this.chart.addData('episode_loss',{
+				label : this.batch_pos,
 				// loss : history.history.loss[0],
-				// epsilon : 0
-			// })
+				loss : loss,
+				epsilon : 0
+			})
 			if (this.batch_pos % 4==0){
 				this.model.saveModels()
 			}

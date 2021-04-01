@@ -304,7 +304,20 @@ var myCharts = function(){
 		},
 		options: JSON.parse(JSON.stringify(twoaxis_options))
 	}
-	
+	var configSet_actions = {
+		type: 'bar',
+		data : {
+			labels: [],
+			datasets : [
+				JSON.parse(JSON.stringify(actions_template))
+			]
+		},
+		options: JSON.parse(JSON.stringify(oneaxis_options))
+	}
+	configSet_actions.options.scales.yAxes[0].ticks = {
+		beginAtZero: true,
+		max: 1
+	}
 	
 	// _this.reward_loss_chart_episods  = new Chart(document.getElementById("loss_reward_chart_episodes").getContext("2d"),configSet_reward_loss_episods);
 	// _this.reward_loss_chart_periods = new Chart(document.getElementById("loss_reward_chart_periods").getContext("2d"),configSet_reward_loss_periods);
@@ -314,7 +327,7 @@ var myCharts = function(){
 	_this.episode_loss = new Chart(document.getElementById("episode_loss").getContext("2d"),configSet_episode_loss);
 	_this.step_reward = new Chart(document.getElementById("step_reward").getContext("2d"),configSet_step_reward);
 	// _this.reward_episodes = new Chart(document.getElementById("reward_episodes").getContext("2d"),configSet_reward_loss_episods);
-	// _this.actions = new Chart(document.getElementById("actions").getContext("2d"),configSet_actions);
+	_this.actions = new Chart(document.getElementById("actions").getContext("2d"),configSet_actions);
 
 	_this.cleanData = function(chart_name){
 		_this[chart_name].config.data.labels = []
