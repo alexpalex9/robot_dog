@@ -44,7 +44,7 @@ class Model {
 			// console.log("hiddenLayerSizes",this.hiddenLayerSizes,hiddenLayerSize, i)
         this.network.add(tf.layers.dense({
             units: hiddenLayerSize,
-            activation: 'relu',
+            activation: 'sigmoid',
             // `inputShape` is required only for the first layer.
             // inputShape: i === 0 ? [this.numStates] : undefined
             inputShape: i === 0 ? [this.numInputs] : undefined
