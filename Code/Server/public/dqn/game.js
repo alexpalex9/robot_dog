@@ -172,15 +172,16 @@ class Orchestrator {
 			// ALEX : wrong here
 			// console.log("train_data",this.train_data)
 			var history = await this.model.train(this.train_data,qval)
+
+			console.log("HISTORY FIT",history)
+			// this.chart.addData('episode_loss',{
+				// label : this.batch_pos,
+				// loss : history.history.loss[0],
+				// epsilon : 0
+			// })
 			if (this.batch_pos % 4==0){
 				this.model.saveModels()
 			}
-			// console.log("HISTORY FIT",history)
-			this.chart.addData('episode_loss',{
-				label : this.batch_pos,
-				loss : history.history.loss[0],
-				epsilon : 0
-			})
 			// fann_train_on_data(ann, train_data, NUM_TRAIN_EPOCHS, NUM_TRAIN_EPOCHS, 0.001);
 		
 		
