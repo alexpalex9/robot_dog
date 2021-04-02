@@ -129,7 +129,7 @@ class Environment
 			_this.socket.emit('cmd', [_this.COMMAND.CMD_SONIC])
 			function responseHandler(message) {
 				// resolve promise with the value we got
-				console.log("SONIC MESSAge",message)
+				// console.log("SONIC MESSAge",message)
 				resolve(message);
 				clearTimeout(timer);
 			}
@@ -205,6 +205,9 @@ class Environment
 				sum = son + sum
 				item = item + 1
 			}
+		}
+		if (item==0){
+			return 0
 		}
 		return sum/item
 		

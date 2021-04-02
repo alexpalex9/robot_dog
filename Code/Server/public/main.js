@@ -344,7 +344,7 @@ var init = function(){
 		
 	})
 	_this.socket.on("sonic",function(data){
-		console.log("sonic event",data)
+		// console.log("sonic",data)
 		$("#sonar_button").html(data + " cm")
 		_this.sonar.value = data
 	})

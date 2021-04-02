@@ -100,7 +100,7 @@ class Orchestrator {
 		// g_settings.max_batch_memory = 5
 		// console.log(this.batch_pos)
 		var done = this.environment.isDone()
-		console.log("IS DONE?",done)
+		// console.log("IS DONE?",done)
 		if (done==false){
 			if(this.batch_pos >= g_settings.max_batch_memory){
 				//if the list is filled once a time completely
