@@ -101,10 +101,7 @@ class Orchestrator {
 		// console.log(this.batch_pos)
 		var done = this.environment.isDone()
 		if (done!=true){
-			if(this.batch_pos >= g_settings.max_batch_memory)
-			
-			
-			{
+			if(this.batch_pos >= g_settings.max_batch_memory){
 				//if the list is filled once a time completely
 				//we start to set new data at random positions
 				//save outputs and inputs

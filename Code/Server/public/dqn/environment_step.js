@@ -66,6 +66,7 @@ class Environment
 		return this.AMOUNT_INPUTS * this.depth
 	}	
 	isDone = function(){
+		console.log("SONIC",this.sonic_state)
 		return (this.sonic_state<5 || this.sonic_state>30)
 	}
 	
