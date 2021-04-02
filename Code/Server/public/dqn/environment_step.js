@@ -129,6 +129,7 @@ class Environment
 			_this.socket.emit('cmd', [_this.COMMAND.CMD_SONIC])
 			function responseHandler(message) {
 				// resolve promise with the value we got
+				console.log("SONIC MESSAge",message)
 				resolve(message);
 				clearTimeout(timer);
 			}
