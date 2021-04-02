@@ -47,7 +47,7 @@ class Orchestrator {
 	}
    
     async handleReinforcementLearning() {
-		console.log('------------- handleReinforcementLearning ---------------')
+		console.log('------------- handleReinforcementLearning ---------------',this.state)
         // this.environment.init();
         // let state = this.environment.getState();
         // let state_tensor = tf.tensor2d(state, [1, state.length])
@@ -99,137 +99,147 @@ class Orchestrator {
 		// for tEST
 		// g_settings.max_batch_memory = 5
 		// console.log(this.batch_pos)
-		if(this.batch_pos >= g_settings.max_batch_memory)
-		
-		
-		{
-			//if the list is filled once a time completely
-			//we start to set new data at random positions
-			//save outputs and inputs
-			var batch_rand_pos = Math.floor(Math.random() * g_settings.max_batch_memory)
-			this.batch_mem['state'][batch_rand_pos] =  this.state;
-			this.batch_mem['next_state'][batch_rand_pos] = next_state;
-			this.batch_mem['reward'][batch_rand_pos] =  all_reward;
-			this.batch_mem['actions'][batch_rand_pos] =  actions;
-			
-			// console.log("REWARD",this.batch_mem['reward'][batch_rand_pos])
-			/////////////////// experience reply //////////////////////
-			//sample a random set of MAX_BATCH_MEM to MIN_BATCH_MEM
-			this.train_data = {
-				input : [],
-				output : []
-			}
-		
-			for(var y = 0; y < g_settings.mini_batch_memory; y++)
-			{
-				var mini_pos = Math.floor(Math.random() * g_settings.max_batch_memory);
-
-				//run the old copy of the ann with new inputs
-				// fann_type *newQ = fann_run(ann, batch_mem[mini_pos].inputs_tp1);
-				// console.log("PREDICT Q VALUE",this.batch_mem.next_state[mini_pos])
-				
-				var newQ = this.model.predict(this.state).dataSync();
-				// console.log("newQ",newQ)
-				// var newQ = this.model.predict(tensor_state).dataSync();
-
-				//search the maximum in newQ
-				
-				// fann_type maxQ[NUM_SERVO_MOT];
-				// var actions = [];
-				var maxQ = []
-				for(var x = 0; x < this.numServos; x++){
-					// ann_getMaxQandAction(x, newQ, &maxQ[x]);
-					var maxQandAction = this.model.getMaxQandAction(x,newQ)
-					// actions.push(maxQandAction.action)
-					// console.log("maxQandAction",x,maxQandAction)
-					maxQ.push(maxQandAction.maxQ)
-				}
-				// var oldQ = []
-				// for (var m in this.batch_mem[mini_pos]{
-				// console.log("this.batch_mem.state[mini_pos].state",mini_pos,this.batch_mem.state[mini_pos])
-				var oldQ = this.model.predict(this.batch_mem.state[mini_pos]).dataSync()
-				// console.log("oldQ",oldQ)
-				// }
-
-				//set the old values as train data (output) - use new max in equation
-				for(var x = 0; x < this.numServos; x++)
-				{
-					// console.log("---> X",x)
-					// console.log("   pos",this.batch_mem.actions[mini_pos][x] * this.numServos + x)
-					// console.log("   rew",this.batch_mem.reward[mini_pos][x])
-					// console.log("   gamma",g_settings.gamma)
-					// console.log("   maxQ",maxQ[x])
-					oldQ[this.batch_mem.actions[mini_pos][x] * this.numServos + x] = (this.batch_mem.reward[mini_pos][x] < 0.1) ? (this.batch_mem.reward[mini_pos][x] + (g_settings.gamma * maxQ[x])) : this.batch_mem.reward[mini_pos][x];
-				}
-				// console.log("New oldQ",oldQ)
-				//ann_displayVector("Desired Outputs", oldQ, num_outputs);
-
-				//store the data in mini batch fann train file
-				// Alex not done here, to be done
-				
-				
-				// memcpy(train_data->input[y], batch_mem[mini_pos].inputs, NUM_INPUTS * sizeof(fann_type));
-				// memcpy(train_data->output[y], oldQ, NUM_OUTPUTS * sizeof(fann_type));
-				this.train_data.input.push(this.batch_mem.state[mini_pos])
-				this.train_data.output.push(oldQ)
-			}
-
-			//train the data sets
-			// ALEX : wrong here
-			// console.log("train_data",this.train_data)
-			// var history = await this.model.train(this.train_data,qval)
-			var loss = await this.model.train(this.train_data)
-
-			// console.log("HISTORY FIT",loss)
-			this.chart.addData('episode_loss',{
-				label : this.batch_pos,
-				// loss : history.history.loss[0],
-				loss : loss,
-				epsilon : 0
-			})
-			if (this.batch_pos % 4==0){
-				this.model.saveModels()
-			}
-			// fann_train_on_data(ann, train_data, NUM_TRAIN_EPOCHS, NUM_TRAIN_EPOCHS, 0.001);
-		
-		
-		}else{
-			
-			// Alex here to continue 
-			// memcpy(batch_mem[batch_pos].inputs, old_in_p, NUM_INPUTS * sizeof(fann_type));
-			// memcpy(batch_mem[batch_pos].inputs_tp1, new_in_p, NUM_INPUTS * sizeof(fann_type));
-			// memcpy(batch_mem[batch_pos].reward, reward, NUM_SERVO_MOT * sizeof(fann_type));
-			// memcpy(batch_mem[batch_pos].servo_actions, actions, NUM_SERVO_MOT * sizeof(uint8_t));
-			this.batch_mem.state.push(this.state);
-			this.batch_mem.next_state.push(next_state);
-			this.batch_mem.reward.push(all_reward);
-			this.batch_mem.actions.push(actions);
-
-			// this.batch_mem.push({
-				// 'state' :  this.state,
-				// 'next_state': next_state,
-				// 'reward':  reward,
-				// 'actions':  actions
-			// })
-
-			//this function use always backpropagation algorithm!
-			//fann_set_training_algorithm has no effect!
-			//or same as fann_set_training_algorithm = incremental and train epoch
-			//train ann   , input, desired outputs
-			//train only single data -> catastrophic forgetting could happen in the first MAX_BATCH_MEM moves
-			var xtensor = tf.tensor(this.state).reshape([1,8])
-			// var ytensor = tf.tensor(qval).reshape([1,12])	
-			var history = await this.model.network.fit(xtensor,qval)
-			
-		}
-		this.batch_pos++;
-		// Exponentially decay the exploration parameter
-		if(this.eps > g_settings.min_epsilon) {
-			this.eps -= ( 1.0 / g_settings.maxStepsPerGame );
-		}
-		
 		var done = this.environment.isDone()
-		if (done){
+		if (done!=true){
+			if(this.batch_pos >= g_settings.max_batch_memory)
+			
+			
+			{
+				//if the list is filled once a time completely
+				//we start to set new data at random positions
+				//save outputs and inputs
+				var batch_rand_pos = Math.floor(Math.random() * g_settings.max_batch_memory)
+				this.batch_mem['state'][batch_rand_pos] =  this.state;
+				this.batch_mem['next_state'][batch_rand_pos] = next_state;
+				this.batch_mem['reward'][batch_rand_pos] =  all_reward;
+				this.batch_mem['actions'][batch_rand_pos] =  actions;
+				
+				// console.log("REWARD",this.batch_mem['reward'][batch_rand_pos])
+				/////////////////// experience reply //////////////////////
+				//sample a random set of MAX_BATCH_MEM to MIN_BATCH_MEM
+				this.train_data = {
+					input : [],
+					output : []
+				}
+			
+				for(var y = 0; y < g_settings.mini_batch_memory; y++)
+				{
+					var mini_pos = Math.floor(Math.random() * g_settings.max_batch_memory);
+
+					//run the old copy of the ann with new inputs
+					// fann_type *newQ = fann_run(ann, batch_mem[mini_pos].inputs_tp1);
+					// console.log("PREDICT Q VALUE",this.batch_mem.next_state[mini_pos])
+					
+					var newQ = this.model.predict(this.state).dataSync();
+					// console.log("newQ",newQ)
+					// var newQ = this.model.predict(tensor_state).dataSync();
+
+					//search the maximum in newQ
+					
+					// fann_type maxQ[NUM_SERVO_MOT];
+					// var actions = [];
+					var maxQ = []
+					for(var x = 0; x < this.numServos; x++){
+						// ann_getMaxQandAction(x, newQ, &maxQ[x]);
+						var maxQandAction = this.model.getMaxQandAction(x,newQ)
+						// actions.push(maxQandAction.action)
+						// console.log("maxQandAction",x,maxQandAction)
+						maxQ.push(maxQandAction.maxQ)
+					}
+					// var oldQ = []
+					// for (var m in this.batch_mem[mini_pos]{
+					// console.log("this.batch_mem.state[mini_pos].state",mini_pos,this.batch_mem.state[mini_pos])
+					var oldQ = this.model.predict(this.batch_mem.state[mini_pos]).dataSync()
+					// console.log("oldQ",oldQ)
+					// }
+
+					//set the old values as train data (output) - use new max in equation
+					for(var x = 0; x < this.numServos; x++)
+					{
+						// console.log("---> X",x)
+						// console.log("   pos",this.batch_mem.actions[mini_pos][x] * this.numServos + x)
+						// console.log("   rew",this.batch_mem.reward[mini_pos][x])
+						// console.log("   gamma",g_settings.gamma)
+						// console.log("   maxQ",maxQ[x])
+						//act = 2
+						// nuServ = 4
+						// x = 2
+						// => index = 2 * 4 + 2 => 10
+						// oldQ[this.batch_mem.actions[mini_pos][x] +  (this.numActions) * x] = (this.batch_mem.reward[mini_pos][x] < 0.1) ? (this.batch_mem.reward[mini_pos][x] + (g_settings.gamma * maxQ[x])) : this.batch_mem.reward[mini_pos][x];
+						// oldQ[this.batch_mem.actions[mini_pos][x] +  (this.numActions) * x] = this.batch_mem.reward[mini_pos][x] + (g_settings.gamma * maxQ[x])) ;
+						var index = this.batch_mem.actions[mini_pos][x] +  (this.numActions) * x
+						var newQofactions = (1 - g_settings.learning_rate)  * oldQ[index] + g_settings.learning_rate * ( this.batch_mem.reward[mini_pos][x] + g_settings.gamma * maxQ[x])
+						oldQ[index] = newQofactions
+					}
+					// console.log("New oldQ",oldQ)
+					//ann_displayVector("Desired Outputs", oldQ, num_outputs);
+
+					//store the data in mini batch fann train file
+					// Alex not done here, to be done
+					
+					
+					// memcpy(train_data->input[y], batch_mem[mini_pos].inputs, NUM_INPUTS * sizeof(fann_type));
+					// memcpy(train_data->output[y], oldQ, NUM_OUTPUTS * sizeof(fann_type));
+					this.train_data.input.push(this.batch_mem.state[mini_pos])
+					this.train_data.output.push(oldQ)
+				}
+
+				//train the data sets
+				// ALEX : wrong here
+				// console.log("train_data",this.train_data)
+				// var history = await this.model.train(this.train_data,qval)
+				var loss = await this.model.train(this.train_data)
+
+				// console.log("HISTORY FIT",loss)
+				this.chart.addData('episode_loss',{
+					label : this.batch_pos,
+					// loss : history.history.loss[0],
+					loss : loss,
+					epsilon : 0
+				})
+				if (this.batch_pos % 4==0){
+					this.model.saveModels()
+				}
+				// fann_train_on_data(ann, train_data, NUM_TRAIN_EPOCHS, NUM_TRAIN_EPOCHS, 0.001);
+			
+			
+			}else{
+				
+				// Alex here to continue 
+				// memcpy(batch_mem[batch_pos].inputs, old_in_p, NUM_INPUTS * sizeof(fann_type));
+				// memcpy(batch_mem[batch_pos].inputs_tp1, new_in_p, NUM_INPUTS * sizeof(fann_type));
+				// memcpy(batch_mem[batch_pos].reward, reward, NUM_SERVO_MOT * sizeof(fann_type));
+				// memcpy(batch_mem[batch_pos].servo_actions, actions, NUM_SERVO_MOT * sizeof(uint8_t));
+				this.batch_mem.state.push(this.state);
+				this.batch_mem.next_state.push(next_state);
+				this.batch_mem.reward.push(all_reward);
+				this.batch_mem.actions.push(actions);
+
+				// this.batch_mem.push({
+					// 'state' :  this.state,
+					// 'next_state': next_state,
+					// 'reward':  reward,
+					// 'actions':  actions
+				// })
+
+				//this function use always backpropagation algorithm!
+				//fann_set_training_algorithm has no effect!
+				//or same as fann_set_training_algorithm = incremental and train epoch
+				//train ann   , input, desired outputs
+				//train only single data -> catastrophic forgetting could happen in the first MAX_BATCH_MEM moves
+				var xtensor = tf.tensor(this.state).reshape([1,8])
+				// var ytensor = tf.tensor(qval).reshape([1,12])	
+				var history = await this.model.network.fit(xtensor,qval)
+				
+			}
+			this.batch_pos++;
+			// Exponentially decay the exploration parameter
+			if(this.eps > g_settings.min_epsilon) {
+				this.eps -= ( 1.0 / g_settings.maxStepsPerGame );
+			}
+		}else{
+		// var done = this.environment.isDone()
+		// if (done){
 			this.pause_training("out of boundaries")
 		}
 		this.state = next_state

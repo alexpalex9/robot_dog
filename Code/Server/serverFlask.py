@@ -125,7 +125,7 @@ class Server():
             self.control.Thread_conditiona.start()
             self.battery_voltage=[8.4,8.4,8.4,8.4,8.4]
         else:
-            self.devSonic = random.randrange(8, 52)
+            self.devSonic = random.randrange(8, 30)
         app = Flask(__name__,
                     static_url_path='',
                     static_folder='public',
