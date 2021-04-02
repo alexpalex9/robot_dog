@@ -33,7 +33,8 @@ class Environment
 		
 	}
 	get_angle_scaled(i,angle){		
-		return (angle-this.servos_walk[i].min)/(this.servos_walk[i].max - this.servos_walk[i].min)
+		return (angle-this.servos_walk[i].min)/(this.servos_walk[i].max - this.servos_walk[i].min) //* 2 -1
+		// return angle
 	}
 	get_servos_count(){
 		return this.servos_walk.length
@@ -118,10 +119,10 @@ class Environment
 		console.log("INIT state",this.states_scaled)
 	}
 
-	servos_scale_sate = function(servo,state){
+	// servos_scale_sate = function(servo,state){
 		// console.log("servos_scale_sate",state,servo,this.servos_object)
-		return state * this.servos_object[servo].scale_a + this.servos_object[servo].scale_b
-	}
+		// return (state * this.servos_object[servo].scale_a + this.servos_object[servo].scale_b) 
+	// }
 	
 	Sonic = function(timeout = 10000) {
 		return new Promise((resolve, reject) => {
@@ -253,7 +254,8 @@ class Environment
 		// this.sonic_state = await this.get_sonic();
 		this.sonic_state = await this.get_sonic();
 		var improvement = this.last_distance - this.sonic_state
-		this.reward = improvement / 5
+		this.reward = improvement /5 
+		// console.log(this.reward)
 		this.last_distance = this.sonic_state
 		
 		var hasmoved = 0

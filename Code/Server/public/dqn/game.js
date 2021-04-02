@@ -163,11 +163,12 @@ class Orchestrator {
 						// nuServ = 4
 						// x = 2
 						// => index = 2 * 4 + 2 => 10
-						// oldQ[this.batch_mem.actions[mini_pos][x] +  (this.numActions) * x] = (this.batch_mem.reward[mini_pos][x] < 0.1) ? (this.batch_mem.reward[mini_pos][x] + (g_settings.gamma * maxQ[x])) : this.batch_mem.reward[mini_pos][x];
+						// oldQ[this.batch_mem.actions[mini_pos][x] *  (this.numActions) + x] = (this.batch_mem.reward[mini_pos][x] < 0.1) ? (this.batch_mem.reward[mini_pos][x] + (g_settings.gamma * maxQ[x])) : this.batch_mem.reward[mini_pos][x];
 						// oldQ[this.batch_mem.actions[mini_pos][x] +  (this.numActions) * x] = this.batch_mem.reward[mini_pos][x] + (g_settings.gamma * maxQ[x])) ;
-						var index = this.batch_mem.actions[mini_pos][x] +  (this.numActions) * x
+						var index = this.batch_mem.actions[mini_pos][x] +  (this.numActions/this.numServos) * x
 						var newQofactions = (1 - g_settings.learning_rate)  * oldQ[index] + g_settings.learning_rate * ( this.batch_mem.reward[mini_pos][x] + g_settings.gamma * maxQ[x])
 						oldQ[index] = newQofactions
+						// console.log("new Q","y=",y,"x=",x,"action=",this.batch_mem.actions[mini_pos][x],"index=",index,"q=",newQofactions)
 					}
 					// console.log("New oldQ",oldQ)
 					//ann_displayVector("Desired Outputs", oldQ, num_outputs);
