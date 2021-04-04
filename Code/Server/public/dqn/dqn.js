@@ -25,7 +25,7 @@ class Model {
         // this.network.summary();
         // this.network.compile({optimizer: 'adam', loss: 'meanSquaredError'});
      // } else {
-		 var load = this.loadModels()
+		 var load = await this.loadModels()
 		if (load!=true){
 			console.warn("no models loaded, creating one")
 			console.log(load)
