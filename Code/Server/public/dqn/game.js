@@ -1,6 +1,60 @@
 // dqn js = https://github.com/prouhard/tfjs-mountaincar/blob/master/src/js/
 // robot 4 leg C = https://github.com/Counterfeiter/Q-LearningRobot/blob/master/Src/ann.c
+// https://sebastianfoerster86.wordpress.com/2016/11/07/robot-controlled-by-artificial-neural-network/
 
+
+//used for experience reply
+// #define MAX_BATCH_MEM				100	//google deep mind (Atari) -> 1e6
+// #define MINI_BATCH_MEM				10	//google deep mind (Atari) -> 32
+
+//FF-ANN train parameter
+// #define NUM_TRAIN_EPOCHS			30
+
+// /steps before update the ann copy
+// #define ITER_BEFORE_COPY			100
+
+// #define DISTANCE_MEASURE_MEDIAN		5
+let g_settings = {
+	// mode :"RL_TRAIN",
+	// agent:{
+		// nSteps : 200,
+		depth : 2,
+		hiddenLayerSizes:[20,12],
+		// maxStepsPerGame : 200,
+		maxStepsPerGame : 700,
+		max_batch_memory : 100,
+		mini_batch_memory : 10,
+		// maxStepsPerGame : 5,
+		// maxStepsPerGame : 2,
+		discountRate : 0.99,
+		learning_rate : 0.95,
+		gamma : 0.8,
+		
+		// max_epsilon : 1,
+		min_epsilon : 0.1,
+		
+		servos : [
+			{'name':2,'init':0,'used':false},
+			// {'name':3,'init':80,'used':true,'min':70,'max':90,'step':10,'actions':[70,80,90]},
+			{'name':3,'init':80,'used':true,'min':60,'max':100,'step':25,'actions':[60,100]},
+			{'name':4,'init':105,'used':false},
+			{'name':5,'init':0,'used':false},
+			// {'name':6,'init':87,'used':true,'min':90,'max':110,'step':10,'actions':[77,87,97]},
+			{'name':6,'init':87,'used':true,'min':67,'max':107,'step':25,'actions':[67,107]},
+			{'name':7,'init':105,'used':false},
+			{'name':8,'init':75,'used':false},
+			// {'name':9,'init':87,'used':true,'min':77,'max':97,'step':10,'actions':[77,87,97]},
+			{'name':9,'init':87,'used':true,'min':67,'max':107,'step':25,'actions':[67,107]},
+			{'name':10,'init':180,'used':false},
+			{'name':11,'init':75,'used':false},
+			// {'name':12,'init':90,'used':true,'min':80,'max':100,'step':10,'actions':[80,90,100]},
+			{'name':12,'init':90,'used':true,'min':70,'max':110,'step':25,'actions':[70,110]},
+			{'name':13,'init':180,'used':false},
+			{'name':15,'init':90,'used':false,'label':'head'},
+		]	
+	// }
+
+};
 
 class Orchestrator {
    
@@ -188,7 +242,9 @@ class Orchestrator {
 				// console.log("train_data",this.train_data)
 				// var history = await this.model.train(this.train_data,qval)
 				var loss = await this.model.train(this.train_data)
-
+				if (loss.history!=undefined){
+					loss = loss.history.loss[0]
+				}
 				// console.log("HISTORY FIT",loss)
 				this.chart.addData('episode_loss',{
 					label : this.batch_pos,
@@ -439,58 +495,7 @@ class Orchestrator {
 
 	
 }
-//used for experience reply
-// #define MAX_BATCH_MEM				100	//google deep mind (Atari) -> 1e6
-// #define MINI_BATCH_MEM				10	//google deep mind (Atari) -> 32
 
-//FF-ANN train parameter
-// #define NUM_TRAIN_EPOCHS			30
-
-// /steps before update the ann copy
-// #define ITER_BEFORE_COPY			100
-
-// #define DISTANCE_MEASURE_MEDIAN		5
-let g_settings = {
-	// mode :"RL_TRAIN",
-	// agent:{
-		// nSteps : 200,
-		depth : 2,
-		hiddenLayerSizes:[24,24],
-		// maxStepsPerGame : 200,
-		maxStepsPerGame : 700,
-		max_batch_memory : 200,
-		mini_batch_memory : 10,
-		// maxStepsPerGame : 5,
-		// maxStepsPerGame : 2,
-		discountRate : 0.99,
-		learning_rate : 0.95,
-		gamma : 0.8,
-		
-		// max_epsilon : 1,
-		min_epsilon : 0.1,
-		
-		servos : [
-			{'name':2,'init':0,'used':false},
-			// {'name':3,'init':80,'used':true,'min':70,'max':90,'step':10,'actions':[70,80,90]},
-			{'name':3,'init':80,'used':true,'min':60,'max':100,'step':25,'actions':[60,100]},
-			{'name':4,'init':105,'used':false},
-			{'name':5,'init':0,'used':false},
-			// {'name':6,'init':87,'used':true,'min':90,'max':110,'step':10,'actions':[77,87,97]},
-			{'name':6,'init':87,'used':true,'min':67,'max':107,'step':25,'actions':[67,107]},
-			{'name':7,'init':105,'used':false},
-			{'name':8,'init':75,'used':false},
-			// {'name':9,'init':87,'used':true,'min':77,'max':97,'step':10,'actions':[77,87,97]},
-			{'name':9,'init':87,'used':true,'min':67,'max':107,'step':25,'actions':[67,107]},
-			{'name':10,'init':180,'used':false},
-			{'name':11,'init':75,'used':false},
-			// {'name':12,'init':90,'used':true,'min':80,'max':100,'step':10,'actions':[80,90,100]},
-			{'name':12,'init':90,'used':true,'min':70,'max':110,'step':25,'actions':[70,110]},
-			{'name':13,'init':180,'used':false},
-			{'name':15,'init':90,'used':false,'label':'head'},
-		]	
-	// }
-
-};
 
 
 var game;

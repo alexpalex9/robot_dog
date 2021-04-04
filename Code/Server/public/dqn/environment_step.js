@@ -33,7 +33,7 @@ class Environment
 		
 	}
 	get_angle_scaled(i,angle){		
-		return (angle-this.servos_walk[i].min)/(this.servos_walk[i].max - this.servos_walk[i].min) //* 2 -1
+		return (angle-this.servos_walk[i].min)/(this.servos_walk[i].max - this.servos_walk[i].min) * 2 -1
 		// return angle
 	}
 	get_servos_count(){

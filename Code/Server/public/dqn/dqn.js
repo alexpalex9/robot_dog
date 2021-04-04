@@ -66,11 +66,11 @@ class Model {
     async train(train_data){
 		var xtensor = tf.tensor(train_data.input).reshape([train_data.input.length,this.numInputs])
 		var ytensor = tf.tensor(train_data.output).reshape([train_data.output.length,this.numActions])	
-		// return await this.network.fit(xtensor,ytensor,{
-			// batchSize: 30,
-			// epochs: 30
-		// })
-		return await this.network.trainOnBatch(xtensor,ytensor)
+		return await this.network.fit(xtensor,ytensor,{
+			batchSize: 30,
+			epochs: 30
+		})
+		// return await this.network.trainOnBatch(xtensor,ytensor)
 
 		// return this.network.trainOnBatch(xtensor,ytensor)
 	}
