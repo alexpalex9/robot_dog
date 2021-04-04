@@ -68,7 +68,7 @@ class Environment
 	}	
 	isDone = function(){
 		console.log("SONIC",this.sonic_state)
-		return (this.sonic_state<5 || this.sonic_state>30)
+		return (this.sonic_state<5 || this.sonic_state>50)
 	}
 	
 	getState = function(){
