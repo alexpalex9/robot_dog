@@ -67,7 +67,7 @@ class Environment
 		return this.AMOUNT_INPUTS * this.depth
 	}	
 	isDone = function(){
-		console.log("SONIC",this.sonic_state)
+		// console.log("SONIC",this.sonic_state)
 		return (this.sonic_state<5 || this.sonic_state>50)
 	}
 	
@@ -214,7 +214,7 @@ class Environment
 		
 	}
 	step = async function(actions_index) {//,state,state_scaled,incremental){
-		// console.log("step, action = ",action)
+		// console.log("step, action = ",actions_index)
 		// console.log("step, state = ",state)
 		// console.log("step, action = ",action_index,this.actions_index)
 		var previous_state = this.states

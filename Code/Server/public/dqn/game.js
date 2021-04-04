@@ -23,7 +23,7 @@ let g_settings = {
 		// maxStepsPerGame : 200,
 		maxStepsPerGame : 700,
 		max_batch_memory : 100,
-		mini_batch_memory : 10,
+		mini_batch_memory : 20,
 		// maxStepsPerGame : 5,
 		// maxStepsPerGame : 2,
 		discountRate : 0.99,
@@ -235,12 +235,14 @@ class Orchestrator {
 					// memcpy(train_data->output[y], oldQ, NUM_OUTPUTS * sizeof(fann_type));
 					this.train_data.input.push(this.batch_mem.state[mini_pos])
 					this.train_data.output.push(oldQ)
+					
 				}
 
 				//train the data sets
 				// ALEX : wrong here
 				// console.log("train_data",this.train_data)
 				// var history = await this.model.train(this.train_data,qval)
+				// console.log(this.train_data)
 				var loss = await this.model.train(this.train_data)
 				if (loss.history!=undefined){
 					loss = loss.history.loss[0]
@@ -332,15 +334,15 @@ class Orchestrator {
 
 				if(this.cnt_rnd_moves++ > 3)
 				{
-					this.cnt_rnd_moves = 0;
+					// this.cnt_rnd_moves = 0;
 					
-					var actions = []
-					for(var x = 0; x < this.numServos; x++)
-					{
-						actions.push(Math.floor(Math.random()  * this.numActions/this.numServos))
-					}
-					this.log("Robot stopping! Use random move! " + actions);
-					await this.environment.step(actions)
+					// var actions = []
+					// for(var x = 0; x < this.numServos; x++)
+					// {
+						// actions.push(Math.floor(Math.random()  * this.numActions/this.numServos))
+					// }
+					// this.log("Robot stopping! Use random move! " + actions);
+					// await this.environment.step(actions)
 				}
 			}
 		// }
@@ -376,14 +378,13 @@ class Orchestrator {
 			// while (step < this.maxStepsPerGame) {
 			if (_this_game.active==true){
 				if (this.steps <= this.maxStepsPerGame) {
-					await _this_game.handleReinforcementLearning(new Date(),false)
+					await _this_game.handleReinforcementLearning()
 					await _this_game.training(_this_game)
 				}else{
 					// await this.replay()
 				}
 			}
 		}
-		
 	}
 	
 	async play_job(_this_game){
