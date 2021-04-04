@@ -287,7 +287,8 @@ class Orchestrator {
 				//train ann   , input, desired outputs
 				//train only single data -> catastrophic forgetting could happen in the first MAX_BATCH_MEM moves
 				var xtensor = tf.tensor(this.state).reshape([1,8])
-				// var ytensor = tf.tensor(qval).reshape([1,12])	
+				// var ytensor = tf.tensor(qval).reshape([1,12])
+				// should be reward here!!, no qval
 				var history = await this.model.network.fit(xtensor,qval)
 				
 			}

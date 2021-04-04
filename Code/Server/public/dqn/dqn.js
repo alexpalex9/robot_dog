@@ -25,8 +25,10 @@ class Model {
         // this.network.summary();
         // this.network.compile({optimizer: 'adam', loss: 'meanSquaredError'});
      // } else {
-		if (this.loadModels()!=true){
+		 var load = this.loadModels()
+		if (load!=true){
 			console.warn("no models loaded, creating one")
+			console.log(load)
 			this.defineModel(numInputs,hiddenLayerSizes);
 		}
 		
