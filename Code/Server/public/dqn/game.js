@@ -85,7 +85,7 @@ class Orchestrator {
 			output : []
 		}
 		this.maxStepsPerGame = g_settings.maxStepsPerGame;
-
+		this.actions_labels = ['1-forward','2-forward','3-forward','4-forward','1-back','2-back','3-back','4-back','1-stop','2-stop','3-stop','4-stop'],
     }
 	resetModel(){
 		this.model = new Model(g_settings.hiddenLayerSizes,this.numInputs,this.numActions)
@@ -113,7 +113,7 @@ class Orchestrator {
 		var qval = this.model.predict(this.state)
 		// console.log("qval",qval.dataSync())
 		this.chart.updateData('actions',{
-			labels : ['1-forward','1-back','1-stop','2-forward','2-back','2-stop','3-forward','3-back','3-stop','4-forward','4-back','4-stop',],
+			labels : this.actions_labels,
 			actions : qval.dataSync()
 		})
 		// for (var a=0; a<this.numActions;s++ ){
@@ -219,10 +219,12 @@ class Orchestrator {
 						// => index = 2 * 4 + 2 => 10
 						// oldQ[this.batch_mem.actions[mini_pos][x] *  (this.numActions) + x] = (this.batch_mem.reward[mini_pos][x] < 0.1) ? (this.batch_mem.reward[mini_pos][x] + (g_settings.gamma * maxQ[x])) : this.batch_mem.reward[mini_pos][x];
 						// oldQ[this.batch_mem.actions[mini_pos][x] +  (this.numActions) * x] = this.batch_mem.reward[mini_pos][x] + (g_settings.gamma * maxQ[x])) ;
-						var index = this.batch_mem.actions[mini_pos][x] +  (this.numActions/this.numServos) * x
+						// var index = this.batch_mem.actions[mini_pos][x] +  (this.numActions/this.numServos) * x
+						// var index = this.batch_mem.actions[mini_pos][x] +  (this.numActions/this.numServos) * x
+						var index = this.batch_mem.actions[mini_pos][x] * this.numServos) + x
 						var newQofactions = (1 - g_settings.learning_rate)  * oldQ[index] + g_settings.learning_rate * ( this.batch_mem.reward[mini_pos][x] + g_settings.gamma * maxQ[x])
 						oldQ[index] = newQofactions
-						// console.log("new Q","y=",y,"x=",x,"action=",this.batch_mem.actions[mini_pos][x],"index=",index,"q=",newQofactions)
+						console.log("new Q","y=",y,"x=",x,"action=",this.batch_mem.actions[mini_pos][x],"index=",index,"q=",newQofactions)
 					}
 					// console.log("New oldQ",oldQ)
 					//ann_displayVector("Desired Outputs", oldQ, num_outputs);
