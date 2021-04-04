@@ -92,7 +92,7 @@ class Orchestrator {
 	}
 	async init(){
 		console.log("Creating game")
-		var load = await this.loadModels()
+		var load = await this.model.loadModels()
 		if (load!=true){
 			console.warn("no models loaded, creating one")
 			console.log(load)
