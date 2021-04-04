@@ -92,6 +92,12 @@ class Orchestrator {
 	}
 	async init(){
 		console.log("Creating game")
+		var load = await this.loadModels()
+		if (load!=true){
+			console.warn("no models loaded, creating one")
+			console.log(load)
+			//this.defineModel(numInputs,hiddenLayerSizes);
+		}
 		await this.environment.init();
 		this.state = this.environment.getState();
 		this.chart = new myCharts()
@@ -224,7 +230,7 @@ class Orchestrator {
 						var index = this.batch_mem.actions[mini_pos][x] * this.numServos + x
 						var newQofactions = (1 - g_settings.learning_rate)  * oldQ[index] + g_settings.learning_rate * ( this.batch_mem.reward[mini_pos][x] + g_settings.gamma * maxQ[x])
 						oldQ[index] = newQofactions
-						console.log("new Q","y=",y,"x=",x,"action=",this.batch_mem.actions[mini_pos][x],"index=",index,"q=",newQofactions)
+						// console.log("new Q","y=",y,"x=",x,"action=",this.batch_mem.actions[mini_pos][x],"index=",index,"q=",newQofactions)
 					}
 					// console.log("New oldQ",oldQ)
 					//ann_displayVector("Desired Outputs", oldQ, num_outputs);

@@ -25,12 +25,7 @@ class Model {
         // this.network.summary();
         // this.network.compile({optimizer: 'adam', loss: 'meanSquaredError'});
      // } else {
-		 var load = await this.loadModels()
-		if (load!=true){
-			console.warn("no models loaded, creating one")
-			console.log(load)
-			this.defineModel(numInputs,hiddenLayerSizes);
-		}
+		
 		
       // }
     }
@@ -101,7 +96,7 @@ class Model {
 		var forward = servo_mot;
 		var backward = servo_mot + this.numServos;
 		var stop = servo_mot + 2 * this.numServos;
-		console.log(servo_mot," -- " ,forward,backward,stop)
+		// console.log(servo_mot," -- " ,forward,backward,stop)
 		var action;
 		var maxQ;
 		//printf("Servo decision: F: %f   B: %f   S: %f\n", Qvalue_vector[forward], Qvalue_vector[backward], ann_output_vec[stop]);
