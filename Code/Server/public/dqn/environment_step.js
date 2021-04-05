@@ -229,7 +229,7 @@ class Environment
 			var new_angle = this.servos_walk[a].state
 			if (action_index==0){
 				new_angle = new_angle + this.servos_walk[a].step
-			}else if (action_index==2){
+			}else if (action_index==1){
 				new_angle = new_angle - this.servos_walk[a].step
 			}
 			if (new_angle > this.servos_walk[a].max){

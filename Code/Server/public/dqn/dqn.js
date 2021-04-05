@@ -47,7 +47,6 @@ class Model {
             inputShape: i === 0 ? [this.numInputs] : undefined
             }));
         });
-		console.log(this.numActions)
         this.network.add(tf.layers.dense({units: this.numActions}));
 
         this.network.summary();

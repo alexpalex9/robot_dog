@@ -107,8 +107,10 @@ class Orchestrator {
 	}
    
     async handleReinforcementLearning() {
+		
 		console.log('------------- handleReinforcementLearning ---------------',this.state)
-        // this.environment.init();
+        this.steps = this.steps + 1
+		// this.environment.init();
         // let state = this.environment.getState();
         // let state_tensor = tf.tensor2d(state, [1, state.length])
         // let totalReward = 0;
