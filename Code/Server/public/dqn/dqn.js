@@ -86,7 +86,7 @@ class Model {
 			// this.m_valueModel.compile({loss: 'meanSquaredError', optimizer: this.valueOptimizer});
 			return true
 		}catch(e){
-			console.log(e)
+			// console.log(e)
 			return e
 		}
 		

@@ -96,7 +96,7 @@ class Orchestrator {
 		if (load!=true){
 			console.warn("no models loaded, creating one")
 			console.log(load)
-			//this.defineModel(numInputs,hiddenLayerSizes);
+			this.model.defineModel(this.numInputs,g_settings.hiddenLayerSizes);
 		}
 		await this.environment.init();
 		this.state = this.environment.getState();
@@ -293,7 +293,7 @@ class Orchestrator {
 				//train ann   , input, desired outputs
 				//train only single data -> catastrophic forgetting could happen in the first MAX_BATCH_MEM moves
 				var xtensor = tf.tensor(this.state).reshape([1,8])
-				// var ytensor = tf.tensor(qval).reshape([1,12])
+				// var ytensor = tf.tensor(all_reward).reshape([1,12])
 				// should be reward here!!, no qval
 				var history = await this.model.network.fit(xtensor,qval)
 				
