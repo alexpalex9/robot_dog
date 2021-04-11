@@ -190,7 +190,8 @@ class Orchestrator {
 					// fann_type *newQ = fann_run(ann, batch_mem[mini_pos].inputs_tp1);
 					// console.log("PREDICT Q VALUE",this.batch_mem.next_state[mini_pos])
 					
-					var newQ = this.model.predict(this.state).dataSync();
+					// var newQ = this.model.predict(this.state).dataSync();
+					var newQ = this.model.predict(this.batch_mem.next_state[mini_pos]).dataSync();
 					// console.log("newQ",newQ)
 					// var newQ = this.model.predict(tensor_state).dataSync();
 
