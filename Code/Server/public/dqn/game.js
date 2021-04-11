@@ -427,6 +427,7 @@ class Orchestrator {
 		$("#reset_button").removeClass('active')
 
 		$("#train_button").removeClass('disabled')
+		$("#play_button").removeClass('disabled')
 		if (msg==undefined){
 			this.log("training reseted : end of episode")
 		}else{
